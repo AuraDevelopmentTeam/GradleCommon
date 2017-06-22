@@ -23,7 +23,7 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
     }
- 
+
     dependencies {
         classpath "net.sf.proguard:proguard-gradle:5.3.3"
         classpath "io.franzbecker:gradle-lombok:1.8"
@@ -68,6 +68,7 @@ configurations {
 repositories {
     jcenter()
     mavenCentral()
+
     maven {
         name "bungeecord-repo"
         url "https://oss.sonatype.org/content/repositories/snapshots"
@@ -87,6 +88,20 @@ repositories {
 }
 
 dependencies {
+    if (type == BUNGEECORD) {
+        compile "net.md-5:bungeecord-api:${bungeecoord_version}"
+
+        shadowRelocate "org.bstats:bstats-bungeecord:${bStats_version}"
+    } else if () {
+        compile "org.spigotmc:spigot-api:${spigot_version}"
+
+        shadowRelocate "org.bstats:bstats-bukkit:${bStats_version}"
+    } else if (type == SPONGE) {
+        compile "org.spongepowered:spongeapi:${sponge_version}"
+
+        shadowRelocate "org.bstats:bstats-sponge:${bStats_version}"
+    }
+
     testCompile "junit:junit:4.12"
 }
 
