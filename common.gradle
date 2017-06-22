@@ -1,0 +1,80 @@
+import io.franzbecker.gradle.lombok.task.DelombokTask
+import java.security.SecureRandom
+import java.util.regex.*
+import org.apache.tools.ant.filters.ReplaceTokens
+import proguard.gradle.ProGuardTask
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            name "Gradle-Plugins"
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+ 
+    dependencies {
+        classpath "net.sf.proguard:proguard-gradle:5.3.3"
+        classpath "io.franzbecker:gradle-lombok:1.8"
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
+    }
+}
+
+if (!project.hasProperty("type")) {
+    println "You have to specify a type!"
+    
+    throw new NoSuchElementException("No type is specified!")
+}
+
+apply plugin: "java"
+apply plugin: "maven"
+apply plugin: "maven-publish"
+apply plugin: "signing"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "io.franzbecker.gradle-lombok"
+apply plugin: "com.github.johnrengelman.shadow"
+
+eclipse {
+    classpath {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+configurations {
+    reTrace
+    shadowRelocate
+    shadow.extendsFrom shadowRelocate
+    compile.extendsFrom shadow
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        name "bungeecord-repo"
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+    maven {
+        name "bstats-repo"
+        url "http://repo.bstats.org/content/repositories/releases/"
+    }
+}
+
+dependencies {
+    testCompile "junit:junit:4.12"
+}
+
+lombok {
+    version = "1.16.16"
+    sha256 = "fbf682c7ff113e5187a9c4b4cbd7a8ad782abd8ccff91b9fa7289a4a6aa8c19a"
+}
