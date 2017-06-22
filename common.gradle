@@ -109,3 +109,97 @@ lombok {
     version = "1.16.16"
     sha256 = "fbf682c7ff113e5187a9c4b4cbd7a8ad782abd8ccff91b9fa7289a4a6aa8c19a"
 }
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", version
+    inputs.property "build", build
+    inputs.property "buildType", buildType
+    
+    expand "version": version, "build": build, "buildType": buildType
+}
+
+task processSources (type: Sync) {
+    inputs.property "version", version
+    inputs.property "build", build
+    inputs.property "buildType", buildType
+    ext.outputDir = file("$buildDir/generated-src")
+    
+    from sourceSets.main.allSource
+    into outputDir
+    filter (ReplaceTokens, tokens: [
+        "version": version,
+        "build": build,
+        "buildType": buildType
+    ])
+}
+
+task delombok(type: DelombokTask, dependsOn: compileJava) {
+    group "build"
+    description "Generates Lombok free Java code from code with Lombok"
+
+  	ext.outputDir = file("$buildDir/delombok")
+    
+  	outputs.dir(outputDir)
+		inputs.dir(processSources.outputDir)
+		args(processSources.outputDir, "-d", outputDir)
+    
+    doLast {
+        fileTree(dir: outputDir, exclude: "**/*.java").forEach{file -> file.delete()}
+    }
+}
+
+compileJava {
+    source = processSources.outputs
+    dependsOn processSources 
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+jar {
+    from sourceSets.main.output
+    from MainDirResources
+    
+    version = full_version
+}
+
+task sourceJar (type: Jar, dependsOn: processSources) {
+    group "build"
+
+    from sourceSets.main.allSource
+    from MainDirResources
+
+    classifier = "sources"
+    version = jar.version
+}
+
+javadoc {
+    dependsOn delombok
+
+    source = delombok.outputDir
+    classpath = sourceSets.main.compileClasspath
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    group "build"
+
+    from javadoc.destinationDir
+    
+    classifier = "javadoc"
+    version = jar.version
+}
+
+shadowJar {
+    from sourceSets.main.output
+    from MainDirResources
+    
+    classifier = "deobf"
+    version = jar.version
+    configurations = [project.configurations.shadow]
+    
+    project.configurations.shadowRelocate.dependencies.each {
+        relocate(it.group, "${project.group}.shadow.${it.group}")
+    }
+}
