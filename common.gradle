@@ -4,6 +4,16 @@ import java.util.regex.*
 import org.apache.tools.ant.filters.ReplaceTokens
 import proguard.gradle.ProGuardTask
 
+def BUNGEECORD = "bungeecord"
+def SPIGOT = "spigot"
+def SPONGE = "sponge" 
+
+if (!project.hasProperty("type")) {
+    throw new NoSuchElementException("No type is specified!")
+} else if ((type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE)) {
+    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${BUNGEECORD}\", \"${SPIGOT}\" or \"${SPONGE}\"")
+}
+
 buildscript {
     repositories {
         jcenter()
@@ -18,13 +28,8 @@ buildscript {
         classpath "net.sf.proguard:proguard-gradle:5.3.3"
         classpath "io.franzbecker:gradle-lombok:1.8"
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
+        classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
     }
-}
-
-if (!project.hasProperty("type")) {
-    println "You have to specify a type!"
-    
-    throw new NoSuchElementException("No type is specified!")
 }
 
 apply plugin: "java"
@@ -35,6 +40,9 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "io.franzbecker.gradle-lombok"
 apply plugin: "com.github.johnrengelman.shadow"
+
+if (type == SPONGE)
+    apply plugin: "org.spongepowered.plugin"
 
 eclipse {
     classpath {
@@ -65,8 +73,16 @@ repositories {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
     maven {
+        name "spigot-repo"
+        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+    }
+    maven {
+        name = "sponge"
+        url = "https://repo.spongepowered.org/maven"
+    }
+    maven {
         name "bstats-repo"
-        url "http://repo.bstats.org/content/repositories/releases/"
+        url "http://repo.bstats.org/content/repositories/releases"
     }
 }
 
