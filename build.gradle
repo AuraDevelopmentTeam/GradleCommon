@@ -93,10 +93,8 @@ task fetchUpdates(type: Exec) {
 }
 
 task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
-    def latestTagSha = "git rev-list --tags --max-count=1".execute().text.trim()
-    
     executable "git"
-    args "checkout", latestTagSha
+    args "checkout", "git rev-list --tags --max-count=1".execute().text.trim()
 }
 
 task updateGradleCommon(dependsOn: [fetchUpdates, checkoutLatestTag])
