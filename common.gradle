@@ -4,15 +4,74 @@ import java.util.regex.*
 import org.apache.tools.ant.filters.ReplaceTokens
 import proguard.gradle.ProGuardTask
 
+def NONE = "none"
 def BUNGEECORD = "bungeecord"
 def SPIGOT = "spigot"
-def SPONGE = "sponge" 
+def SPONGE = "sponge"
+
+def getBuild() {
+    def build = 150
+    def commits = "git rev-list --count HEAD".execute().text.trim()
+
+    return (build + commits.toInteger()).toString()
+}
+def getBuildType() {
+    def description = "git describe --dirty".execute().text.trim()
+    
+    if(description.endsWith("dirty"))
+        return "SNAPSHOT"
+    else if(description.contains("-"))
+        return "DEV"
+    else
+        return "RELEASE"
+}
+def getVersion() {
+    //def baseVersion = "${version}.${build}"
+    def baseVersion = build
+
+    if(buildType != "RELEASE")
+        baseVersion += "_${buildType}"
+
+    return baseVersion
+} 
 
 if (!project.hasProperty("type")) {
     throw new NoSuchElementException("No type is specified!")
-} else if ((type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE)) {
-    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${BUNGEECORD}\", \"${SPIGOT}\" or \"${SPONGE}\"")
+} else if ((type != NONE) && (type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE)) {
+    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${NONE}\", \"${BUNGEECORD}\", \"${SPIGOT}\" or \"${SPONGE}\"")
+} else if (!project.hasProperty("pluginId")) {
+    throw new NoSuchElementException("No pluginId is specified!")
 }
+
+ext {
+    if (!project.hasProperty("pluginName")) pluginName = pluginId
+
+    if (!project.hasProperty("build")) build = getBuild()
+    if (!project.hasProperty("buildType")) buildType = getBuildType()
+
+    if (!project.hasProperty("openSource")) openSource = false
+    if (!project.hasProperty("useStats")) useStats = (type != NONE)
+    if (!project.hasProperty("customCharts")) customCharts = true
+    
+    shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
+    mainDirResources = fileTree(dir: file(projectDir), includes: ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"])
+    
+    // default versions
+    
+    if (!project.hasProperty("lombokVersion")) lombokVersion = "1.16.16"
+    if (!project.hasProperty("lombokHash")) lombokHash = "fbf682c7ff113e5187a9c4b4cbd7a8ad782abd8ccff91b9fa7289a4a6aa8c19a"
+
+    if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.12-SNAPSHOT"
+    if (!project.hasProperty("spigot_version")) spigot_version = "1.12-R0.1-SNAPSHOT"
+    if (!project.hasProperty("sponge_version")) sponge_version = "7.0.0-SNAPSHOT"
+
+    if (!project.hasProperty("bStats_version")) bStats_version = "1.1"
+}
+
+version = getVersion()
+if (group.isEmpty()) group = "dev.aura.${pluginId}"
+
+if (useStats) def bStatsName = "bStats-${type}" + customCharts? "" : "-lite"
 
 buildscript {
     repositories {
@@ -38,8 +97,8 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 apply plugin: "eclipse"
 apply plugin: "idea"
-apply plugin: "io.franzbecker.gradle-lombok"
-apply plugin: "com.github.johnrengelman.shadow"
+//apply plugin: "io.franzbecker.gradle-lombok"
+//apply plugin: "com.github.johnrengelman.shadow"
 
 if (type == SPONGE)
     apply plugin: "org.spongepowered.plugin"
@@ -90,25 +149,23 @@ repositories {
 dependencies {
     if (type == BUNGEECORD) {
         compile "net.md-5:bungeecord-api:${bungeecoord_version}"
-
-        shadowRelocate "org.bstats:bstats-bungeecord:${bStats_version}"
-    } else if () {
+    } else if (type == SPIGOT) {
         compile "org.spigotmc:spigot-api:${spigot_version}"
-
-        shadowRelocate "org.bstats:bstats-bukkit:${bStats_version}"
     } else if (type == SPONGE) {
         compile "org.spongepowered:spongeapi:${sponge_version}"
-
-        shadowRelocate "org.bstats:bstats-sponge:${bStats_version}"
+    }
+    
+    if (useStats) {
+        shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
     }
 
     testCompile "junit:junit:4.12"
 }
 
-lombok {
-    version = "1.16.16"
-    sha256 = "fbf682c7ff113e5187a9c4b4cbd7a8ad782abd8ccff91b9fa7289a4a6aa8c19a"
-}
+/*lombok {
+    version = lombokVersion
+    sha256 = lombokHash
+}*/
 
 processResources {
     // this will ensure that this task is redone when the versions change.
@@ -160,16 +217,14 @@ tasks.withType(JavaCompile) {
 
 jar {
     from sourceSets.main.output
-    from MainDirResources
-    
-    version = full_version
+    from mainDirResources
 }
 
 task sourceJar (type: Jar, dependsOn: processSources) {
     group "build"
 
     from sourceSets.main.allSource
-    from MainDirResources
+    from mainDirResources
 
     classifier = "sources"
     version = jar.version
@@ -191,9 +246,9 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     version = jar.version
 }
 
-shadowJar {
+/*shadowJar {
     from sourceSets.main.output
-    from MainDirResources
+    from mainDirResources
     
     classifier = "deobf"
     version = jar.version
@@ -201,5 +256,63 @@ shadowJar {
     
     project.configurations.shadowRelocate.dependencies.each {
         relocate(it.group, "${project.group}.shadow.${it.group}")
+    }
+}*/
+
+artifacts {
+    archives shadowJar
+    archives sourceJar
+}
+
+signing {
+    required { project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile") }
+
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            if (project.hasProperty("local_maven")) {
+                repository(url: "file://${local_maven}")
+                pom {
+                    groupId = project.group
+                    version = project.version
+                    artifactId = project.archivesBaseName
+                    project {
+                        name project.archivesBaseName
+                        packaging "jar"
+                        description "This plugin synchronizes the player inventory with a database"
+                        url "https://github.com/BrainStone/InvSync"
+                        scm {
+                            url "https://github.com/BrainStone/InvSync"
+                            connection "scm:git:git@github.com:BrainStone/InvSync.git"
+                            developerConnection "scm:git:git@github.com:BrainStone/InvSync.git"
+                        }
+                        issueManagement {
+                            system "github"
+                            url "https://github.com/BrainStone/InvSync/issues"
+                        }
+                        licenses {
+                            license {
+                                name "License"
+                                url "https://raw.githubusercontent.com/BrainStone/InvSync/master/LICENSE"
+                                distribution "repo"
+                            }
+                        }
+                        developers {
+                            developer {
+                                id "brainstone"
+                                name "The_BrainStone"
+                                roles {
+                                    role "owner"
+                                    role "developer"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

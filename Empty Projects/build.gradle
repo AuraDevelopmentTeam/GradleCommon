@@ -1,5 +1,6 @@
 ext {
-    type = "test"
+    type = "none"
+    pluginId = "test"
 }
 
 apply from: "../common.gradle"
