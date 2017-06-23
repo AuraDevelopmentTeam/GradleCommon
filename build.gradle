@@ -86,3 +86,17 @@ if (project.hasProperty("newProjectDir")) {
 
     task createNewProject(dependsOn: [initGit, addSubmodule, setGitTag, initGradle, copyTemplateFiles, addAllFiles, makeGradlewExecutable, createFirstCommit, createFirstTag]) {}
 }
+
+task fetchUpdates(type: Exec) {
+    executable "git"
+    args "fetch", "--tags"
+}
+
+task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
+    def latestTagSha = "git rev-list --tags --max-count=1".execute().text.trim()
+    
+    executable "git"
+    args "checkout", latestTagSha
+}
+
+task updateGradleCommon(dependsOn: [fetchUpdates, checkoutLatestTag])
