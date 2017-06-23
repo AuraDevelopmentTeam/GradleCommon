@@ -64,13 +64,13 @@ def getChangelog() {
     try {
         Pattern pattern = Pattern.compile("^Version .*?(?= {0,2}\\n{0,3}Version)", Pattern.DOTALL);
         Matcher match = pattern.matcher(file("CHANGELOG.md").text.replaceAll("\r", ""));
-    
+
         if (match.find())
             return match.group();
     } catch(IOException e) {
         // Ignore
     }
-    
+
     return "";
 }
 
@@ -437,6 +437,26 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
        dictonary.delete()
     }
 }
+
+test {
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: " + descriptor)
+    }
+
+    onOutput { descriptor, event ->
+       logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+    }
+}
+
+task generateTestReport(type: Zip, dependsOn: test) {
+    from file("${buildDir}/reports/tests/test")
+    archiveName "${project.name}-TestReport.zip"
+    destinationDir rootProject.projectDir
+
+    test.finalizedBy generateTestReport
+}
+
+clean.dependsOn cleanGenerateTestReport
 
 artifacts {
     if (openSource) {
