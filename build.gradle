@@ -1,3 +1,4 @@
+import org.apache.tools.ant.DirectoryScanner
 import org.apache.tools.ant.taskdefs.condition.Os
 
 if (project.hasProperty("newProjectDir")) {
@@ -36,6 +37,11 @@ if (project.hasProperty("newProjectDir")) {
     }
 
     task copyTemplateFiles(type: Copy, dependsOn: initGradle) {
+        doFirst {
+            DirectoryScanner.defaultExcludes.each { DirectoryScanner.removeDefaultExclude it }
+            DirectoryScanner.addDefaultExclude "something has to be in here or everything gets excluded"
+        }
+
         from (projectDir) {
             include ".gitattributes"
             include ".gitignore"
@@ -44,6 +50,10 @@ if (project.hasProperty("newProjectDir")) {
         from "template"
 
         into destiontionDir
+
+        doLast {
+            DirectoryScanner.resetDefaultExcludes()
+        }
     }
 
     task addAllFiles(type: Exec, dependsOn: [setGitTag, copyTemplateFiles]) {
