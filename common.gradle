@@ -637,4 +637,5 @@ Settings:
 Type:\t\t${type}
 Open Source:\t${openSource}
 Use Stats:\t${useStats}
-Custom Charts:\t${customCharts}"""
+Custom Charts:\t${customCharts}
+"""

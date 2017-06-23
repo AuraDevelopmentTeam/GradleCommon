@@ -24,7 +24,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir new File(destiontionDir, "Gradle-Common")
 
         executable "git"
-        args "checkout", "v2.2.0"
+        args "checkout", "v2.2.1"
     }
 
     task initGradle(type: Exec) {
@@ -100,7 +100,22 @@ task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
     }
     
     executable "git"
-    args "checkout", 
+    args "checkout", latestTag  
 }
 
-task updateGradleCommon(dependsOn: [fetchUpdates, checkoutLatestTag])
+task stageUpdate(type: Exec, dependsOn: checkoutLatestTag) {
+    workingDir ".."
+    
+    executable "git"
+    args "add", "GradleCommon"  
+}
+
+
+task commitUpdate(type: Exec, dependsOn: stageUpdate) {
+    workingDir ".."
+    
+    executable "git"
+    args "commit", "-m", "Updated Gradle Common"  
+}
+
+task updateGradleCommon(dependsOn: [fetchUpdates, checkoutLatestTag, stageUpdate, commitUpdate])
