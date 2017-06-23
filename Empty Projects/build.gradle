@@ -1,19 +1,9 @@
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven {
-            name "Gradle-Plugins"
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
+apply from: "../common.gradle"
 
-    dependencies {
-        classpath "net.sf.proguard:proguard-gradle:5.3.3"
-        classpath "io.franzbecker:gradle-lombok:1.8"
-        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
-        classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
-    }
+repositories {
+    // Additional repositories
 }
 
-apply from: "../common.gradle"
+dependencies {
+    // Additional dependencies
+}
