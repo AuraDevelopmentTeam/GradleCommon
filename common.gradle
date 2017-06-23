@@ -53,7 +53,7 @@ def getBuildType() {
         return "RELEASE"
 }
 def getVersion() {
-    def baseVersion = gitDescription.replaceAll("\$v|-.*", "") + ".${build}"
+    def baseVersion = gitDescription.replaceAll("^v|-.*", "") + ".${build}"
 
     if(buildType != "RELEASE")
         baseVersion += "_${buildType}"
