@@ -1,11 +1,11 @@
 // =================================================
-//     ____                                __       
+//     ____                                __
 //    /  _/____ ___   ____   ____   _____ / /_ _____
 //    / / / __ `__ \ / __ \ / __ \ / ___// __// ___/
-//  _/ / / / / / / // /_/ // /_/ // /   / /_ (__  ) 
-// /___//_/ /_/ /_// .___/ \____//_/    \__//____/  
-//                /_/                                                                                              
-// 
+//  _/ / / / / / / // /_/ // /_/ // /   / /_ (__  )
+// /___//_/ /_/ /_// .___/ \____//_/    \__//____/
+//                /_/
+//
 // =================================================
 
 import io.franzbecker.gradle.lombok.task.DelombokTask
@@ -16,12 +16,12 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import proguard.gradle.ProGuardTask
 
 // =============================================================
-//     ____         ____ _         _  __   _                    
+//     ____         ____ _         _  __   _
 //    / __ \ ___   / __/(_)____   (_)/ /_ (_)____   ____   _____
 //   / / / // _ \ / /_ / // __ \ / // __// // __ \ / __ \ / ___/
-//  / /_/ //  __// __// // / / // // /_ / // /_/ // / / /(__  ) 
-// /_____/ \___//_/  /_//_/ /_//_/ \__//_/ \____//_/ /_//____/  
-// 
+//  / /_/ //  __// __// // / / // // /_ / // /_/ // / / /(__  )
+// /_____/ \___//_/  /_//_/ /_//_/ \__//_/ \____//_/ /_//____/
+//
 // =============================================================
 
 final String NONE = "none"
@@ -30,8 +30,11 @@ final String SPIGOT = "spigot"
 final String SPONGE = "sponge"
 
 ext {
-    if (!project.hasProperty("buildOffset")) buildOffset = 0
-    
+    if (project.hasProperty("buildOffset"))
+        buildOffset = Integer.parseInt(buildOffset)
+    else
+        buildOffset = 0
+
     gitDescription = "git describe --dirty".execute(null, projectDir).text.trim()
 }
 
@@ -60,7 +63,7 @@ def getVersion() {
 def getChangelog() {
     Pattern pattern = Pattern.compile("^Version .*?(?= {0,2}\\n{0,3}Version)", Pattern.DOTALL);
     Matcher match = pattern.matcher(file("CHANGELOG.md").text.replaceAll("\r", ""));
-    
+
     if (match.find())
         return match.group();
     else
@@ -68,15 +71,15 @@ def getChangelog() {
 }
 
 // ===============================================
-// 
-//    _____        __   __   _                    
+//
+//    _____        __   __   _
 //   / ___/ ___   / /_ / /_ (_)____   ____ _ _____
 //   \__ \ / _ \ / __// __// // __ \ / __ `// ___/
-//  ___/ //  __// /_ / /_ / // / / // /_/ /(__  ) 
-// /____/ \___/ \__/ \__//_//_/ /_/ \__, //____/  
-//                                 /____/         
-// 
-// =============================================== 
+//  ___/ //  __// /_ / /_ / // / / // /_/ /(__  )
+// /____/ \___/ \__/ \__//_//_/ /_/ \__, //____/
+//                                 /____/
+//
+// ===============================================
 
 if (!project.hasProperty("type")) {
     throw new NoSuchElementException("No type is specified!")
@@ -87,23 +90,22 @@ if (!project.hasProperty("type")) {
 }
 
 ext {
-    if (!project.hasProperty("pluginName")) pluginName = pluginId
+    if (!project.hasProperty("pluginName")) pluginName = name
+    if (!project.hasProperty("baseGroup")) baseGroup = "dev.aura"
 
     if (!project.hasProperty("build")) build = getBuild()
     if (!project.hasProperty("buildType")) buildType = getBuildType()
 
     if (!project.hasProperty("openSource")) openSource = false
-    if (!project.hasProperty("secretSalt")) secretSalt = "defaultSalt"
+    if (!project.hasProperty("secretSalt")) secretSalt = "CHANGEME"
     if (!project.hasProperty("useStats")) useStats = (type != NONE)
     if (!project.hasProperty("customCharts")) customCharts = false
-    
-    if (!project.hasProperty("baseGroup")) baseGroup = "dev.aura"
-    
+
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
     mainDirResources = fileTree(dir: file(projectDir), includes: ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"])
-    
+
     // default versions
-    
+
     if (!project.hasProperty("lombokVersion")) lombokVersion = "1.16.16"
     if (!project.hasProperty("lombokHash")) lombokHash = "fbf682c7ff113e5187a9c4b4cbd7a8ad782abd8ccff91b9fa7289a4a6aa8c19a"
 
@@ -124,14 +126,14 @@ ext {
 }
 
 // ==========================================
-// 
-//     ____   __               _             
+//
+//     ____   __               _
 //    / __ \ / /__  __ ____ _ (_)____   _____
 //   / /_/ // // / / // __ `// // __ \ / ___/
-//  / ____// // /_/ // /_/ // // / / /(__  ) 
-// /_/    /_/ \__,_/ \__, //_//_/ /_//____/  
-//                  /____/                   
-// 
+//  / ____// // /_/ // /_/ // // / / /(__  )
+// /_/    /_/ \__,_/ \__, //_//_/ /_//____/
+//                  /____/
+//
 // ==========================================
 
 buildscript {
@@ -164,15 +166,15 @@ apply plugin: "com.github.johnrengelman.shadow"
 if (type == SPONGE)
     apply plugin: "org.spongepowered.plugin"
 
-// ==============================================================================    
-// 
-//    ______               ____ _                             __   _             
-//   / ____/____   ____   / __/(_)____ _ __  __ _____ ____ _ / /_ (_)____   ____ 
+// ==============================================================================
+//
+//    ______               ____ _                             __   _
+//   / ____/____   ____   / __/(_)____ _ __  __ _____ ____ _ / /_ (_)____   ____
 //  / /    / __ \ / __ \ / /_ / // __ `// / / // ___// __ `// __// // __ \ / __ \
 // / /___ / /_/ // / / // __// // /_/ // /_/ // /   / /_/ // /_ / // /_/ // / / /
-// \____/ \____//_/ /_//_/  /_/ \__, / \__,_//_/    \__,_/ \__//_/ \____//_/ /_/ 
-//                             /____/                                            
-// 
+// \____/ \____//_/ /_//_/  /_/ \__, / \__,_//_/    \__,_/ \__//_/ \____//_/ /_/
+//                             /____/
+//
 // ==============================================================================
 
 eclipse {
@@ -226,7 +228,7 @@ dependencies {
     } else if (type == SPONGE) {
         compile "org.spongepowered:spongeapi:${sponge_version}"
     }
-    
+
     if (useStats) {
         shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
     }
@@ -245,7 +247,7 @@ if (type == SPONGE) {
             }
         }
     }
-    
+
     compileJava {
         outputs.upToDateWhen { false }
         doFirst { println() }
@@ -265,7 +267,7 @@ processResources {
     inputs.property "version", project.version
     inputs.property "build", project.build
     inputs.property "buildType", project.buildType
-    
+
     expand \
         "id": project.pluginId,
         "name": project.pluginName,
@@ -283,7 +285,7 @@ task processSources (type: Sync) {
     inputs.property "build", project.build
     inputs.property "buildType", project.buildType
     ext.outputDir = file("$buildDir/generated-src")
-    
+
     from sourceSets.main.allSource
     into outputDir
     filter (ReplaceTokens, tokens: [
@@ -301,11 +303,11 @@ task delombok(type: DelombokTask, dependsOn: compileJava) {
     description "Generates Lombok free Java code from code with Lombok"
 
   	ext.outputDir = file("$buildDir/delombok")
-    
+
   	outputs.dir(outputDir)
 		inputs.dir(processSources.outputDir)
 		args(processSources.outputDir, "-d", outputDir)
-    
+
     doLast {
         fileTree(dir: outputDir, exclude: "**/*.java").forEach{file -> file.delete()}
     }
@@ -313,7 +315,7 @@ task delombok(type: DelombokTask, dependsOn: compileJava) {
 
 compileJava {
     source = processSources.outputs
-    dependsOn processSources 
+    dependsOn processSources
 }
 
 tasks.withType(JavaCompile) {
@@ -350,7 +352,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     group "build"
 
     from javadoc.destinationDir
-    
+
     classifier = "javadoc"
     version = jar.version
 }
@@ -358,11 +360,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 shadowJar {
     from sourceSets.main.output
     from mainDirResources
-    
+
     classifier = openSource? null : "deobf"
     version = jar.version
     configurations = [project.configurations.shadow]
-    
+
     project.configurations.shadowRelocate.dependencies.each {
         relocate(it.group, "${project.group}.shadow.${it.group}")
     }
@@ -372,63 +374,63 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     onlyIf { !openSource }
 
     group "build"
-    
+
     def dictonary = file("dictionary.txt")
 
     // Inputs and outputs
     injars shadowJar.archivePath
     outjars jar.archivePath
     printmapping "${jar.archivePath}.map"
- 
+
     // Libraries
     libraryjars configurations.compile
     libraryjars "<java.home>/lib/rt.jar"
-    
+
     // General settings
-    renamesourcefileattribute pluginName 
+    renamesourcefileattribute pluginName
     keepattributes "Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod"
     dontshrink
     dontoptimize
     adaptresourcefilecontents "**.yml"
     adaptresourcefilecontents "**.info"
-    
+
     // Stuff that depends on the group name
     keep "class ${project.baseGroup}.**.api.** { *; }"
     keep "class ${project.baseGroup}.**.shadow.** { *; }"
     repackageclasses project.group
-    
+
     // No notes or warnings from classes that aren't ours!
     dontwarn "!class ${project.baseGroup}.**"
     dontnote "!class ${project.baseGroup}.**"
-    
+
     // Obfuscation names. They'll be different for each version
     classobfuscationdictionary dictonary
     obfuscationdictionary dictonary
-    
+
     jar.finalizedBy proguard
-    
+
     doFirst {
         def firstChars = ('A'..'Z') + ('a'..'z')
         def allChars = firstChars + ('0'..'9')
         def rand = new SecureRandom("${version}${secretSalt}".getBytes())
         def str
         def out = ""
-    
+
         (1..10000).each {
             str = firstChars[rand.nextInt(firstChars.size())]
-            
+
             (2..3).each {
                 str += allChars[rand.nextInt(allChars.size())]
             }
-        
+
             out += "${str}\n"
         }
-        
+
         dictonary.text = out;
     }
-    
+
     doLast {
-       dictonary.delete() 
+       dictonary.delete()
     }
 }
 
@@ -451,41 +453,59 @@ signing {
 uploadArchives {
     repositories {
         mavenDeployer {
+            if (shouldSign) {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            }
+
             if (project.hasProperty("local_maven")) {
                 repository(url: "file://${local_maven}")
-                pom {
-                    groupId = project.group
-                    version = project.version
-                    artifactId = project.archivesBaseName
-                    project {
-                        name project.archivesBaseName
-                        packaging "jar"
-                        description "This plugin synchronizes the player inventory with a database"
-                        url "https://github.com/BrainStone/InvSync"
-                        scm {
-                            url "https://github.com/BrainStone/InvSync"
-                            connection "scm:git:git@github.com:BrainStone/InvSync.git"
-                            developerConnection "scm:git:git@github.com:BrainStone/InvSync.git"
+            } else {
+                repository(url: "file://${rootProject.projectDir}/maven")
+            }
+
+            pom {
+                groupId = project.group
+                version = project.version
+                artifactId = project.archivesBaseName
+                project {
+                    name project.archivesBaseName
+                    packaging "jar"
+                    description project.description
+                    url "https://gitlab.brainstonemod.com/AuraDev/${project.archivesBaseName}"
+                    scm {
+                        url "https://gitlab.brainstonemod.com/AuraDev/${project.archivesBaseName}"
+                        connection "scm:git:git@gitlab.brainstonemod.com:AuraDev/${project.archivesBaseName}.git"
+                        developerConnection "scm:git:gitlab.brainstonemod.com:AuraDev/${project.archivesBaseName}.git"
+                    }
+                    issueManagement {
+                        system "github"
+                        url "https://github.com/AuraDevelopmentTeam/${project.archivesBaseName}/issues"
+                    }
+                    licenses {
+                        license {
+                            name "License"
+                            url "https://github.com/AuraDevelopmentTeam/${project.archivesBaseName}/blob/master/LICENSE.md"
+                            distribution "repo"
                         }
-                        issueManagement {
-                            system "github"
-                            url "https://github.com/BrainStone/InvSync/issues"
-                        }
-                        licenses {
-                            license {
-                                name "License"
-                                url "https://raw.githubusercontent.com/BrainStone/InvSync/master/LICENSE"
-                                distribution "repo"
+                    }
+                    developers {
+                        developer {
+                            id "shawn_ian"
+                            name "shawn_ian"
+                            roles {
+                                role "developer"
+                                role "team leader"
                             }
-                        }
-                        developers {
-                            developer {
-                                id "brainstone"
-                                name "The_BrainStone"
-                                roles {
-                                    role "owner"
-                                    role "developer"
-                                }
+                            id "brainstone"
+                            name "The_BrainStone"
+                            roles {
+                                role "developer"
+                                role "development leader"
+                            }
+                            id "ryada"
+                            name "Ryada"
+                            roles {
+                                role "helper developer"
                             }
                         }
                     }
@@ -496,12 +516,12 @@ uploadArchives {
 }
 
 // ==========================================================================
-//    _____                     _         __   ______              __        
+//    _____                     _         __   ______              __
 //   / ___/ ____   ___   _____ (_)____ _ / /  /_  __/____ _ _____ / /__ _____
 //   \__ \ / __ \ / _ \ / ___// // __ `// /    / /  / __ `// ___// //_// ___/
-//  ___/ // /_/ //  __// /__ / // /_/ // /    / /  / /_/ /(__  )/ ,<  (__  ) 
-// /____// .___/ \___/ \___//_/ \__,_//_/    /_/   \__,_//____//_/|_|/____/  
-//      /_/                                                                  
+//  ___/ // /_/ //  __// /__ / // /_/ // /    / /  / /_/ /(__  )/ ,<  (__  )
+// /____// .___/ \___/ \___//_/ \__,_//_/    /_/   \__,_//____//_/|_|/____/
+//      /_/
 // ==========================================================================
 
 task reTrace(type: JavaExec) {
@@ -514,24 +534,24 @@ Specify "-Pstacktrace_file=<file>" (with quotes) to specify the stacktrace file.
 
     classpath configurations.reTrace
     main = "proguard.retrace.ReTrace"
-    
+
     def mapping_file
     def stacktrace_file
-    
+
     if (project.hasProperty("mapping_file")) {
         mapping_file = project.mapping_file
     } else {
         dependsOn proguard
-        
+
         mapping_file = "${jar.archivePath}.map"
     }
-    
+
     if (project.hasProperty("stacktrace_file")) {
         stacktrace_file = project.stacktrace_file
     } else {
         stacktrace_file = "stacktrace.txt"
     }
-    
+
     args mapping_file
     args stacktrace_file
 }
@@ -544,7 +564,7 @@ Specify "-Pmajor" to update the major version."""
 
     doLast {
         def newVersion = Arrays.stream(project.version.split("\\."), 0, 3).map{num -> Integer.parseInt(num)}.toArray()
-        
+
         if (project.hasProperty("major")) {
             newVersion[0]++;
             newVersion[1] = 0;
@@ -555,12 +575,12 @@ Specify "-Pmajor" to update the major version."""
         } else {
             newVersion[2]++;
         }
-        
+
         newVersion = Arrays.stream(newVersion).map{num -> Integer.toString(num)}.collect(Collectors.joining("."))
-        
+
         exec {
             executable "git"
-            args "tag", "-a", "v${newVersion}, "-m", getChangelog()
+            args "tag", "-a", "v${newVersion}", "-m", getChangelog()
         }
     }
 }

@@ -16,11 +16,4 @@ buildscript {
     }
 }
 
-ext {
-    type = "sponge"
-    pluginId = "test"
-    openSource = false
-    customCharts = false
-}
-
 apply from: "../common.gradle"
