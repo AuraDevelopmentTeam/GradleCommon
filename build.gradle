@@ -1,0 +1,78 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+if (project.hasProperty("newProjectDir")) {
+    File destiontionDir = new File(newProjectDir)
+
+    task initGit(type: Exec) {
+        workingDir destiontionDir
+
+        executable "git"
+        args "init"
+    }
+
+    task addSubmodule(type: Exec, dependsOn: initGit) {
+        workingDir destiontionDir
+
+        executable "git"
+        args "submodule", "add", "-f", "git@gitlab.brainstonemod.com:AuraDev/Gradle-Common.git"
+
+        ignoreExitValue = true
+    }
+
+    task setGitTag(type: Exec, dependsOn: addSubmodule) {
+        workingDir new File(destiontionDir, "Gradle-Common")
+
+        executable "git"
+        args "checkout", "v1.2.0"
+    }
+
+    task initGradle(type: Exec) {
+        workingDir destiontionDir
+
+        executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
+        args "-Dorg.gradle.daemon=false", "init", "wrapper"
+
+        shouldRunAfter setGitTag
+    }
+
+    task copyTemplateFiles(type: Copy, dependsOn: initGradle) {
+        from (projectDir) {
+            include ".gitattributes"
+            include ".gitignore"
+        }
+
+        from "template"
+
+        into destiontionDir
+    }
+
+    task addAllFiles(type: Exec, dependsOn: [setGitTag, copyTemplateFiles]) {
+        workingDir destiontionDir
+
+        executable "git"
+        args "add", "-A"
+    }
+
+    task makeGradlewExecutable(type: Exec, dependsOn: addAllFiles) {
+        workingDir destiontionDir
+
+        executable "git"
+        args "update-index", "--chmod=+x", "gradlew"
+    }
+
+    task createFirstCommit(type: Exec, dependsOn: makeGradlewExecutable) {
+        workingDir destiontionDir
+
+        executable "git"
+        args "commit", "-m", "Initial commit!"
+    }
+
+    task createFirstTag(type: Exec, dependsOn: createFirstCommit) {
+        workingDir destiontionDir
+
+        executable "git"
+        args "tag", "-a", "v0.0.0", "-m", "Project starts!"
+    }
+
+    task createNewProject(dependsOn: [initGit, addSubmodule, setGitTag, initGradle, copyTemplateFiles, addAllFiles, makeGradlewExecutable, createFirstCommit, createFirstTag]) {}
+}
