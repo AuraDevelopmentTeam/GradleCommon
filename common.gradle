@@ -1,39 +1,82 @@
+// =================================================
+//     ____                                __       
+//    /  _/____ ___   ____   ____   _____ / /_ _____
+//    / / / __ `__ \ / __ \ / __ \ / ___// __// ___/
+//  _/ / / / / / / // /_/ // /_/ // /   / /_ (__  ) 
+// /___//_/ /_/ /_// .___/ \____//_/    \__//____/  
+//                /_/                                                                                              
+// 
+// =================================================
+
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import java.security.SecureRandom
 import java.util.regex.*
+import java.util.stream.Collectors
 import org.apache.tools.ant.filters.ReplaceTokens
 import proguard.gradle.ProGuardTask
 
-def NONE = "none"
-def BUNGEECORD = "bungeecord"
-def SPIGOT = "spigot"
-def SPONGE = "sponge"
+// =============================================================
+//     ____         ____ _         _  __   _                    
+//    / __ \ ___   / __/(_)____   (_)/ /_ (_)____   ____   _____
+//   / / / // _ \ / /_ / // __ \ / // __// // __ \ / __ \ / ___/
+//  / /_/ //  __// __// // / / // // /_ / // /_/ // / / /(__  ) 
+// /_____/ \___//_/  /_//_/ /_//_/ \__//_/ \____//_/ /_//____/  
+// 
+// =============================================================
+
+final String NONE = "none"
+final String BUNGEECORD = "bungeecord"
+final String SPIGOT = "spigot"
+final String SPONGE = "sponge"
+
+ext {
+    if (!project.hasProperty("buildOffset")) buildOffset = 0
+    
+    gitDescription = "git describe --dirty".execute(null, projectDir).text.trim()
+}
 
 def getBuild() {
-    def build = 150
-    def commits = "git rev-list --count HEAD".execute().text.trim()
+    def build = project.buildOffset
+    def commits = "git rev-list --count HEAD".execute(null, projectDir).text.trim()
 
     return (build + commits.toInteger()).toString()
 }
 def getBuildType() {
-    def description = "git describe --dirty".execute().text.trim()
-    
-    if(description.endsWith("dirty"))
+    if(project.gitDescription.endsWith("dirty"))
         return "SNAPSHOT"
-    else if(description.contains("-"))
+    else if(project.gitDescription.contains("-"))
         return "DEV"
     else
         return "RELEASE"
 }
 def getVersion() {
-    //def baseVersion = "${version}.${build}"
-    def baseVersion = build
+    def baseVersion = gitDescription.replaceAll("\$v|-.*", "") + ".${build}"
 
     if(buildType != "RELEASE")
         baseVersion += "_${buildType}"
 
     return baseVersion
-} 
+}
+def getChangelog() {
+    Pattern pattern = Pattern.compile("^Version .*?(?= {0,2}\\n{0,3}Version)", Pattern.DOTALL);
+    Matcher match = pattern.matcher(file("CHANGELOG.md").text.replaceAll("\r", ""));
+    
+    if (match.find())
+        return match.group();
+    else
+        return "";
+}
+
+// ===============================================
+// 
+//    _____        __   __   _                    
+//   / ___/ ___   / /_ / /_ (_)____   ____ _ _____
+//   \__ \ / _ \ / __// __// // __ \ / __ `// ___/
+//  ___/ //  __// /_ / /_ / // / / // /_/ /(__  ) 
+// /____/ \___/ \__/ \__//_//_/ /_/ \__, //____/  
+//                                 /____/         
+// 
+// =============================================== 
 
 if (!project.hasProperty("type")) {
     throw new NoSuchElementException("No type is specified!")
@@ -50,8 +93,11 @@ ext {
     if (!project.hasProperty("buildType")) buildType = getBuildType()
 
     if (!project.hasProperty("openSource")) openSource = false
+    if (!project.hasProperty("secretSalt")) secretSalt = "defaultSalt"
     if (!project.hasProperty("useStats")) useStats = (type != NONE)
-    if (!project.hasProperty("customCharts")) customCharts = true
+    if (!project.hasProperty("customCharts")) customCharts = false
+    
+    if (!project.hasProperty("baseGroup")) baseGroup = "dev.aura"
     
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
     mainDirResources = fileTree(dir: file(projectDir), includes: ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"])
@@ -69,9 +115,24 @@ ext {
 }
 
 version = getVersion()
-if (group.isEmpty()) group = "dev.aura.${pluginId}"
+if (description == null) description = "Empty description"
+if (group.isEmpty()) group = "${baseGroup}.${pluginId}"
 
-if (useStats) def bStatsName = "bStats-${type}" + customCharts? "" : "-lite"
+ext {
+    if (useStats) bStatsName = "bstats-${type}" + (customCharts? "" : "-lite")
+    commonManifest = { attributes "Implementation-Title": pluginName, "Implementation-Version": version }
+}
+
+// ==========================================
+// 
+//     ____   __               _             
+//    / __ \ / /__  __ ____ _ (_)____   _____
+//   / /_/ // // / / // __ `// // __ \ / ___/
+//  / ____// // /_/ // /_/ // // / / /(__  ) 
+// /_/    /_/ \__,_/ \__, //_//_/ /_//____/  
+//                  /____/                   
+// 
+// ==========================================
 
 buildscript {
     repositories {
@@ -102,6 +163,17 @@ apply plugin: "com.github.johnrengelman.shadow"
 
 if (type == SPONGE)
     apply plugin: "org.spongepowered.plugin"
+
+// ==============================================================================    
+// 
+//    ______               ____ _                             __   _             
+//   / ____/____   ____   / __/(_)____ _ __  __ _____ ____ _ / /_ (_)____   ____ 
+//  / /    / __ \ / __ \ / /_ / // __ `// / / // ___// __ `// __// // __ \ / __ \
+// / /___ / /_/ // / / // __// // /_/ // /_/ // /   / /_/ // /_ / // /_/ // / / /
+// \____/ \____//_/ /_//_/  /_/ \__, / \__,_//_/    \__,_/ \__//_/ \____//_/ /_/ 
+//                             /____/                                            
+// 
+// ==============================================================================
 
 eclipse {
     classpath {
@@ -162,6 +234,24 @@ dependencies {
     testCompile "junit:junit:4.12"
 }
 
+if (type == SPONGE) {
+    sponge {
+        plugin {
+            meta {
+                id = pluginId
+                name = pluginName
+                version = version
+                description = description
+            }
+        }
+    }
+    
+    compileJava {
+        outputs.upToDateWhen { false }
+        doFirst { println() }
+    }
+}
+
 lombok {
     version = lombokVersion
     sha256 = lombokHash
@@ -169,25 +259,40 @@ lombok {
 
 processResources {
     // this will ensure that this task is redone when the versions change.
-    inputs.property "version", version
-    inputs.property "build", build
-    inputs.property "buildType", buildType
+    inputs.property "pluginId", project.pluginId
+    inputs.property "pluginName", project.pluginName
+    inputs.property "description", project.description
+    inputs.property "version", project.version
+    inputs.property "build", project.build
+    inputs.property "buildType", project.buildType
     
-    expand "version": version, "build": build, "buildType": buildType
+    expand \
+        "id": project.pluginId,
+        "name": project.pluginName,
+        "description": project.description,
+        "version": project.version,
+        "build": project.build,
+        "buildType": project.buildType
 }
 
 task processSources (type: Sync) {
-    inputs.property "version", version
-    inputs.property "build", build
-    inputs.property "buildType", buildType
+    inputs.property "pluginId", project.pluginId
+    inputs.property "pluginName", project.pluginName
+    inputs.property "description", project.description
+    inputs.property "version", project.version
+    inputs.property "build", project.build
+    inputs.property "buildType", project.buildType
     ext.outputDir = file("$buildDir/generated-src")
     
     from sourceSets.main.allSource
     into outputDir
     filter (ReplaceTokens, tokens: [
-        "version": version,
-        "build": build,
-        "buildType": buildType
+        "id": project.pluginId,
+        "name": project.pluginName,
+        "description": project.description,
+        "version": project.version,
+        "build": project.build,
+        "buildType": project.buildType
     ])
 }
 
@@ -213,6 +318,10 @@ compileJava {
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+}
+
+tasks.withType(Jar) {
+    manifest commonManifest
 }
 
 jar {
@@ -250,7 +359,7 @@ shadowJar {
     from sourceSets.main.output
     from mainDirResources
     
-    classifier = "deobf"
+    classifier = openSource? null : "deobf"
     version = jar.version
     configurations = [project.configurations.shadow]
     
@@ -259,9 +368,78 @@ shadowJar {
     }
 }
 
+task proguard(type: ProGuardTask, dependsOn: shadowJar) {
+    onlyIf { !openSource }
+
+    group "build"
+    
+    def dictonary = file("dictionary.txt")
+
+    // Inputs and outputs
+    injars shadowJar.archivePath
+    outjars jar.archivePath
+    printmapping "${jar.archivePath}.map"
+ 
+    // Libraries
+    libraryjars configurations.compile
+    libraryjars "<java.home>/lib/rt.jar"
+    
+    // General settings
+    renamesourcefileattribute pluginName 
+    keepattributes "Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod"
+    dontshrink
+    dontoptimize
+    adaptresourcefilecontents "**.yml"
+    adaptresourcefilecontents "**.info"
+    
+    // Stuff that depends on the group name
+    keep "class ${project.baseGroup}.**.api.** { *; }"
+    keep "class ${project.baseGroup}.**.shadow.** { *; }"
+    repackageclasses project.group
+    
+    // No notes or warnings from classes that aren't ours!
+    dontwarn "!class ${project.baseGroup}.**"
+    dontnote "!class ${project.baseGroup}.**"
+    
+    // Obfuscation names. They'll be different for each version
+    classobfuscationdictionary dictonary
+    obfuscationdictionary dictonary
+    
+    jar.finalizedBy proguard
+    
+    doFirst {
+        def firstChars = ('A'..'Z') + ('a'..'z')
+        def allChars = firstChars + ('0'..'9')
+        def rand = new SecureRandom("${version}${secretSalt}".getBytes())
+        def str
+        def out = ""
+    
+        (1..10000).each {
+            str = firstChars[rand.nextInt(firstChars.size())]
+            
+            (2..3).each {
+                str += allChars[rand.nextInt(allChars.size())]
+            }
+        
+            out += "${str}\n"
+        }
+        
+        dictonary.text = out;
+    }
+    
+    doLast {
+       dictonary.delete() 
+    }
+}
+
 artifacts {
-    archives shadowJar
-    archives sourceJar
+    if (openSource) {
+        archives shadowJar
+        archives sourceJar
+        archives javadocJar
+    } else {
+        archives jar
+    }
 }
 
 signing {
@@ -316,3 +494,92 @@ uploadArchives {
         }
     }
 }
+
+// ==========================================================================
+//    _____                     _         __   ______              __        
+//   / ___/ ____   ___   _____ (_)____ _ / /  /_  __/____ _ _____ / /__ _____
+//   \__ \ / __ \ / _ \ / ___// // __ `// /    / /  / __ `// ___// //_// ___/
+//  ___/ // /_/ //  __// /__ / // /_/ // /    / /  / /_/ /(__  )/ ,<  (__  ) 
+// /____// .___/ \___/ \___//_/ \__,_//_/    /_/   \__,_//____//_/|_|/____/  
+//      /_/                                                                  
+// ==========================================================================
+
+task reTrace(type: JavaExec) {
+    onlyIf { !openSource }
+
+    group "help"
+    description """Deobfuscates an obfuscated stacktrace
+Specify "-Pmapping_file=<file>" (with quotes) to use a given mapping file. If not provided use (and generate if necessary) the mapping file of the current code.
+Specify "-Pstacktrace_file=<file>" (with quotes) to specify the stacktrace file. If not provided "stacktrace.txt" (in the project root) is used."""
+
+    classpath configurations.reTrace
+    main = "proguard.retrace.ReTrace"
+    
+    def mapping_file
+    def stacktrace_file
+    
+    if (project.hasProperty("mapping_file")) {
+        mapping_file = project.mapping_file
+    } else {
+        dependsOn proguard
+        
+        mapping_file = "${jar.archivePath}.map"
+    }
+    
+    if (project.hasProperty("stacktrace_file")) {
+        stacktrace_file = project.stacktrace_file
+    } else {
+        stacktrace_file = "stacktrace.txt"
+    }
+    
+    args mapping_file
+    args stacktrace_file
+}
+
+task gitTag {
+    group "help"
+    description """Tags the current version in git.
+Specify "-Pminor" to update the minor version.
+Specify "-Pmajor" to update the major version."""
+
+    doLast {
+        def newVersion = Arrays.stream(project.version.split("\\."), 0, 3).map{num -> Integer.parseInt(num)}.toArray()
+        
+        if (project.hasProperty("major")) {
+            newVersion[0]++;
+            newVersion[1] = 0;
+            newVersion[2] = 0;
+        } else if (project.hasProperty("minor")) {
+            newVersion[1]++;
+            newVersion[2] = 0;
+        } else {
+            newVersion[2]++;
+        }
+        
+        newVersion = Arrays.stream(newVersion).map{num -> Integer.toString(num)}.collect(Collectors.joining("."))
+        
+        exec {
+            executable "git"
+            args "tag", "-a", "v${newVersion}, "-m", getChangelog()
+        }
+    }
+}
+
+println """Project Info:
+=============
+
+Plugin ID:\t${pluginId}
+Plugin Name:\t${pluginName}
+Description:\t${description}
+Version:\t${version}
+Build:\t\t${build}
+Build Type:\t${buildType}
+Group:\t\t${group}
+
+Settings:
+---------
+
+Type:\t\t${type}
+Open Source:\t${openSource}
+Use Stats:\t${useStats}
+Custom Charts:\t${customCharts}"""
