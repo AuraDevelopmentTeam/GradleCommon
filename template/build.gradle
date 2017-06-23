@@ -1,4 +1,4 @@
-apply from: "Gradle-Common/common.gradle"
+apply from: "GradleCommon/common.gradle"
 
 repositories {
     // Additional repositories

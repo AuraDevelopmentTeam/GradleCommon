@@ -122,7 +122,7 @@ ext {
 
 version = getVersion()
 if (description == null) description = "Empty description"
-if (group.isEmpty()) group = "${baseGroup}.${pluginId}"
+group = "${baseGroup}.${pluginId}"
 
 ext {
     if (useStats) bStatsName = "bstats-${type}" + (customCharts? "" : "-lite")
@@ -238,6 +238,9 @@ dependencies {
     }
 
     testCompile "junit:junit:4.12"
+
+    if (!openSource)
+        reTrace "net.sf.proguard:proguard-retrace:5.3.3"
 }
 
 if (type == SPONGE) {
