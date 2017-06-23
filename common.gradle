@@ -39,10 +39,9 @@ ext {
 }
 
 def getBuild() {
-    def build = project.buildOffset
     def commits = "git rev-list --count HEAD".execute(null, projectDir).text.trim()
 
-    return (build + commits.toInteger()).toString()
+    return (project.buildOffset + commits.toInteger()).toString()
 }
 def getBuildType() {
     if(project.gitDescription.endsWith("dirty"))
@@ -53,7 +52,7 @@ def getBuildType() {
         return "RELEASE"
 }
 def getVersion() {
-    def baseVersion = gitDescription.replaceAll("^v|-.*", "") + ".${build}"
+    def baseVersion = gitDescription.replaceAll("^v|-.*", "") + ".${project.buildNum}"
 
     if(buildType != "RELEASE")
         baseVersion += "_${buildType}"
@@ -97,8 +96,8 @@ ext {
     if (!project.hasProperty("pluginName")) pluginName = name
     if (!project.hasProperty("baseGroup")) baseGroup = "dev.aura"
 
-    if (!project.hasProperty("build")) build = getBuild()
-    if (!project.hasProperty("buildType")) buildType = getBuildType()
+    buildNum = getBuild()
+    buildType = getBuildType()
 
     if (!project.hasProperty("openSource")) openSource = false
     if (!project.hasProperty("secretSalt")) secretSalt = "CHANGEME"
@@ -272,7 +271,7 @@ processResources {
     inputs.property "pluginName", project.pluginName
     inputs.property "description", project.description
     inputs.property "version", project.version
-    inputs.property "build", project.build
+    inputs.property "buildNum", project.buildNum
     inputs.property "buildType", project.buildType
 
     expand \
@@ -280,7 +279,7 @@ processResources {
         "name": project.pluginName,
         "description": project.description,
         "version": project.version,
-        "build": project.build,
+        "build": project.buildNum,
         "buildType": project.buildType
 }
 
@@ -289,7 +288,7 @@ task processSources (type: Sync) {
     inputs.property "pluginName", project.pluginName
     inputs.property "description", project.description
     inputs.property "version", project.version
-    inputs.property "build", project.build
+    inputs.property "buildNum", project.buildNum
     inputs.property "buildType", project.buildType
     ext.outputDir = file("$buildDir/generated-src")
 
@@ -300,7 +299,7 @@ task processSources (type: Sync) {
         "name": project.pluginName,
         "description": project.description,
         "version": project.version,
-        "build": project.build,
+        "build": project.buildNum,
         "buildType": project.buildType
     ])
 }
@@ -619,7 +618,7 @@ Plugin ID:\t${pluginId}
 Plugin Name:\t${pluginName}
 Description:\t${description}
 Version:\t${version}
-Build:\t\t${build}
+Build:\t\t${buildNum}
 Build Type:\t${buildType}
 Group:\t\t${group}
 
