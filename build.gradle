@@ -15,7 +15,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir destiontionDir
 
         executable "git"
-        args "submodule", "add", "git@gitlab.brainstonemod.com:AuraDev/GradleCommon.git"
+        args "submodule", "add", "../../AuraDev/GradleCommon.git"
 
         ignoreExitValue = true
     }
@@ -24,7 +24,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir new File(destiontionDir, "Gradle-Common")
 
         executable "git"
-        args "checkout", "v2.1.0"
+        args "checkout", "v2.2.0"
     }
 
     task initGradle(type: Exec) {
@@ -93,8 +93,14 @@ task fetchUpdates(type: Exec) {
 }
 
 task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
+    def latestTag
+    
+    doFirst {
+        latestTag = "git rev-list --tags --max-count=1".execute().text.trim()
+    }
+    
     executable "git"
-    args "checkout", "git rev-list --tags --max-count=1".execute().text.trim()
+    args "checkout", 
 }
 
 task updateGradleCommon(dependsOn: [fetchUpdates, checkoutLatestTag])
