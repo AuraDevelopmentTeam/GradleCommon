@@ -100,7 +100,7 @@ task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
     }
     
     executable "git"
-    args "checkout", latestTag  
+    args "checkout", "${-> latestTag}"   
 }
 
 task stageUpdate(type: Exec, dependsOn: checkoutLatestTag) {
