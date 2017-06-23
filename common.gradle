@@ -99,10 +99,19 @@ ext {
     buildNum = getBuild()
     buildType = getBuildType()
 
-    if (!project.hasProperty("openSource")) openSource = false
+    if (project.hasProperty("openSource"))
+        openSource = Boolean.parseBoolean(openSource)
+    else
+        openSource = false
     if (!project.hasProperty("secretSalt")) secretSalt = "CHANGEME"
-    if (!project.hasProperty("useStats")) useStats = (type != NONE)
-    if (!project.hasProperty("customCharts")) customCharts = false
+    if (project.hasProperty("useStats"))
+        useStats = Boolean.parseBoolean(useStats)
+    else
+        useStats = (type != NONE)
+    if (project.hasProperty("customCharts"))
+        customCharts = Boolean.parseBoolean(customCharts)
+    else
+        customCharts = false
 
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
     mainDirResources = fileTree(dir: file(projectDir), includes: ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"])
