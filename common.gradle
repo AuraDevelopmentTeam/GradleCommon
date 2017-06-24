@@ -134,7 +134,7 @@ ext {
 
 version = getVersion()
 if (description == null) description = "Empty description"
-if (project != rootProject) baseGroup = project.parent.group
+if (project != rootProject) ext.baseGroup = project.parent.group
 group = "${baseGroup}.${pluginId}"
 
 ext {
