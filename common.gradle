@@ -44,7 +44,7 @@ def getBuild() {
     return (project.buildOffset + commits.toInteger()).toString()
 }
 def getBuildType() {
-    if(project.gitDescription.endsWith("dirty"))
+    if (project.gitDescription.endsWith("dirty"))
         return "SNAPSHOT"
     else if(project.gitDescription.contains("-"))
         return "DEV"
@@ -53,9 +53,13 @@ def getBuildType() {
 }
 def getVersion() {
     def baseVersion = gitDescription.replaceAll("^v|-.*", "") + ".${project.buildNum}"
+    def branch = "git rev-parse --abbrev-ref HEAD".execute().text.trim()
+    
+    if (branch != master)
+        baseVersion += "-${branch}"
 
-    if(buildType != "RELEASE")
-        baseVersion += "_${buildType}"
+    if (buildType != "RELEASE")
+        baseVersion += "-${buildType}"
 
     return baseVersion
 }
