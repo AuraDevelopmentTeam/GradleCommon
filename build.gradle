@@ -1,6 +1,10 @@
 import org.apache.tools.ant.DirectoryScanner
 import org.apache.tools.ant.taskdefs.condition.Os
 
+def getLatestTag() {
+    return "git rev-list --tags --max-count=1".execute().text.trim()
+}
+
 if (project.hasProperty("newProjectDir")) {
     File destiontionDir = new File(newProjectDir)
 
@@ -24,7 +28,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir new File(destiontionDir, "Gradle-Common")
 
         executable "git"
-        args "checkout", "v2.3.2"
+        args "checkout", "${-> getLatestTag()}"
     }
 
     task initGradle(type: Exec) {
@@ -98,14 +102,8 @@ task fetchUpdates(type: Exec, dependsOn: resetChanges) {
 }
 
 task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
-    def latestTag
-    
-    doFirst {
-        latestTag = "git rev-list --tags --max-count=1".execute().text.trim()
-    }
-    
     executable "git"
-    args "checkout", "${-> latestTag}"   
+    args "checkout", "${-> getLatestTag()}"   
 }
 
 task stageUpdate(type: Exec, dependsOn: checkoutLatestTag) {
