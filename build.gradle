@@ -103,22 +103,24 @@ task fetchUpdates(type: Exec, dependsOn: resetChanges) {
 
 task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
     executable "git"
-    args "checkout", "${-> getLatestTag()}"   
+    args "checkout", "${-> getLatestTag()}"
 }
 
 task stageUpdate(type: Exec, dependsOn: checkoutLatestTag) {
     workingDir ".."
-    
+
     executable "git"
-    args "add", "GradleCommon"  
+    args "add", "GradleCommon"
 }
 
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
     workingDir ".."
-    
+
     executable "git"
-    args "commit", "-m", "Updated Gradle Common"  
+    args "commit", "-m", "Updated Gradle Common"
+
+    ignoreExitValue = true
 }
 
 task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, stageUpdate, commitUpdate])
