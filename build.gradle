@@ -24,7 +24,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir new File(destiontionDir, "Gradle-Common")
 
         executable "git"
-        args "checkout", "v2.2.9"
+        args "checkout", "v2.3.0"
     }
 
     task initGradle(type: Exec) {

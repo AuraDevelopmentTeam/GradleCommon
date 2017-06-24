@@ -134,6 +134,7 @@ ext {
 
 version = getVersion()
 if (description == null) description = "Empty description"
+if (project != rootProject) baseGroup = project.parent.group
 group = "${baseGroup}.${pluginId}"
 
 ext {
@@ -414,13 +415,15 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     adaptresourcefilecontents "**.info"
 
     // Stuff that depends on the group name
-    keep "class ${project.baseGroup}.**.api.** { *; }"
-    keep "class ${project.baseGroup}.**.shadow.** { *; }"
+    keep "class ${rootProject.baseGroup}.**.api.** { *; }"
+    keep "class ${rootProject.baseGroup}.**.shadow.** { *; }"
     repackageclasses project.group
 
     // No notes or warnings from classes that aren't ours!
-    dontwarn "!class ${project.baseGroup}.**"
-    dontnote "!class ${project.baseGroup}.**"
+    dontwarn "!class ${rootProject.baseGroup}.**"
+    dontnote "!class ${rootProject.baseGroup}.**"
+    dontwarn "class ${rootProject.baseGroup}.**.shadow.**"
+    dontnote "class ${rootProject.baseGroup}.**.shadow.**"
 
     // Obfuscation names. They'll be different for each version
     classobfuscationdictionary dictonary
