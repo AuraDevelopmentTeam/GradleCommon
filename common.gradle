@@ -630,7 +630,7 @@ Specify "-Pmajor" to update the major version."""
 }
 
 if (project == rootProject) {
-    task updateGradleCommon(dependsOn: project(":GradleCommon").tasks.updateGradleCommon) {}
+    task updateGradleCommon(dependsOn: ":GradleCommon:updateGradleCommon") {}
 }
 
 println """Project Info:

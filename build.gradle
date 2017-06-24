@@ -4,7 +4,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 description "Common Gradle Build Script"
 
 def getLatestTag() {
-    return "git rev-list --tags --max-count=1".execute().text.trim()
+    return "git rev-list --tags --max-count=1".execute(null, projectDir).text.trim()
 }
 
 if (project.hasProperty("newProjectDir")) {
