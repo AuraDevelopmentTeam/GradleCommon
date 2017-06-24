@@ -422,10 +422,8 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     repackageclasses project.group
 
     // No notes or warnings from classes that aren't ours!
-    dontwarn "!class ${rootProject.baseGroup}.**"
-    dontnote "!class ${rootProject.baseGroup}.**"
-    dontwarn "class ${rootProject.baseGroup}.**.shadow.**"
-    dontnote "class ${rootProject.baseGroup}.**.shadow.**"
+    dontwarn "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
+    dontnote "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
 
     // Obfuscation names. They'll be different for each version
     classobfuscationdictionary dictonary
