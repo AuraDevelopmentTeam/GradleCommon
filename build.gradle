@@ -87,7 +87,12 @@ if (project.hasProperty("newProjectDir")) {
     task createNewProject(dependsOn: [initGit, addSubmodule, setGitTag, initGradle, copyTemplateFiles, addAllFiles, makeGradlewExecutable, createFirstCommit, createFirstTag]) {}
 }
 
-task fetchUpdates(type: Exec) {
+task resetChanges(type: Exec) {
+    executable "git"
+    args "reset", "--hard"
+}
+
+task fetchUpdates(type: Exec, dependsOn: resetChanges) {
     executable "git"
     args "fetch", "--tags"
 }
@@ -118,4 +123,4 @@ task commitUpdate(type: Exec, dependsOn: stageUpdate) {
     args "commit", "-m", "Updated Gradle Common"  
 }
 
-task updateGradleCommon(dependsOn: [fetchUpdates, checkoutLatestTag, stageUpdate, commitUpdate])
+task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, stageUpdate, commitUpdate])
