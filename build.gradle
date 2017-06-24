@@ -27,7 +27,7 @@ if (project.hasProperty("newProjectDir")) {
     }
 
     task setGitTag(type: Exec, dependsOn: addSubmodule) {
-        workingDir new File(destiontionDir, "Gradle-Common")
+        workingDir new File(destiontionDir, "GradleCommon")
 
         executable "git"
         args "checkout", "${-> getLatestTag()}"
