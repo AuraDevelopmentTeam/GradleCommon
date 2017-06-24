@@ -55,7 +55,7 @@ def getVersion() {
     def baseVersion = gitDescription.replaceAll("^v|-.*", "") + ".${project.buildNum}"
     def branch = "git rev-parse --abbrev-ref HEAD".execute().text.trim()
     
-    if (branch != master)
+    if (branch != "master")
         baseVersion += "-${branch}"
 
     if (buildType != "RELEASE")
