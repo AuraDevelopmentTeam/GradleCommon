@@ -10,6 +10,5 @@
 
 # How to update GradleCommon
 
-1. Open a command prompt in the GradleCommon directory of the repository where you want to update GradleCommon.
-2. Run this command:  
+1. Run this command:  
    ```./gradlew updateGradleCommon```

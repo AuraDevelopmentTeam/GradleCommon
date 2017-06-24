@@ -630,12 +630,7 @@ Specify "-Pmajor" to update the major version."""
 }
 
 if (project == rootProject) {
-    task updateGradleCommon(type: Exec) {
-        workingDir file("GradleCommon")
-
-        executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
-        args "-Dorg.gradle.daemon=false", "updateGradleCommon"
-    }
+    task updateGradleCommon(dependsOn: project(":GradleCommon").updateGradleCommon) {}
 }
 
 println """Project Info:

@@ -1,6 +1,8 @@
 import org.apache.tools.ant.DirectoryScanner
 import org.apache.tools.ant.taskdefs.condition.Os
 
+description "Common Gradle Build Script"
+
 def getLatestTag() {
     return "git rev-list --tags --max-count=1".execute().text.trim()
 }
@@ -92,22 +94,28 @@ if (project.hasProperty("newProjectDir")) {
 }
 
 task resetChanges(type: Exec) {
+    workingDir projectDir
+
     executable "git"
     args "reset", "--hard"
 }
 
 task fetchUpdates(type: Exec, dependsOn: resetChanges) {
+    workingDir projectDir
+
     executable "git"
     args "fetch", "--tags"
 }
 
 task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
+    workingDir projectDir
+
     executable "git"
     args "checkout", "${-> getLatestTag()}"
 }
 
 task stageUpdate(type: Exec, dependsOn: checkoutLatestTag) {
-    workingDir ".."
+    workingDir project.file("..")
 
     executable "git"
     args "add", "GradleCommon"
@@ -115,7 +123,7 @@ task stageUpdate(type: Exec, dependsOn: checkoutLatestTag) {
 
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
-    workingDir ".."
+    workingDir project.file("..")
 
     executable "git"
     args "commit", "-m", "Updated Gradle Common"
