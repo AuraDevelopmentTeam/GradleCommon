@@ -391,68 +391,68 @@ shadowJar {
     }
 }
 
-task proguard(type: ProGuardTask, dependsOn: shadowJar) {
-    onlyIf { !openSource }
+if (!openSource) {
+    task proguard(type: ProGuardTask, dependsOn: shadowJar) {
+        group "build"
 
-    group "build"
+        def dictonary = file("dictionary.txt")
 
-    def dictonary = file("dictionary.txt")
+        // Inputs and outputs
+        injars shadowJar.archivePath
+        outjars jar.archivePath
+        printmapping "${jar.archivePath}.map"
 
-    // Inputs and outputs
-    injars shadowJar.archivePath
-    outjars jar.archivePath
-    printmapping "${jar.archivePath}.map"
+        // Libraries
+        libraryjars "${System.getProperty('java.home')}/lib/rt.jar"               // Most platforms
+        libraryjars "${System.getProperty('java.home')}/../Classes/classes.jar"   // MacOS X
+        libraryjars configurations.compile
 
-    // Libraries
-    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"               // Most platforms
-    libraryjars "${System.getProperty('java.home')}/../Classes/classes.jar"   // MacOS X
-    libraryjars configurations.compile
+        // General settings
+        renamesourcefileattribute pluginName
+        keepattributes "Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod"
+        dontshrink
+        dontoptimize
+        adaptresourcefilecontents "**.yml"
+        adaptresourcefilecontents "**.info"
 
-    // General settings
-    renamesourcefileattribute pluginName
-    keepattributes "Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod"
-    dontshrink
-    dontoptimize
-    adaptresourcefilecontents "**.yml"
-    adaptresourcefilecontents "**.info"
+        // Stuff that depends on the group name
+        keep "class ${rootProject.baseGroup}.**.api.** { *; }"
+        keep "class ${rootProject.baseGroup}.**.shadow.** { *; }"
+        repackageclasses project.group
 
-    // Stuff that depends on the group name
-    keep "class ${rootProject.baseGroup}.**.api.** { *; }"
-    keep "class ${rootProject.baseGroup}.**.shadow.** { *; }"
-    repackageclasses project.group
+        // No notes or warnings from classes that aren't ours!
+        dontwarn "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
+        dontnote "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
 
-    // No notes or warnings from classes that aren't ours!
-    dontwarn "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
-    dontnote "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
+        // Obfuscation names. They'll be different for each version
+        classobfuscationdictionary dictonary
+        obfuscationdictionary dictonary
 
-    // Obfuscation names. They'll be different for each version
-    classobfuscationdictionary dictonary
-    obfuscationdictionary dictonary
+        jar.finalizedBy proguard
 
-    jar.finalizedBy proguard
+        doFirst {
+            def firstChars = ('A'..'Z') + ('a'..'z')
+            def allChars = firstChars + ('0'..'9')
+            def rand = new SecureRandom("${version}${secretSalt}".getBytes())
+            def str
+            def out = ""
 
-    doFirst {
-        def firstChars = ('A'..'Z') + ('a'..'z')
-        def allChars = firstChars + ('0'..'9')
-        def rand = new SecureRandom("${version}${secretSalt}".getBytes())
-        def str
-        def out = ""
+            (1..10000).each {
+                str = firstChars[rand.nextInt(firstChars.size())]
 
-        (1..10000).each {
-            str = firstChars[rand.nextInt(firstChars.size())]
+                (2..3).each {
+                    str += allChars[rand.nextInt(allChars.size())]
+                }
 
-            (2..3).each {
-                str += allChars[rand.nextInt(allChars.size())]
+                out += "${str}\n"
             }
 
-            out += "${str}\n"
+            dictonary.text = out;
         }
 
-        dictonary.text = out;
-    }
-
-    doLast {
-       dictonary.delete()
+        doLast {
+           dictonary.delete()
+        }
     }
 }
 
@@ -566,36 +566,36 @@ uploadArchives {
 //      /_/
 // ==========================================================================
 
-task reTrace(type: JavaExec) {
-    onlyIf { !openSource }
-
-    group "help"
-    description """Deobfuscates an obfuscated stacktrace
+if (!openSource) {
+    task reTrace(type: JavaExec) {
+        group "help"
+        description """Deobfuscates an obfuscated stacktrace
 Specify "-Pmapping_file=<file>" (with quotes) to use a given mapping file. If not provided use (and generate if necessary) the mapping file of the current code.
 Specify "-Pstacktrace_file=<file>" (with quotes) to specify the stacktrace file. If not provided "stacktrace.txt" (in the project root) is used."""
 
-    classpath configurations.reTrace
-    main = "proguard.retrace.ReTrace"
+        classpath configurations.reTrace
+        main = "proguard.retrace.ReTrace"
 
-    def mapping_file
-    def stacktrace_file
+        def mapping_file
+        def stacktrace_file
 
-    if (project.hasProperty("mapping_file")) {
-        mapping_file = project.mapping_file
-    } else {
-        dependsOn proguard
+        if (project.hasProperty("mapping_file")) {
+            mapping_file = project.mapping_file
+        } else {
+            dependsOn proguard
 
-        mapping_file = "${jar.archivePath}.map"
+            mapping_file = "${jar.archivePath}.map"
+        }
+
+        if (project.hasProperty("stacktrace_file")) {
+            stacktrace_file = project.stacktrace_file
+        } else {
+            stacktrace_file = "stacktrace.txt"
+        }
+
+        args mapping_file
+        args stacktrace_file
     }
-
-    if (project.hasProperty("stacktrace_file")) {
-        stacktrace_file = project.stacktrace_file
-    } else {
-        stacktrace_file = "stacktrace.txt"
-    }
-
-    args mapping_file
-    args stacktrace_file
 }
 
 task gitTag {
