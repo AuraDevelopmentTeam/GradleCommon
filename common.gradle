@@ -403,8 +403,9 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     printmapping "${jar.archivePath}.map"
 
     // Libraries
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"               // Most platforms
+    libraryjars "${System.getProperty('java.home')}/../Classes/classes.jar"   // MacOS X
     libraryjars configurations.compile
-    libraryjars "<java.home>/lib/rt.jar"
 
     // General settings
     renamesourcefileattribute pluginName
