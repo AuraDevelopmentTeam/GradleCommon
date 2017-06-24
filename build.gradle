@@ -73,7 +73,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir destiontionDir
 
         executable "git"
-        args "commit", "-m", "Initial commit!"
+        args "commit", "-m", "Initial commit!\n\n[ci skip]"
     }
 
     task createFirstTag(type: Exec, dependsOn: createFirstCommit) {
