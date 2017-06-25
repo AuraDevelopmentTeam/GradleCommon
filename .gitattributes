@@ -1,4 +1,4 @@
 # Auto detect text files and perform LF normalization
 *         text=auto
 # Detect correct language
-*.gradle  linguist-vendored=false
+*.gradle  linguist-language=Groovy
