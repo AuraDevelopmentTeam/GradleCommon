@@ -14,7 +14,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir destiontionDir
 
         executable "git"
-        args "submodule", "add", "../../AuraDev/GradleCommon.git"
+        args "submodule", "add", "https://github.com/AuraDevelopmentTeam/GradleCommon.git"
 
         ignoreExitValue = true
     }
