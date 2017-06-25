@@ -72,10 +72,10 @@ def getChangelog() {
         if (match.find())
             return match.group();
     } catch(IOException e) {
-        // Ignore
+        println e
     }
 
-    return "";
+    return "Empty";
 }
 
 // ===============================================
