@@ -599,34 +599,34 @@ Specify "-Pstacktrace_file=<file>" (with quotes) to specify the stacktrace file.
 }
 
 if (project == rootProject) {
-  task gitTag {
-      group "help"
-      description """Tags the current version in git.
+    task gitTag {
+        group "help"
+        description """Tags the current version in git.
 Specify "-Pminor" to update the minor version.
 Specify "-Pmajor" to update the major version."""
 
-      doLast {
-          def newVersion = Arrays.stream(project.version.split("\\."), 0, 3).map{num -> Integer.parseInt(num)}.toArray()
+        doLast {
+            def newVersion = Arrays.stream(project.version.split("\\."), 0, 3).map{num -> Integer.parseInt(num)}.toArray()
 
-          if (project.hasProperty("major")) {
-              newVersion[0]++;
-              newVersion[1] = 0;
-              newVersion[2] = 0;
-          } else if (project.hasProperty("minor")) {
-              newVersion[1]++;
-              newVersion[2] = 0;
-          } else {
-              newVersion[2]++;
-          }
+            if (project.hasProperty("major")) {
+                newVersion[0]++;
+                newVersion[1] = 0;
+                newVersion[2] = 0;
+            } else if (project.hasProperty("minor")) {
+                newVersion[1]++;
+                newVersion[2] = 0;
+            } else {
+                newVersion[2]++;
+            }
 
-          newVersion = Arrays.stream(newVersion).map{num -> Integer.toString(num)}.collect(Collectors.joining("."))
+            newVersion = Arrays.stream(newVersion).map{num -> Integer.toString(num)}.collect(Collectors.joining("."))
 
-          exec {
-              executable "git"
-              args "tag", "-a", "v${newVersion}", "-m", getChangelog()
-          }
-      }
-  }
+            exec {
+                executable "git"
+                args "tag", "-a", "v${newVersion}", "-m", getChangelog().replace("\"", "\\\"")
+            }
+        }
+    }
 
     task updateGradleCommon(dependsOn: ":GradleCommon:updateGradleCommon") {}
 }
