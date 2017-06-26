@@ -83,7 +83,16 @@ if (project.hasProperty("newProjectDir")) {
         args "tag", "-a", "v0.0.0", "-m", "Project starts!"
     }
 
-    task createNewProject(dependsOn: [addSubmodule, setGitTag, initGradle, copyTemplateFiles, addAllFiles, makeGradlewExecutable, createFirstCommit, createFirstTag]) {}
+    task addGitHooks(type: Exec, dependsOn: initGradle) {
+        workingDir destiontionDir
+
+        executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
+        args "-Dorg.gradle.daemon=false", "addGitHooks"
+
+        shouldRunAfter createFirstTag
+    }
+
+    task createNewProject(dependsOn: [addSubmodule, setGitTag, initGradle, copyTemplateFiles, addAllFiles, makeGradlewExecutable, createFirstCommit, createFirstTag, addGitHooks]) {}
 }
 
 task resetChanges(type: Exec) {
