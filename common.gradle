@@ -433,7 +433,8 @@ if (!openSource) {
         doFirst {
             def firstChars = ('A'..'Z') + ('a'..'z')
             def allChars = firstChars + ('0'..'9')
-            def rand = new SecureRandom("${version}${secretSalt}".getBytes())
+            def rand = SecureRandom.getInstance("SHA1PRNG")
+            rand.setSeed("${version}${secretSalt}".getBytes("UTF-8"))
             def str
             def out = ""
 
