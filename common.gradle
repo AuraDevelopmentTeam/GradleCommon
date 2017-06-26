@@ -632,7 +632,7 @@ Specify "-Pmajor" to update the major version."""
     task updateGradleCommon(dependsOn: ":GradleCommon:updateGradleCommon") {}
 
     task addGitHooks(type: Copy) {
-        from "GradleCommon"
+        from "GradleCommon/hooks"
         into ".git/hooks"
     }
 }
