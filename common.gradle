@@ -139,7 +139,7 @@ if (project != rootProject) ext.baseGroup = project.parent.group
 group = "${baseGroup}.${pluginId}"
 
 ext {
-    if (useStats) bStatsName = "bstats-${type}" + (customCharts? "" : "-lite")
+    if (useStats) bStatsName = "bstats-" + ((type == SPIGOT)? "bukkit" : type) + (customCharts? "" : "-lite")
     commonManifest = { attributes "Implementation-Title": pluginName, "Implementation-Version": version }
 }
 
