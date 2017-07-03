@@ -511,7 +511,7 @@ uploadArchives {
             }
 
             pom {
-                groupId = project.group
+                groupId = rootProject.group
                 version = project.version
                 artifactId = project.archivesBaseName
                 project {
