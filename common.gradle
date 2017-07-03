@@ -340,11 +340,9 @@ compileJava {
 }
 
 tasks.withType(JavaCompile) {
-    options {
-        encoding = "UTF-8"
-        incremental = true
-        deprecation = true
-    }
+    options.encoding = "UTF-8"
+    options.incremental = true
+    options.deprecation = true
 }
 
 tasks.withType(Jar) {
