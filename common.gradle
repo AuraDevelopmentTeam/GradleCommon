@@ -140,7 +140,16 @@ group = "${baseGroup}.${pluginId}"
 
 ext {
     if (useStats) bStatsName = "bstats-" + ((type == SPIGOT)? "bukkit" : type) + (customCharts? "" : "-lite")
-    commonManifest = { attributes "Implementation-Title": pluginName, "Implementation-Version": version }
+    commonManifest = {
+        attributes(
+            "Specification-Title": pluginName,
+            "Specification-Version": version,
+            "Specification-Vendor": "Aura Development Team",
+            "Implementation-Title": pluginName,
+            "Implementation-Version": version,
+            "Implementation-Vendor": "Aura Development Team"
+        )
+    }
 }
 
 // ==========================================
