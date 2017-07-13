@@ -31,10 +31,10 @@ final String SPIGOT = "spigot"
 final String SPONGE = "sponge"
 
 ext {
-    if (project.hasProperty("buildOffset"))
+    if (project.hasProperty("buildOffset")) {
         if (buildOffset instanceof String)
             buildOffset = Integer.parseInt(buildOffset)
-    else
+    } else
         buildOffset = 0
 
     gitDescription = "git describe --dirty".execute(null, projectDir).text.trim()
@@ -105,21 +105,21 @@ ext {
     buildNum = getBuild()
     buildType = getBuildType()
 
-    if (project.hasProperty("openSource"))
+    if (project.hasProperty("openSource")) {
         if (openSource instanceof String)
             openSource = Boolean.parseBoolean(openSource)
-    else
+    } else
         openSource = true
     if (!project.hasProperty("secretSalt")) secretSalt = "CHANGEME"
-    if (project.hasProperty("useStats"))
+    if (project.hasProperty("useStats")) {
         if (useStats instanceof String)
             useStats = Boolean.parseBoolean(useStats)
-    else
+    } else
         useStats = (type != NONE)
-    if (project.hasProperty("customCharts"))
+    if (project.hasProperty("customCharts")) {
         if (customCharts instanceof String)
             customCharts = Boolean.parseBoolean(customCharts)
-    else
+    } else
         customCharts = false
 
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
