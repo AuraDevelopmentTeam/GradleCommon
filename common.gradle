@@ -32,7 +32,8 @@ final String SPONGE = "sponge"
 
 ext {
     if (project.hasProperty("buildOffset"))
-        buildOffset = Integer.parseInt(buildOffset)
+        if (buildOffset instanceof String)
+            buildOffset = Integer.parseInt(buildOffset)
     else
         buildOffset = 0
 
@@ -104,17 +105,20 @@ ext {
     buildNum = getBuild()
     buildType = getBuildType()
 
-    if (project.hasProperty("openSource"))
-        openSource = Boolean.parseBoolean(openSource)
+    if (project.hasProperty("openSource") && )
+        if (openSource instanceof String)
+            openSource = Boolean.parseBoolean(openSource)
     else
         openSource = true
     if (!project.hasProperty("secretSalt")) secretSalt = "CHANGEME"
     if (project.hasProperty("useStats"))
-        useStats = Boolean.parseBoolean(useStats)
+        if (useStats instanceof String)
+            useStats = Boolean.parseBoolean(useStats)
     else
         useStats = (type != NONE)
     if (project.hasProperty("customCharts"))
-        customCharts = Boolean.parseBoolean(customCharts)
+        if (customCharts instanceof String)
+            customCharts = Boolean.parseBoolean(customCharts)
     else
         customCharts = false
 
