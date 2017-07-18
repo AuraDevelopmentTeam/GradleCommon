@@ -309,6 +309,8 @@ processResources {
         "version": project.version,
         "build": project.buildNum,
         "buildType": project.buildType
+
+    exclude "lang"
 }
 
 task processSources (type: Sync) {
