@@ -302,15 +302,17 @@ processResources {
     inputs.property "buildNum", project.buildNum
     inputs.property "buildType", project.buildType
 
-    expand \
-        "id": project.pluginId,
-        "name": project.pluginName,
-        "description": project.description,
-        "version": project.version,
-        "build": project.buildNum,
-        "buildType": project.buildType
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "lang"
 
-    exclude "lang"
+        expand \
+            "id": project.pluginId,
+            "name": project.pluginName,
+            "description": project.description,
+            "version": project.version,
+            "build": project.buildNum,
+            "buildType": project.buildType
+    }
 }
 
 task processSources (type: Sync) {
