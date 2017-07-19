@@ -405,8 +405,10 @@ shadowJar {
     version = jar.version
     configurations = [project.configurations.shadow]
 
-    project.configurations.shadowRelocate.dependencies.each {
-        relocate(it.group, "${project.group}.shadow.${it.group}")
+    doFirst {
+        project.configurations.shadowRelocate.dependencies.each {
+            relocate(it.group, "${project.group}.shadow.${it.group}")
+        }
     }
 }
 
