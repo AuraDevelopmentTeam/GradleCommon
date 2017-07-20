@@ -304,6 +304,7 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         exclude "lang"
+        exclude "*.conf"
 
         expand \
             "id": project.pluginId,
