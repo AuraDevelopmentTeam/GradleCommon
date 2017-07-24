@@ -670,11 +670,11 @@ task printCoverage(dependsOn: generateCoverageReport) {
     rootProject.printFinalCoverage.dependsOn printCoverage
 }
 
-task coverage(dependsOn: [jacocoTestReport, jacocoTestCoverageVerification, generateCoverageReport, printCoverage, rootProject.printFinalCoverage]) {}
+task coverage(dependsOn: [test, jacocoTestReport, jacocoTestCoverageVerification, generateCoverageReport, printCoverage, rootProject.printFinalCoverage]) {}
 
-check.finalizedBy coverage
+check.dependsOn coverage
 jacocoTestReport.finalizedBy jacocoTestCoverageVerification
-jacocoTestCoverageVerification.finalizedBy printCoverage
+jacocoTestCoverageVerification.finalizedBy generateCoverageReport
 generateCoverageReport.finalizedBy printCoverage
 
 clean.dependsOn cleanGenerateTestReport
