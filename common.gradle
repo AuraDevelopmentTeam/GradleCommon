@@ -617,6 +617,15 @@ if (project == rootProject) {
     }
 
     task printFinalCoverage {
+        onlyIf {
+            for(Task task : taskDependencies.getDependencies(printFinalCoverage)) {
+                if (task.didWork)
+                    return true;
+            }
+
+            return false;
+        }
+
         doLast {
             printCoverageText("all projects", coverageInstructions, coverageBranches, coverageLines, coverageComplexity, coverageMethods)
         }
@@ -624,12 +633,16 @@ if (project == rootProject) {
 }
 
 task generateCoverageReport(type: Zip, dependsOn: jacocoTestReport) {
+    onlyIf { jacocoTestReport.didWork }
+
     from file("${buildDir}/reports/jacoco/test/html")
     archiveName "${project.name}-CoverageReport.zip"
     destinationDir rootProject.projectDir
 }
 
 task printCoverage(dependsOn: generateCoverageReport) {
+    onlyIf { jacocoTestReport.didWork }
+
     doLast {
         def instructions = [0, 0]
         def branches = [0, 0]
