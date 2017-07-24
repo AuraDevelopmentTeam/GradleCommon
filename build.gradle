@@ -123,17 +123,21 @@ task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
     args "checkout", "${-> getLatestTag()}"
 }
 
-task copyCiScript(type: Copy, dependsOn: checkoutLatestTag) {
-    from project.file("template")
-    include ".gitlab-ci.yml"
-    into project.file("..")
+task copyTemplateFiles(type: Exec, dependsOn: checkoutLatestTag) {
+    def windows = Os.isFamily(Os.FAMILY_WINDOWS)
+
+    workingDir projectDir
+    
+    executable windows? "copy" : "cp"
+    
+    args windows? "/Y" : "-f", "template/.gitlab-ci.yml", ".gitignore", ".gitattributes", ".."
 }
 
-task stageUpdate(type: Exec, dependsOn: copyCiScript) {
+task stageUpdate(type: Exec, dependsOn: copyTemplateFiles) {
     workingDir project.file("..")
 
     executable "git"
-    args "add", "GradleCommon", ".gitlab-ci.yml"
+    args "add", "GradleCommon", ".gitlab-ci.yml", ".gitignore", ".gitattributes"
 }
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
@@ -145,4 +149,4 @@ task commitUpdate(type: Exec, dependsOn: stageUpdate) {
     ignoreExitValue = true
 }
 
-task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, copyCiScript, stageUpdate, commitUpdate])
+task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, copyTemplateFiles, stageUpdate, commitUpdate])
