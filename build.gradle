@@ -123,13 +123,18 @@ task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
     args "checkout", "${-> getLatestTag()}"
 }
 
-task stageUpdate(type: Exec, dependsOn: checkoutLatestTag) {
+task copyCiScript(type: Copy, dependsOn: checkoutLatestTag) {
+    from project.file("template")
+    include ".gitlab-ci.yml"
+    into project.file("..")
+}
+
+task stageUpdate(type: Exec, dependsOn: copyCiScript) {
     workingDir project.file("..")
 
     executable "git"
-    args "add", "GradleCommon"
+    args "add", "GradleCommon", ".gitlab-ci.yml"
 }
-
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
     workingDir project.file("..")
@@ -140,4 +145,4 @@ task commitUpdate(type: Exec, dependsOn: stageUpdate) {
     ignoreExitValue = true
 }
 
-task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, stageUpdate, commitUpdate])
+task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, copyCiScript, stageUpdate, commitUpdate])
