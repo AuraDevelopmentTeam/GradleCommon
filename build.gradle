@@ -10,7 +10,14 @@ def getLatestTag() {
 if (project.hasProperty("newProjectDir")) {
     File destiontionDir = new File(newProjectDir)
 
-    task addSubmodule(type: Exec) {
+    task initRepo(type: Exec) {
+        workingDir destiontionDir
+
+        executable "git"
+        args "init"
+    }
+
+    task addSubmodule(type: Exec, dependsOn: initRepo) {
         workingDir destiontionDir
 
         executable "git"
@@ -92,7 +99,7 @@ if (project.hasProperty("newProjectDir")) {
         shouldRunAfter createFirstTag
     }
 
-    task createNewProject(dependsOn: [addSubmodule, setGitTag, initGradle, copyTemplateFiles, addAllFiles, makeGradlewExecutable, createFirstCommit, createFirstTag, addGitHooks]) {}
+    task createNewProject(dependsOn: [initRepo, addSubmodule, setGitTag, initGradle, copyTemplateFiles, addAllFiles, makeGradlewExecutable, createFirstCommit, createFirstTag, addGitHooks]) {}
 }
 
 task resetChanges(type: Exec) {
