@@ -628,7 +628,8 @@ task generateCoverageReport(type: Zip, dependsOn: jacocoTestCoverageVerification
     archiveName "${project.name}-CoverageReport.zip"
     destinationDir rootProject.projectDir
 
-    test.finalizedBy generateTestReport
+    jacocoTestReport.finalizedBy generateCoverageReport
+    finalizedBy printCoverage
 }
 
 task printCoverage(dependsOn: generateCoverageReport) {
@@ -670,12 +671,11 @@ task printCoverage(dependsOn: generateCoverageReport) {
     rootProject.printFinalCoverage.dependsOn printCoverage
 }
 
-task coverage(dependsOn: [test, jacocoTestReport, jacocoTestCoverageVerification, generateCoverageReport, printCoverage, rootProject.printFinalCoverage]) {}
+task coverage(dependsOn: [test, jacocoTestReport, generateCoverageReport, printCoverage, rootProject.printFinalCoverage, jacocoTestCoverageVerification]) {}
 
 check.dependsOn coverage
-jacocoTestReport.finalizedBy jacocoTestCoverageVerification
-jacocoTestCoverageVerification.finalizedBy generateCoverageReport
-generateCoverageReport.finalizedBy printCoverage
+jacocoTestReport.dependsOn test
+rootProject.printFinalCoverage.finalizedBy jacocoTestCoverageVerification
 
 clean.dependsOn cleanGenerateTestReport
 
