@@ -629,7 +629,6 @@ task generateCoverageReport(type: Zip, dependsOn: jacocoTestCoverageVerification
     destinationDir rootProject.projectDir
 
     jacocoTestReport.finalizedBy generateCoverageReport
-    finalizedBy printCoverage
 }
 
 task printCoverage(dependsOn: generateCoverageReport) {
@@ -667,6 +666,7 @@ task printCoverage(dependsOn: generateCoverageReport) {
         rootProject.coverageMethods[1] += methods[1]
     }
 
+    generateCoverageReport.finalizedBy printCoverage
     finalizedBy rootProject.printFinalCoverage
     rootProject.printFinalCoverage.dependsOn printCoverage
 }
