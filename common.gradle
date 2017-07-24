@@ -623,12 +623,10 @@ if (project == rootProject) {
     }
 }
 
-task generateCoverageReport(type: Zip, dependsOn: jacocoTestCoverageVerification) {
+task generateCoverageReport(type: Zip, dependsOn: jacocoTestReport) {
     from file("${buildDir}/reports/jacoco/test/html")
     archiveName "${project.name}-CoverageReport.zip"
     destinationDir rootProject.projectDir
-
-    jacocoTestReport.finalizedBy generateCoverageReport
 }
 
 task printCoverage(dependsOn: generateCoverageReport) {
@@ -666,16 +664,14 @@ task printCoverage(dependsOn: generateCoverageReport) {
         rootProject.coverageMethods[1] += methods[1]
     }
 
-    generateCoverageReport.finalizedBy printCoverage
-    finalizedBy rootProject.printFinalCoverage
     rootProject.printFinalCoverage.dependsOn printCoverage
 }
 
-task coverage(dependsOn: [test, jacocoTestReport, generateCoverageReport, printCoverage, rootProject.printFinalCoverage, jacocoTestCoverageVerification]) {}
+task coverage(dependsOn: [rootProject.printFinalCoverage, jacocoTestCoverageVerification]) {}
 
 check.dependsOn coverage
 jacocoTestReport.dependsOn test
-rootProject.printFinalCoverage.finalizedBy jacocoTestCoverageVerification
+jacocoTestCoverageVerification.shouldRunAfter rootProject.printFinalCoverage
 
 clean.dependsOn cleanGenerateTestReport
 
