@@ -499,7 +499,7 @@ test {
     }
 }
 
-task generateTestReport(type: Zip, dependsOn: test) {
+task generateTestReport(type: Zip) {
     from file("${buildDir}/reports/tests/test")
     archiveName "${project.name}-TestReport.zip"
     destinationDir rootProject.projectDir
@@ -632,15 +632,17 @@ if (project == rootProject) {
     }
 }
 
-task generateCoverageReport(type: Zip, dependsOn: jacocoTestReport) {
+task generateCoverageReport(type: Zip) {
     onlyIf { jacocoTestReport.didWork }
 
     from file("${buildDir}/reports/jacoco/test/html")
     archiveName "${project.name}-CoverageReport.zip"
     destinationDir rootProject.projectDir
+
+    jacocoTestReport.finalizedBy generateCoverageReport
 }
 
-task printCoverage(dependsOn: generateCoverageReport) {
+task printCoverage(dependsOn: jacocoTestReport) {
     onlyIf { jacocoTestReport.didWork }
 
     doLast {
@@ -677,6 +679,7 @@ task printCoverage(dependsOn: generateCoverageReport) {
         rootProject.coverageMethods[1] += methods[1]
     }
 
+    shouldRunAfter generateCoverageReport
     rootProject.printFinalCoverage.dependsOn printCoverage
 }
 
@@ -686,7 +689,7 @@ check.dependsOn coverage
 jacocoTestReport.dependsOn test
 jacocoTestCoverageVerification.shouldRunAfter rootProject.printFinalCoverage
 
-clean.dependsOn cleanGenerateTestReport
+clean.dependsOn cleanGenerateCoverageReport
 
 // ==========================================================================
 //
