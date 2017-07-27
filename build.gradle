@@ -123,7 +123,7 @@ task checkoutLatestTag(type: Exec, dependsOn: fetchUpdates) {
     args "checkout", "${-> getLatestTag()}"
 }
 
-task copyTemplateFiles(dependsOn: checkoutLatestTag) {
+task updateTemplateFiles(dependsOn: checkoutLatestTag) {
     doLast {
         DirectoryScanner.defaultExcludes.each { DirectoryScanner.removeDefaultExclude it }
         DirectoryScanner.addDefaultExclude "something has to be in here or everything gets excluded"
@@ -161,4 +161,4 @@ task commitUpdate(type: Exec, dependsOn: stageUpdate) {
     ignoreExitValue = true
 }
 
-task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, copyTemplateFiles, stageUpdate, commitUpdate])
+task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, updateTemplateFiles, stageUpdate, commitUpdate])
