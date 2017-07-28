@@ -107,6 +107,14 @@ if (!project.hasProperty("type")) {
 }
 
 ext {
+    signing = {}
+
+    // Environment Variables
+    if (System.env.keyId != null) signing.keyId = System.env.keyId
+    if (System.env.password != null) signing.password = System.env.password
+    if (System.env.secretKeyRingFile != null) signing.secretKeyRingFile = System.env.secretKeyRingFile
+    if (System.env.codacyApiToken != null) codacyApiToken = System.env.codacyApiToken
+
     if (!project.hasProperty("pluginName")) pluginName = name
     if (!project.hasProperty("baseGroup")) baseGroup = "dev.aura"
 
@@ -279,6 +287,8 @@ dependencies {
 
     if (!openSource)
         reTrace "net.sf.proguard:proguard-retrace:5.3.3"
+
+    codacy "com.codacy:codacy-coverage-reporter:2.0.0"
 }
 
 if (type == SPONGE) {
