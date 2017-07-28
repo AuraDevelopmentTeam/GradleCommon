@@ -233,10 +233,11 @@ idea {
 }
 
 configurations {
+    codacy
     reTrace
     shadowRelocate
     shadow.extendsFrom shadowRelocate
-    compile.extendsFrom shadow
+    provided.extendsFrom shadow
 }
 
 repositories {
@@ -604,6 +605,13 @@ uploadArchives {
 jacocoTestReport {
     reports {
         csv.enabled true
+        xml.enabled true
+    }
+}
+
+test {
+    jacoco {
+        append = false
     }
 }
 
@@ -681,6 +689,26 @@ task printCoverage(dependsOn: jacocoTestReport) {
 
     shouldRunAfter generateCoverageReport
     rootProject.printFinalCoverage.dependsOn printCoverage
+}
+
+task sendCoverageToCodacy(type: JavaExec) {
+    if (project.hasProperty("codacyApiToken")) {
+        enabled = true
+        dependsOn jacocoTestReport
+
+        main = "com.codacy.CodacyCoverageReporter"
+        classpath = configurations.codacy
+        args = [
+            "-l",
+            "Java",
+            "-r",
+            "${buildDir}/reports/jacoco/test/jacocoTestReport.xml",
+            "--projectToken",
+            project.codacyApiToken
+        ]
+    } else {
+        enabled = false
+    }
 }
 
 task coverage(dependsOn: [rootProject.printFinalCoverage, jacocoTestCoverageVerification]) {}

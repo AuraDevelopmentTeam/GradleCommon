@@ -63,6 +63,14 @@ deploy:
   when: always
   only:
   - tags
+  
+sendCoverage:
+  stage: deploy
+  dependencies:
+  - coverage
+  script:
+  - ./gradlew --console=plain sendCoverageToCodacy
+  when: always
 
 pages:
   stage: deploy
