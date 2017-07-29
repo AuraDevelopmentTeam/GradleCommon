@@ -56,7 +56,7 @@ coverage:
 deploy:
   stage: deploy
   script:
-  - ./gradlew --console=plain uploadArchives
+  - ./gradlew --console=plain uploadArchives uploadArchivesToMavenCentral
   when: always
   only:
   - tags

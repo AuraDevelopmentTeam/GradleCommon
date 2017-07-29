@@ -192,7 +192,14 @@ ext {
     if (!project.hasProperty("sponge_version")) sponge_version = "7.0.0-SNAPSHOT"
 
     if (!project.hasProperty("bStats_version")) bStats_version = "1.2"
+}
 
+version = getVersion()
+if (description == null) description = "Empty description"
+if (project != rootProject) ext.baseGroup = project.parent.group
+group = "${baseGroup}.${pluginId}"
+
+ext {
     // bStats
     if (useStats) bStatsName = "bstats-" + ((type == SPIGOT)? "bukkit" : type) + (customCharts? "" : "-lite")
 
@@ -207,12 +214,62 @@ ext {
             "Implementation-Vendor": "Aura Development Team"
         )
     }
-}
 
-version = getVersion()
-if (description == null) description = "Empty description"
-if (project != rootProject) ext.baseGroup = project.parent.group
-group = "${baseGroup}.${pluginId}"
+    // Common POM
+    commonPom = project.pom {
+        groupId = rootProject.group
+        version = project.version
+        artifactId = project.archivesBaseName
+        project {
+            name project.archivesBaseName
+            packaging "jar"
+            description project.description
+            url "https://gitlab.brainstonemod.com/AuraDev/${project.archivesBaseName}"
+            scm {
+                url "https://gitlab.brainstonemod.com/AuraDev/${project.archivesBaseName}"
+                connection "scm:git:git@gitlab.brainstonemod.com:AuraDev/${project.archivesBaseName}.git"
+                developerConnection "scm:git:gitlab.brainstonemod.com:AuraDev/${project.archivesBaseName}.git"
+            }
+            issueManagement {
+                system "github"
+                url "https://github.com/AuraDevelopmentTeam/${project.archivesBaseName}/issues"
+            }
+            licenses {
+                license {
+                    name "License"
+                    url "https://github.com/AuraDevelopmentTeam/${project.archivesBaseName}/blob/master/LICENSE.md"
+                    distribution "repo"
+                }
+            }
+            developers {
+                developer {
+                    id "shawn_ian"
+                    name "shawn_ian"
+                    roles {
+                        role "developer"
+                        role "team leader"
+                    }
+                }
+                developer {
+                    id "brainstone"
+                    name "The_BrainStone"
+                    email "yannick@tedworld.de"
+                    roles {
+                        role "developer"
+                        role "development leader"
+                    }
+                }
+                developer {
+                    id "ryada"
+                    name "Ryada"
+                    roles {
+                        role "helper developer"
+                    }
+                }
+            }
+        }
+    }
+}
 
 // ==============================================================================
 //
@@ -548,54 +605,27 @@ uploadArchives {
                 repository(url: "file://${rootProject.projectDir}/maven")
             }
 
-            pom {
-                groupId = rootProject.group
-                version = project.version
-                artifactId = project.archivesBaseName
-                project {
-                    name project.archivesBaseName
-                    packaging "jar"
-                    description project.description
-                    url "https://gitlab.brainstonemod.com/AuraDev/${project.archivesBaseName}"
-                    scm {
-                        url "https://gitlab.brainstonemod.com/AuraDev/${project.archivesBaseName}"
-                        connection "scm:git:git@gitlab.brainstonemod.com:AuraDev/${project.archivesBaseName}.git"
-                        developerConnection "scm:git:gitlab.brainstonemod.com:AuraDev/${project.archivesBaseName}.git"
-                    }
-                    issueManagement {
-                        system "github"
-                        url "https://github.com/AuraDevelopmentTeam/${project.archivesBaseName}/issues"
-                    }
-                    licenses {
-                        license {
-                            name "License"
-                            url "https://github.com/AuraDevelopmentTeam/${project.archivesBaseName}/blob/master/LICENSE.md"
-                            distribution "repo"
-                        }
-                    }
-                    developers {
-                        developer {
-                            id "shawn_ian"
-                            name "shawn_ian"
-                            roles {
-                                role "developer"
-                                role "team leader"
-                            }
-                            id "brainstone"
-                            name "The_BrainStone"
-                            roles {
-                                role "developer"
-                                role "development leader"
-                            }
-                            id "ryada"
-                            name "Ryada"
-                            roles {
-                                role "helper developer"
-                            }
-                        }
-                    }
-                }
+            pom = commonPom
+        }
+    }
+}
+
+task uploadArchivesToMavenCentral(type: Upload) {
+    onlyIf {
+        project.hasProperty("ossrhUser") && project.hasProperty("ossrhPassword") && shouldSign
+    }
+
+    configuration = uploadArchives.configuration
+
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: project.findProperty("ossrhUser"), password: project.findProperty("ossrhPassword"))
             }
+
+            pom = commonPom
         }
     }
 }
