@@ -301,7 +301,7 @@ configurations {
     reTrace
     shadowRelocate
     shadow.extendsFrom shadowRelocate
-    provided.extendsFrom shadow
+    compile.extendsFrom shadow
 }
 
 repositories {
@@ -344,7 +344,8 @@ dependencies {
     if (!openSource)
         reTrace "net.sf.proguard:proguard-retrace:5.3.3"
 
-    codacy "com.codacy:codacy-coverage-reporter:2.0.0"
+    if (project.hasProperty("codacyApiToken"))
+        codacy "com.codacy:codacy-coverage-reporter:2.0.0"
 }
 
 if (type == SPONGE) {
