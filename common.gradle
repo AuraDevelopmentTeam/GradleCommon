@@ -110,10 +110,11 @@ buildscript {
 
     dependencies {
         classpath "net.sf.proguard:proguard-gradle:5.3.3"
-        classpath "io.franzbecker:gradle-lombok:1.8"
+        classpath "io.franzbecker:gradle-lombok:1.10"
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
         classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
         classpath "com.xlson.groovycsv:groovycsv:1.2"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.15.0"
     }
 }
 
@@ -124,8 +125,9 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 apply plugin: "eclipse"
 apply plugin: "idea"
-apply plugin: io.franzbecker.gradle.lombok.LombokPlugin
-apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+apply plugin: "io.franzbecker.gradle.lombok.LombokPlugin"
+apply plugin: "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
+apply plugin: "com.github.ben-manes.versions"
 
 if (type == SPONGE)
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
