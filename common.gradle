@@ -125,7 +125,7 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 apply plugin: "eclipse"
 apply plugin: "idea"
-apply plugin: "io.franzbecker.gradle.lombok.LombokPlugin"
+apply plugin: "io.franzbecker.gradle-lombok"
 apply plugin: "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
 apply plugin: "com.github.ben-manes.versions"
 
