@@ -117,10 +117,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "io.franzbecker.gradle-lombok" version "1.10"
-}
-
 apply plugin: "java"
 apply plugin: "jacoco"
 apply plugin: "maven"
@@ -128,8 +124,9 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 apply plugin: "eclipse"
 apply plugin: "idea"
-apply plugin: "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
-apply plugin: "com.github.ben-manes.versions"
+apply plugin: io.franzbecker.gradle.lombok.LombokPlugin
+apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+apply plugin: com.github.ben-manes.versions
 
 if (type == SPONGE)
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
