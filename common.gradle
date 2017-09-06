@@ -403,9 +403,30 @@ task processSources (type: Sync) {
     inputs.property "version", project.version
     inputs.property "buildNum", project.buildNum
     inputs.property "buildType", project.buildType
-    ext.outputDir = file("$buildDir/generated-src")
+    ext.outputDir = file("$buildDir/generated-src/main")
 
     from sourceSets.main.allSource
+    into outputDir
+    filter (ReplaceTokens, tokens: [
+        "id": project.pluginId,
+        "name": project.pluginName,
+        "description": project.description,
+        "version": project.version,
+        "build": project.buildNum,
+        "buildType": project.buildType
+    ])
+}
+
+task processTestSources (type: Sync) {
+    inputs.property "pluginId", project.pluginId
+    inputs.property "pluginName", project.pluginName
+    inputs.property "description", project.description
+    inputs.property "version", project.version
+    inputs.property "buildNum", project.buildNum
+    inputs.property "buildType", project.buildType
+    ext.outputDir = file("$buildDir/generated-src/test")
+
+    from sourceSets.test.allSource
     into outputDir
     filter (ReplaceTokens, tokens: [
         "id": project.pluginId,
@@ -437,6 +458,11 @@ compileJava {
     dependsOn processSources
 }
 
+compileTestJava {
+    source = processTestSources.outputs
+    dependsOn processTestSources
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
     options.incremental = true
@@ -450,7 +476,7 @@ tasks.withType(Jar) {
 jar {
     from sourceSets.main.output
     from mainDirResources
-    
+
     classifier = "dev"
 
     finalizedBy shadowJar
