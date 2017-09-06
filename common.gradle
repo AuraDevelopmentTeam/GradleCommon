@@ -245,27 +245,27 @@ ext {
             }
             developers {
                 developer {
-                    id "shawn_ian"
-                    name "shawn_ian"
-                    roles {
-                        role "developer"
-                        role "team leader"
-                    }
-                }
-                developer {
                     id "brainstone"
                     name "The_BrainStone"
                     email "yannick@tedworld.de"
                     roles {
                         role "developer"
                         role "development leader"
+                        role "team leader"
+                    }
+                }
+                developer {
+                    id "shawn_ian"
+                    name "shawn_ian"
+                    roles {
+                        role "former developer"
                     }
                 }
                 developer {
                     id "ryada"
                     name "Ryada"
                     roles {
-                        role "helper developer"
+                        role "former developer"
                     }
                 }
             }
