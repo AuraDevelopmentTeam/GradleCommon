@@ -15,7 +15,6 @@ import java.security.SecureRandom
 import java.util.regex.*
 import java.util.stream.Collectors
 import org.apache.tools.ant.filters.ReplaceTokens
-import proguard.gradle.ProGuardTask
 
 // =============================================================
 //     ____         ____ _         _  __   _
@@ -109,7 +108,6 @@ buildscript {
     }
 
     dependencies {
-        classpath "net.sf.proguard:proguard-gradle:5.3.3"
         classpath "io.franzbecker:gradle-lombok:1.10"
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
         classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
@@ -498,46 +496,6 @@ shadowJar {
         project.configurations.shadowRelocate.dependencies.each {
             relocate(it.group, "${project.group}.shadow.${it.group}")
         }
-    }
-}
-
-task proguard(type: ProGuardTask, dependsOn: shadowJar) {
-    group "build"
-
-    def tempFile = "${shadowJar.archivePath}.temp.jar"
-
-    // Inputs and outputs
-    injars tempFile
-    outjars shadowJar.archivePath
-
-    // Libraries
-    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"               // Most platforms
-    libraryjars "${System.getProperty('java.home')}/../Classes/classes.jar"   // MacOS X
-    libraryjars configurations.compile
-
-    // General settings
-    dontobfuscate
-    dontshrink
-    keep "class ** { *; }"
-    optimizations "!code/simplification/advanced,code/simplification/*,code/removal/simple,code/removal/variable,code/allocation/variable"
-
-    // No notes or warnings from classes that aren't ours!
-    dontwarn "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
-    dontnote "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
-
-    shadowJar.finalizedBy proguard
-
-    doFirst {
-        copy {
-            from "${buildDir}/libs"
-            into "${buildDir}/libs"
-            include(shadowJar.archivePath.getName())
-            rename ".*\\.jar", "\$0.temp.jar"
-        }
-    }
-
-    doLast {
-        delete tempFile
     }
 }
 
