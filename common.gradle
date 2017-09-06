@@ -567,6 +567,14 @@ test {
     onOutput { descriptor, event ->
        logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
     }
+
+    jacoco {
+        append = true
+    }
+
+    forkEvery = 1
+
+    dependsOn cleanTest
 }
 
 task generateTestReport(type: Zip) {
@@ -648,12 +656,6 @@ jacocoTestReport {
     reports {
         csv.enabled true
         xml.enabled true
-    }
-}
-
-test {
-    jacoco {
-        append = false
     }
 }
 
