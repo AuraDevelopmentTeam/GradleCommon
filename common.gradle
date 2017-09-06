@@ -157,6 +157,10 @@ ext {
     if (System.env.password != null) ext."signing.password" = System.env.password
     if (System.env.secretKeyRingFile != null) ext."signing.secretKeyRingFile" = System.env.secretKeyRingFile
     if (System.env.codacyApiToken != null) codacyApiToken = System.env.codacyApiToken
+    if (System.env.testSecrets != null)
+        testSecrets = System.env.testSecrets
+    else
+        testSecrets = "{}" 
 
     if (!project.hasProperty("pluginName")) pluginName = name
     if (!project.hasProperty("baseGroup")) baseGroup = "dev.aura"
@@ -415,6 +419,7 @@ task processTestSources (type: Sync) {
     inputs.property "version", project.version
     inputs.property "buildNum", project.buildNum
     inputs.property "buildType", project.buildType
+    inputs.property "testSecrets", project.testSecrets
     ext.outputDir = file("$buildDir/generated-src/test")
 
     from sourceSets.test.allSource
@@ -425,7 +430,8 @@ task processTestSources (type: Sync) {
         "description": project.description,
         "version": project.version,
         "build": project.buildNum,
-        "buildType": project.buildType
+        "buildType": project.buildType,
+        "testSecrets": project.testSecrets
     ])
 }
 
