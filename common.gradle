@@ -450,6 +450,10 @@ tasks.withType(Jar) {
 jar {
     from sourceSets.main.output
     from mainDirResources
+    
+    classifier = "dev"
+
+    finalizedBy shadowJar
 }
 
 task sourceJar (type: Jar, dependsOn: processSources) {
@@ -482,7 +486,7 @@ shadowJar {
     from sourceSets.main.output
     from mainDirResources
 
-    classifier = openSource? null : "deobf"
+    classifier = null
     version = jar.version
     configurations = [project.configurations.shadow]
 
@@ -593,6 +597,7 @@ clean.dependsOn cleanGenerateTestReport
 
 artifacts {
     if (openSource) {
+        archives jar
         archives shadowJar
         archives sourceJar
         archives javadocJar
