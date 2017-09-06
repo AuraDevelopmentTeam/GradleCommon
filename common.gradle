@@ -572,6 +572,10 @@ test {
         append = true
     }
 
+    if (gradle.startParameter.isParallelProjectExecutionEnabled()) {
+        maxParallelForks = gradle.startParameter.maxWorkerCount
+    }
+
     forkEvery = 1
 
     dependsOn cleanTest
