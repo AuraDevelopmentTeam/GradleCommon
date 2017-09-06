@@ -298,7 +298,6 @@ idea {
 
 configurations {
     codacy
-    reTrace
     shadowRelocate
     shadow.extendsFrom shadowRelocate
     compile.extendsFrom shadow
@@ -475,8 +474,6 @@ jar {
     from mainDirResources
 
     classifier = "dev"
-
-    finalizedBy shadowJar
 }
 
 task sourceJar (type: Jar, dependsOn: processSources) {
@@ -486,22 +483,6 @@ task sourceJar (type: Jar, dependsOn: processSources) {
     from mainDirResources
 
     classifier = "sources"
-    version = jar.version
-}
-
-javadoc {
-    dependsOn delombok
-
-    source = delombok.outputDir
-    classpath = sourceSets.main.compileClasspath
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    group "build"
-
-    from javadoc.destinationDir
-
-    classifier = "javadoc"
     version = jar.version
 }
 
@@ -542,6 +523,22 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     dontnote "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
 
     shadowJar.finalizedBy proguard
+}
+
+javadoc {
+    dependsOn delombok
+
+    source = delombok.outputDir
+    classpath = sourceSets.main.compileClasspath
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    group "build"
+
+    from javadoc.destinationDir
+
+    classifier = "javadoc"
+    version = jar.version
 }
 
 test {
