@@ -504,8 +504,10 @@ shadowJar {
 task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     group "build"
 
+    def tempFile = "${shadowJar.archivePath}.temp.jar"
+
     // Inputs and outputs
-    injars shadowJar.archivePath
+    injars tempFile
     outjars shadowJar.archivePath
 
     // Libraries
@@ -516,6 +518,7 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     // General settings
     dontobfuscate
     dontshrink
+    keep "class ** { *; }"
     optimizations "!code/simplification/advanced,code/simplification/*,code/removal/simple,code/removal/variable,code/allocation/variable"
 
     // No notes or warnings from classes that aren't ours!
@@ -523,6 +526,19 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     dontnote "!class ${rootProject.baseGroup}.**|class ${rootProject.baseGroup}.**.shadow.**"
 
     shadowJar.finalizedBy proguard
+
+    doFirst {
+        copy {
+            from "${buildDir}/libs"
+            into "${buildDir}/libs"
+            include(shadowJar.archivePath.getName())
+            rename ".*\\.jar", "\$0.temp.jar"
+        }
+    }
+
+    doLast {
+        delete tempFile
+    }
 }
 
 javadoc {
