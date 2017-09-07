@@ -1,6 +1,16 @@
 import org.apache.tools.ant.DirectoryScanner
 import org.apache.tools.ant.taskdefs.condition.Os
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.ajoberstar:grgit:2.0.0"
+    }
+}
+
 description "Common Gradle Build Script"
 
 def getLatestTag() {
