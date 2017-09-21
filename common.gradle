@@ -176,6 +176,11 @@ ext {
             customCharts = Boolean.parseBoolean(customCharts)
     } else
         customCharts = false
+    if (project.hasProperty("useRootValues")) {
+        if (useRootValues instanceof String)
+            useRootValues = Boolean.parseBoolean(useRootValues)
+    } else
+        useRootValues = false
 
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
     mainDirResources = fileTree(dir: file(projectDir), includes: ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"])
@@ -370,69 +375,75 @@ lombok {
 }
 
 processResources {
+    def baseProject = useRootValues? rootProject : project
+
     // this will ensure that this task is redone when the versions change.
-    inputs.property "pluginId", project.pluginId
-    inputs.property "pluginName", project.pluginName
-    inputs.property "description", project.description
-    inputs.property "version", project.version
-    inputs.property "buildNum", project.buildNum
-    inputs.property "buildType", project.buildType
+    inputs.property "pluginId", baseProject.pluginId
+    inputs.property "pluginName", baseProject.pluginName
+    inputs.property "description", baseProject.description
+    inputs.property "version", baseProject.version
+    inputs.property "buildNum", baseProject.buildNum
+    inputs.property "buildType", baseProject.buildType
 
     from(sourceSets.main.resources.srcDirs) {
         exclude "lang"
         exclude "*.conf"
 
         expand \
-            "id": project.pluginId,
-            "name": project.pluginName,
-            "description": project.description,
-            "version": project.version,
-            "build": project.buildNum,
-            "buildType": project.buildType
+            "id": baseProject.pluginId,
+            "name": baseProject.pluginName,
+            "description": baseProject.description,
+            "version": baseProject.version,
+            "build": baseProject.buildNum,
+            "buildType": baseProject.buildType
     }
 }
 
 task processSources (type: Sync) {
-    inputs.property "pluginId", project.pluginId
-    inputs.property "pluginName", project.pluginName
-    inputs.property "description", project.description
-    inputs.property "version", project.version
-    inputs.property "buildNum", project.buildNum
-    inputs.property "buildType", project.buildType
+    def baseProject = useRootValues? rootProject : project
+
+    inputs.property "pluginId", baseProject.pluginId
+    inputs.property "pluginName", baseProject.pluginName
+    inputs.property "description", baseProject.description
+    inputs.property "version", baseProject.version
+    inputs.property "buildNum", baseProject.buildNum
+    inputs.property "buildType", baseProject.buildType
     ext.outputDir = file("$buildDir/generated-src/main")
 
     from sourceSets.main.allSource
     into outputDir
     filter (ReplaceTokens, tokens: [
-        "id": project.pluginId,
-        "name": project.pluginName,
-        "description": project.description,
-        "version": project.version,
-        "build": project.buildNum,
-        "buildType": project.buildType
+        "id": baseProject.pluginId,
+        "name": baseProject.pluginName,
+        "description": baseProject.description,
+        "version": baseProject.version,
+        "build": baseProject.buildNum,
+        "buildType": baseProject.buildType
     ])
 }
 
 task processTestSources (type: Sync) {
-    inputs.property "pluginId", project.pluginId
-    inputs.property "pluginName", project.pluginName
-    inputs.property "description", project.description
-    inputs.property "version", project.version
-    inputs.property "buildNum", project.buildNum
-    inputs.property "buildType", project.buildType
-    inputs.property "testSecrets", project.testSecrets
+    def baseProject = useRootValues? rootProject : project
+
+    inputs.property "pluginId", baseProject.pluginId
+    inputs.property "pluginName", baseProject.pluginName
+    inputs.property "description", baseProject.description
+    inputs.property "version", baseProject.version
+    inputs.property "buildNum", baseProject.buildNum
+    inputs.property "buildType", baseProject.buildType
+    inputs.property "testSecrets", baseProject.testSecrets
     ext.outputDir = file("$buildDir/generated-src/test")
 
     from sourceSets.test.allSource
     into outputDir
     filter (ReplaceTokens, tokens: [
-        "id": project.pluginId,
-        "name": project.pluginName,
-        "description": project.description,
-        "version": project.version,
-        "build": project.buildNum,
-        "buildType": project.buildType,
-        "testSecrets": project.testSecrets
+        "id": baseProject.pluginId,
+        "name": baseProject.pluginName,
+        "description": baseProject.description,
+        "version": baseProject.version,
+        "build": baseProject.buildNum,
+        "buildType": baseProject.buildType,
+        "testSecrets": baseProject.testSecrets
     ])
 }
 
