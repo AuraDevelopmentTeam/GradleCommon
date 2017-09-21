@@ -285,6 +285,10 @@ eclipse {
         downloadJavadoc = true
         downloadSources = true
     }
+
+    project {
+        name = pluginName
+    }
 }
 
 idea {
