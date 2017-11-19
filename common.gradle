@@ -113,11 +113,27 @@ buildscript {
     }
 
     dependencies {
-        classpath "io.franzbecker:gradle-lombok:1.10"
-        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
-        classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
         classpath "com.xlson.groovycsv:groovycsv:1.2"
+
+        classpath "io.franzbecker:gradle-lombok:1.11"
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
         classpath "com.github.ben-manes:gradle-versions-plugin:0.15.0"
+
+        if (type == "sponge")
+            classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
+    }
+}
+
+allprojects {
+    buildscript {
+        repositories {
+            jcenter()
+            mavenCentral()
+            maven {
+                name "Gradle-Plugins"
+                url "https://plugins.gradle.org/m2/"
+            }
+        }
     }
 }
 
