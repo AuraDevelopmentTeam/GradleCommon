@@ -37,7 +37,7 @@ ext {
     } else
         buildOffset = 0
 
-    gitDescription = "git describe --dirty".execute(null, projectDir).text.trim()
+    gitDescription = "git describe --tags --dirty".execute(null, projectDir).text.trim()
 }
 
 def getBuild() {
