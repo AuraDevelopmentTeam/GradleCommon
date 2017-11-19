@@ -245,6 +245,9 @@ ext {
         )
     }
 
+    // JSON patterns
+    jsonPatterns = ["mcmod.info", "**/*.json", "**/*.mcmeta"]
+
     // Common POM
     commonPom = project.pom {
         groupId = rootProject.group
@@ -467,6 +470,15 @@ processResources {
             "version": baseProject.version,
             "build": baseProject.buildNum,
             "buildType": baseProject.buildType
+    }
+
+    rename "(.+_at.cfg)", "META-INF/\$1"
+
+    // Minify json resources
+    doLast {
+        fileTree(dir: outputs.files.asPath, includes: jsonPatterns).each {
+            File file -> file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+        }
     }
 }
 
