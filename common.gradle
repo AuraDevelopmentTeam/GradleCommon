@@ -522,11 +522,12 @@ task delombok(type: DelombokTask, dependsOn: compileJava) {
     group "build"
     description "Generates Lombok free Java code from code with Lombok"
 
-  	ext.outputDir = file("$buildDir/delombok")
+    ext.outputDir = file("$buildDir/delombok")
 
-  	outputs.dir(outputDir)
-		inputs.dir(processSources.outputDir)
-		args(processSources.outputDir, "-d", outputDir)
+    classpath += project.configurations.compileOnly
+    outputs.dir(outputDir)
+    inputs.dir(processSources.outputDir)
+    args(processSources.outputDir, "-d", outputDir)
 
     doLast {
         fileTree(dir: outputDir, exclude: "**/*.java").forEach{file -> file.delete()}
