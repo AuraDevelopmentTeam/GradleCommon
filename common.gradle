@@ -146,6 +146,9 @@ if (type == SPONGE)
 //
 // ===============================================
 
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
 if (!project.hasProperty("type")) {
     throw new NoSuchElementException("No type is specified!")
 } else if ((type != NONE) && (type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE)) {
