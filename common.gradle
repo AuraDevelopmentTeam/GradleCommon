@@ -211,8 +211,8 @@ ext {
 
     // default versions
 
-    if (!project.hasProperty("lombokVersion")) lombokVersion = "1.16.18"
-    if (!project.hasProperty("lombokHash")) lombokHash = "9d957f572386b9e257093a45b148f9b411cff80d9efd55eaf6fca27002d2e4d9"
+    if (!project.hasProperty("lombok_version")) lombok_version = "1.16.18"
+    if (!project.hasProperty("lombok_hash")) lombok_hash = "9d957f572386b9e257093a45b148f9b411cff80d9efd55eaf6fca27002d2e4d9"
 
     if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.12-SNAPSHOT"
     if (!project.hasProperty("spigot_version")) spigot_version = "1.12-R0.1-SNAPSHOT"
@@ -430,8 +430,8 @@ if (type == SPONGE) {
 }
 
 lombok {
-    version = lombokVersion
-    sha256 = lombokHash
+    version = lombok_version
+    sha256 = lombok_hash
 }
 
 processResources {
