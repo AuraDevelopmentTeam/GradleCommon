@@ -355,11 +355,15 @@ repositories {
     mavenCentral()
 
     maven {
-        name "bungeecord-repo"
+        name "Aura Dev"
+        url "https://maven.jnc.world"
+    }
+    maven {
+        name "bungeecord"
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
     maven {
-        name "spigot-repo"
+        name "spigot"
         url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
     }
     maven {
@@ -367,7 +371,7 @@ repositories {
         url = "https://repo.spongepowered.org/maven"
     }
     maven {
-        name "bstats-repo"
+        name "bstats"
         url "http://repo.bstats.org/content/repositories/releases"
     }
 }
