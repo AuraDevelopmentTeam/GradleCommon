@@ -10,6 +10,7 @@
 
 import static com.xlson.groovycsv.CsvParser.parseCsv
 
+import com.github.spotbugs.SpotBugsTask
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import java.security.SecureRandom
 import java.util.regex.*
