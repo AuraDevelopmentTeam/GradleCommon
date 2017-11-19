@@ -119,6 +119,7 @@ buildscript {
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
         classpath "com.github.ben-manes:gradle-versions-plugin:0.15.0"
         classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.5"
+        classpath "io.freefair.gradle:gradle-plugins:2.0.2"
 
         if (type == "sponge")
             classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
@@ -149,6 +150,7 @@ apply plugin: io.franzbecker.gradle.lombok.LombokPlugin
 apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
 apply plugin: com.github.spotbugs.SpotBugsPlugin
+apply plugin: io.freefair.gradle.plugins.javadoc.JavadocLinksPlugin
 
 if (type == SPONGE)
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
@@ -603,6 +605,18 @@ javadoc {
 
     source = delombok.outputDir
     classpath = sourceSets.main.compileClasspath
+    def appName = "${pluginName} - ${version}"
+
+    project.configure(options) {
+        memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+        charSet = "UTF-8"
+        docTitle = appName
+        windowTitle = appName
+        header = "<b>$appName</b>"
+        author = "true"
+        use = "true"
+        links("https://jd.spongepowered.org/${sponge_version}/")
+    }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
