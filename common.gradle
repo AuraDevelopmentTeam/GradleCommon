@@ -118,6 +118,7 @@ buildscript {
         classpath "io.franzbecker:gradle-lombok:1.11"
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
         classpath "com.github.ben-manes:gradle-versions-plugin:0.15.0"
+        classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.5"
 
         if (type == "sponge")
             classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
@@ -147,6 +148,7 @@ apply plugin: "idea"
 apply plugin: io.franzbecker.gradle.lombok.LombokPlugin
 apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
+apply plugin: com.github.spotbugs.SpotBugsPlugin
 
 if (type == SPONGE)
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
@@ -213,6 +215,7 @@ ext {
 
     if (!project.hasProperty("lombok_version")) lombok_version = "1.16.18"
     if (!project.hasProperty("lombok_hash")) lombok_hash = "9d957f572386b9e257093a45b148f9b411cff80d9efd55eaf6fca27002d2e4d9"
+    if (!project.hasProperty("spotBugs_version")) spotBugs_version = "3.1.0"
 
     if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.12-SNAPSHOT"
     if (!project.hasProperty("spigot_version")) spigot_version = "1.12-R0.1-SNAPSHOT"
@@ -366,6 +369,11 @@ configurations {
     compile.extendsFrom shadow
 }
 
+spotbugs {
+    toolVersion = spotBugs_version
+    effort = "max"
+}
+
 repositories {
     jcenter()
     mavenCentral()
@@ -405,7 +413,10 @@ dependencies {
         shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
     }
 
+    compileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
+
     testCompile "junit:junit:4.12"
+    testCompileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
     if (project.hasProperty("codacyApiToken"))
         codacy "com.codacy:codacy-coverage-reporter:2.0.0"
@@ -620,7 +631,32 @@ task generateTestReport(type: Zip) {
     test.finalizedBy generateTestReport
 }
 
+task spotbugs(dependsOn: tasks.withType(SpotBugsTask)) {
+    group "verification"
+    description "Run SpotBugs analysis for all classes"
+
+    check.dependsOn tasks.spotbugs
+}
+
+task generateSpotbugsReport(type: Zip) {
+    from file("${buildDir}/reports/spotbugs")
+    archiveName "${project.name}-SpotbugsReport.zip"
+    destinationDir rootProject.projectDir
+}
+
+tasks.withType(SpotBugsTask) {
+    group "verification"
+
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+
+    finalizedBy tasks.generateSpotbugsReport
+}
+
 clean.dependsOn cleanGenerateTestReport
+clean.dependsOn cleanGenerateSpotbugsReport
 
 artifacts {
     archives jar
