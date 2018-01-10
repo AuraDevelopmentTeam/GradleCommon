@@ -104,43 +104,6 @@ def printCoverageText(projectName, coverageInstructions, coverageBranches, cover
 //
 // ==========================================
 
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven {
-            name "Gradle-Plugins"
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-
-    dependencies {
-        classpath "com.xlson.groovycsv:groovycsv:1.2"
-
-        classpath "io.franzbecker:gradle-lombok:1.11"
-        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.15.0"
-        classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.5"
-        classpath "io.freefair.gradle:gradle-plugins:2.0.2"
-
-        if (type == "sponge")
-            classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
-    }
-}
-
-allprojects {
-    buildscript {
-        repositories {
-            jcenter()
-            mavenCentral()
-            maven {
-                name "Gradle-Plugins"
-                url "https://plugins.gradle.org/m2/"
-            }
-        }
-    }
-}
-
 apply plugin: "java"
 apply plugin: "jacoco"
 apply plugin: "maven"
@@ -148,14 +111,6 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 apply plugin: "eclipse"
 apply plugin: "idea"
-apply plugin: io.franzbecker.gradle.lombok.LombokPlugin
-apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
-apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
-apply plugin: com.github.spotbugs.SpotBugsPlugin
-apply plugin: io.freefair.gradle.plugins.javadoc.JavadocLinksPlugin
-
-if (type == SPONGE)
-    apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
 
 // ===============================================
 //
@@ -167,9 +122,6 @@ if (type == SPONGE)
 //                                 /____/
 //
 // ===============================================
-
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
 
 if (!project.hasProperty("type")) {
     throw new NoSuchElementException("No type is specified!")
@@ -211,6 +163,11 @@ ext {
             useRootValues = Boolean.parseBoolean(useRootValues)
     } else
         useRootValues = false
+    if (project.hasProperty("enableShadow")) {
+        if (enableShadow instanceof String)
+            enableShadow = Boolean.parseBoolean(enableShadow)
+    } else
+        enableShadow = true
 
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
     mainDirResources = fileTree(dir: file(projectDir), includes: ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"])
@@ -219,7 +176,7 @@ ext {
 
     if (!project.hasProperty("lombok_version")) lombok_version = "1.16.18"
     if (!project.hasProperty("lombok_hash")) lombok_hash = "9d957f572386b9e257093a45b148f9b411cff80d9efd55eaf6fca27002d2e4d9"
-    if (!project.hasProperty("spotBugs_version")) spotBugs_version = "3.1.0"
+    if (!project.hasProperty("spotBugs_version")) spotBugs_version = "3.1.1"
 
     if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.12-SNAPSHOT"
     if (!project.hasProperty("spigot_version")) spigot_version = "1.12-R0.1-SNAPSHOT"
@@ -308,6 +265,69 @@ ext {
     }
 }
 
+// ==========================================
+//
+//     ____   __               _
+//    / __ \ / /__  __ ____ _ (_)____   _____
+//   / /_/ // // / / // __ `// // __ \ / ___/
+//  / ____// // /_/ // /_/ // // / / /(__  )
+// /_/    /_/ \__,_/ \__, //_//_/ /_//____/
+//                  /____/
+//
+// ==========================================
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            name "Gradle-Plugins"
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath "com.xlson.groovycsv:groovycsv:1.2"
+
+        classpath "io.franzbecker:gradle-lombok:1.11"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.15.0"
+        classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.5"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.5.2"
+        classpath "io.freefair.gradle:gradle-plugins:2.0.2"
+        
+        if (!project.hasProperty("enableShadow") || Boolean.parseBoolean(enableShadow))
+            classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+
+        if (type == "sponge")
+            classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
+    }
+}
+
+allprojects {
+    buildscript {
+        repositories {
+            jcenter()
+            mavenCentral()
+            maven {
+                name "Gradle-Plugins"
+                url "https://plugins.gradle.org/m2/"
+            }
+        }
+    }
+}
+
+apply plugin: io.franzbecker.gradle.lombok.LombokPlugin
+apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
+apply plugin: com.github.spotbugs.SpotBugsPlugin
+apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
+apply plugin: io.freefair.gradle.plugins.javadoc.JavadocLinksPlugin
+
+if (enableShadow)
+    apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+
+if (type == SPONGE)
+    apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
+
 // ==============================================================================
 //
 //    ______               ____ _                             __   _
@@ -319,6 +339,8 @@ ext {
 //
 // ==============================================================================
 
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
 Project proj = project
 
 eclipse {
@@ -371,14 +393,24 @@ idea {
 
 configurations {
     codacy
-    shadowRelocate
-    shadow.extendsFrom shadowRelocate
-    compile.extendsFrom shadow
+    
+    if (enableShadow) {
+        shadowRelocate
+        shadow.extendsFrom shadowRelocate
+        compile.extendsFrom shadow
+    }
 }
 
 spotbugs {
     toolVersion = spotBugs_version
     effort = "max"
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        licenseHeader "// " + file("LICENSE.md").text
+    }
 }
 
 repositories {
@@ -398,8 +430,8 @@ repositories {
         url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
     }
     maven {
-        name = "sponge"
-        url = "https://repo.spongepowered.org/maven"
+        name "sponge"
+        url "https://repo.spongepowered.org/maven"
     }
     maven {
         name "bstats"
@@ -414,10 +446,6 @@ dependencies {
         compile "org.spigotmc:spigot-api:${spigot_version}"
     } else if (type == SPONGE) {
         compile "org.spongepowered:spongeapi:${sponge_version}"
-    }
-
-    if (useStats) {
-        shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
     }
 
     compileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
@@ -587,17 +615,20 @@ task sourceJar (type: Jar, dependsOn: processSources) {
     version = jar.version
 }
 
-shadowJar {
-    from sourceSets.main.output
-    from mainDirResources
+if (enableShadow) {
+    shadowJar {
+        from sourceSets.main.output
+        from mainDirResources
 
-    classifier = null
-    version = jar.version
-    configurations = [project.configurations.shadow]
+        classifier = null
+        version = jar.version
+        configurations = [project.configurations.shadow]
 
-    doFirst {
-        project.configurations.shadowRelocate.dependencies.each {
-            relocate(it.group, "${project.group}.shadow.${it.group}")
+        doFirst {
+            project.configurations.shadowRelocate.dependencies.each {
+                def group = it.group.replace("-", "")
+                relocate(group, "${project.group}.shadow.${group}")
+            }
         }
     }
 }
@@ -689,9 +720,11 @@ clean.dependsOn cleanGenerateSpotbugsReport
 
 artifacts {
     archives jar
-    archives shadowJar
     archives sourceJar
     archives javadocJar
+    
+    if (enableShadow)
+        archives shadowJar
 }
 
 signing {
