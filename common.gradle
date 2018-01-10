@@ -409,7 +409,9 @@ spotbugs {
 spotless {
     java {
         googleJavaFormat()
-        licenseHeader "// " + file("LICENSE.md").text
+
+        if (file("LICENSE.md").exists())
+            licenseHeader "// " + file("LICENSE.md").text
     }
 }
 
