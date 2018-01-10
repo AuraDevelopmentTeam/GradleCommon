@@ -449,6 +449,10 @@ dependencies {
     } else if (type == SPONGE) {
         compile "org.spongepowered:spongeapi:${sponge_version}"
     }
+    
+    if (useStats) {
+        shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
+    }
 
     compileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
