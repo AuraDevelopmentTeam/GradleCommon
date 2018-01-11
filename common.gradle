@@ -631,9 +631,11 @@ if (enableShadow) {
         configurations = [project.configurations.shadow]
 
         doFirst {
-            project.configurations.shadowRelocate.dependencies.each {
-                def group = it.group.replace("-", "")
-                relocate(group, "${project.group}.shadow.${group}")
+            project.configurations.shadowRelocate.incoming.resolutionResult.allComponents {
+                if (it.id instanceof ModuleComponentIdentifier) {
+                    def group = it.id.group.replace("-", "")
+                    relocate(group, "${project.group}.shadow.${group}")
+                }
             }
         }
     }
