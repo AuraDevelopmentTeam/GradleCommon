@@ -145,11 +145,32 @@ task updateTemplateFiles(dependsOn: checkoutLatestTag) {
     }
 }
 
-task stageUpdate(type: Exec, dependsOn: updateTemplateFiles) {
+task updateGradleWrapper1(type: Exec, dependsOn: updateTemplateFiles) {
+    def gradleVersion
+    
+    doFirst {
+        gradleVersion = file("gradle/wrapper/gradle-wrapper.properties").text =~ /(?<=gradle-)\d+(?:\.\d+){1,2}/
+        gradleVersion = gradleVersion.find()? gradleVersion.group() : gradle.gradleVersion
+    }
+    
+    workingDir project.file("..")
+
+    executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
+    args "-Dorg.gradle.daemon=false", "wrapper", "--gradle-version=${-> gradleVersion}"
+}
+
+task updateGradleWrapper2(type: Exec, dependsOn: updateGradleWrapper1) {
+    workingDir project.file("..")
+
+    executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
+    args "-Dorg.gradle.daemon=false", "wrapper"
+}
+
+task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
     workingDir project.file("..")
 
     executable "git"
-    args "add", "GradleCommon", ".gitlab-ci.yml", ".gitignore", ".gitattributes"
+    args "add", "GradleCommon", ".gitlab-ci.yml", ".gitignore", ".gitattributes", "gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties"
 }
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
@@ -161,4 +182,4 @@ task commitUpdate(type: Exec, dependsOn: stageUpdate) {
     ignoreExitValue = true
 }
 
-task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, updateTemplateFiles, stageUpdate, commitUpdate])
+task updateGradleCommon(dependsOn: [resetChanges, fetchUpdates, checkoutLatestTag, updateTemplateFiles, updateGradleWrapper1, updateGradleWrapper2, stageUpdate, commitUpdate])
