@@ -72,3 +72,9 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+
+#################
+## Dev Env
+#################
+
+*.lang.txt
