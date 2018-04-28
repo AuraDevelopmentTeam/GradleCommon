@@ -524,8 +524,9 @@ processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "pluginId", baseProject.pluginId
     inputs.property "pluginName", baseProject.pluginName
-    inputs.property "description", baseProject.description
     inputs.property "version", baseProject.version
+    inputs.property "group", baseProject.group
+    inputs.property "description", baseProject.description
     inputs.property "buildNum", baseProject.buildNum
     inputs.property "buildType", baseProject.buildType
 
@@ -536,8 +537,9 @@ processResources {
         expand \
             "id": baseProject.pluginId,
             "name": baseProject.pluginName,
-            "description": baseProject.description,
             "version": baseProject.version,
+            "group": baseProject.group,
+            "description": baseProject.description,
             "build": baseProject.buildNum,
             "buildType": baseProject.buildType
     }
@@ -557,8 +559,9 @@ task processSources (type: Sync) {
 
     inputs.property "pluginId", baseProject.pluginId
     inputs.property "pluginName", baseProject.pluginName
-    inputs.property "description", baseProject.description
     inputs.property "version", baseProject.version
+    inputs.property "group", baseProject.group
+    inputs.property "description", baseProject.description
     inputs.property "buildNum", baseProject.buildNum
     inputs.property "buildType", baseProject.buildType
     ext.outputDir = file("$buildDir/generated-src/main")
@@ -568,8 +571,9 @@ task processSources (type: Sync) {
     filter (ReplaceTokens, tokens: [
         "id": baseProject.pluginId,
         "name": baseProject.pluginName,
-        "description": baseProject.description,
         "version": baseProject.version,
+        "group": baseProject.group,
+        "description": baseProject.description,
         "build": baseProject.buildNum,
         "buildType": baseProject.buildType
     ])
@@ -580,8 +584,9 @@ task processTestSources (type: Sync) {
 
     inputs.property "pluginId", baseProject.pluginId
     inputs.property "pluginName", baseProject.pluginName
-    inputs.property "description", baseProject.description
     inputs.property "version", baseProject.version
+    inputs.property "group", baseProject.group
+    inputs.property "description", baseProject.description
     inputs.property "buildNum", baseProject.buildNum
     inputs.property "buildType", baseProject.buildType
     inputs.property "testSecrets", baseProject.testSecrets
@@ -592,8 +597,9 @@ task processTestSources (type: Sync) {
     filter (ReplaceTokens, tokens: [
         "id": baseProject.pluginId,
         "name": baseProject.pluginName,
-        "description": baseProject.description,
         "version": baseProject.version,
+        "group": baseProject.group,
+        "description": baseProject.description,
         "build": baseProject.buildNum,
         "buildType": baseProject.buildType,
         "testSecrets": baseProject.testSecrets
