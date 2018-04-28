@@ -111,6 +111,19 @@ def printCoverageText(projectName, coverageInstructions, coverageBranches, cover
     println String.format("Covered %.2f%% of complexity for ${projectName}.", ((double)coverageComplexity[1] / (double)coverageComplexity[0]) * 100.0)
     println String.format("Covered %.2f%% of methods for ${projectName}.", ((double)coverageMethods[1] / (double)coverageMethods[0]) * 100.0)
 }
+def signJar(archivePath) {
+    if (project.hasProperty("keyStoreAlias") && project.hasProperty("keyStore") && project.hasProperty("keyStorePass")) {
+        ant.signjar(
+            jar:                  archivePath,
+            alias:                project.keyStoreAlias,
+            keystore:             project.keyStore,
+            storepass:            project.keyStorePass,
+            preservelastmodified: true
+        )
+    } else {
+        println "WARNING!!!\tCannot sign jar!"
+    }
+}
 
 // ==========================================
 //
@@ -159,7 +172,7 @@ ext {
     if (System.env.testSecrets != null)
         testSecrets = System.env.testSecrets
     else
-        testSecrets = "{}" 
+        testSecrets = "{}"
 
     if (!project.hasProperty("pluginName")) pluginName = name
     if (!project.hasProperty("baseGroup")) baseGroup = "dev.aura"
@@ -167,6 +180,11 @@ ext {
     buildNum = getBuild()
     buildType = getBuildType()
 
+    if (project.hasProperty("signJar")) {
+        if (signJar instanceof String)
+            signJar = Boolean.parseBoolean(signJar)
+    } else
+        signJar = false
     if (project.hasProperty("useStats")) {
         if (useStats instanceof String)
             useStats = Boolean.parseBoolean(useStats)
@@ -320,7 +338,7 @@ buildscript {
         classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.5"
         classpath "com.diffplug.spotless:spotless-plugin-gradle:3.5.2"
         classpath "io.freefair.gradle:gradle-plugins:2.0.2"
-        
+
         if (!project.hasProperty("enableShadow") || Boolean.parseBoolean(enableShadow.toString()))
             classpath "com.github.jengelman.gradle.plugins:shadow:2.0.3"
 
@@ -419,7 +437,7 @@ idea {
 
 configurations {
     codacy
-    
+
     if (enableShadow) {
         shadowRelocate
         shadow.extendsFrom shadowRelocate
@@ -475,7 +493,7 @@ dependencies {
     } else if (type == SPONGE) {
         compile "org.spongepowered:spongeapi:${sponge_version}"
     }
-    
+
     if (useStats) {
         shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
     }
@@ -640,6 +658,12 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Jar) {
     manifest commonManifest
+
+    if (signJar) {
+        doLast {
+            signJar(jar)
+        }
+    }
 }
 
 jar {
@@ -768,7 +792,7 @@ artifacts {
     archives jar
     archives sourceJar
     archives javadocJar
-    
+
     if (enableShadow)
         archives shadowJar
 }
