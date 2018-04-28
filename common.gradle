@@ -1120,6 +1120,8 @@ task formatJson {
 
 task optimizePng {
     doLast {
+        def pngPatterns = ["**/*.png"]
+
         sourceSets.main.resources.srcDirs.each {
             dir -> fileTree(dir: dir, includes: pngPatterns).each { File file ->
                 long size = file.length()
