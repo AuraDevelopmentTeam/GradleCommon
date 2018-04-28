@@ -255,6 +255,8 @@ ext {
 
     // JSON patterns
     jsonPatterns = ["mcmod.info", "**/*.json", "**/*.mcmeta"]
+    // PNG patterns
+    pngPatterns = ["**/*.png"]
 
     // Common POM
     commonPom = project.pom {
@@ -592,6 +594,7 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude "lang"
         exclude "*.conf"
+        exclude pngPatterns
 
         expand \
             "id": baseProject.pluginId,
@@ -1120,8 +1123,6 @@ task formatJson {
 
 task optimizePng {
     doLast {
-        def pngPatterns = ["**/*.png"]
-
         sourceSets.main.resources.srcDirs.each {
             dir -> fileTree(dir: dir, includes: pngPatterns).each { File file ->
                 long size = file.length()
