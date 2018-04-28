@@ -928,7 +928,7 @@ if (type == FORGE) {
             addGameVersion "${minecraft_version}"
             addGameVersion "Java 8"
 
-            curseforge_additional_versions.split(',').each{ addGameVersion it }
+            if (!curseforge_additional_versions.isEmpty()) curseforge_additional_versions.split(',').each{ addGameVersion it }
 
             mainArtifact(jar) {
                 displayName = jar.archiveName.replace(".jar", "")
@@ -943,8 +943,8 @@ if (type == FORGE) {
             }
 
             relations {
-                curseforge_required_libraries.split(',').each{ requiredLibrary it }
-                curseforge_optional_libraries.split(',').each{ optionalLibrary it }
+                if (!curseforge_required_libraries.isEmpty()) curseforge_required_libraries.split(',').each{ requiredLibrary it }
+                if (!curseforge_optional_libraries.isEmpty()) curseforge_optional_libraries.split(',').each{ optionalLibrary it }
             }
         }
     }
