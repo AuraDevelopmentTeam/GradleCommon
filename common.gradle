@@ -225,6 +225,9 @@ ext {
     if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.12-SNAPSHOT"
     if (!project.hasProperty("spigot_version")) spigot_version = "1.12.2-R0.1-SNAPSHOT"
     if (!project.hasProperty("sponge_version")) sponge_version = "7.1.0-SNAPSHOT"
+    if (!project.hasProperty("minecraft_version")) minecraft_version = "1.12.2"
+    if (!project.hasProperty("forge_version")) forge_version = "14.23.3.2655"
+    if (!project.hasProperty("mapping_version")) mapping_version = "snapshot_20180423"
 
     if (!project.hasProperty("bStats_version")) bStats_version = "1.2"
 }
@@ -644,6 +647,7 @@ task processTestSources (type: Sync) {
     inputs.property "description", baseProject.description
     inputs.property "buildNum", baseProject.buildNum
     inputs.property "buildType", baseProject.buildType
+    inputs.property "minecraftVersion", baseProject.minecraft_version
     inputs.property "testSecrets", baseProject.testSecrets
     ext.outputDir = file("$buildDir/generated-src/test")
 
@@ -657,6 +661,7 @@ task processTestSources (type: Sync) {
         "description": baseProject.description,
         "build": baseProject.buildNum,
         "buildType": baseProject.buildType,
+        "minecraftVersion": baseProject.minecraft_version,
         "testSecrets": baseProject.testSecrets
     ])
 }
