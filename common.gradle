@@ -187,6 +187,11 @@ ext {
             enableShadow = Boolean.parseBoolean(enableShadow)
     } else
         enableShadow = true
+    if (project.hasProperty("enableMockTesting")) {
+        if (enableMockTesting instanceof String)
+            enableMockTesting = Boolean.parseBoolean(enableMockTesting)
+    } else
+        enableMockTesting = false
 
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
     mainDirResources = fileTree(dir: file(projectDir), includes: ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"])
@@ -196,6 +201,8 @@ ext {
     if (!project.hasProperty("lombok_version")) lombok_version = "1.16.20"
     if (!project.hasProperty("lombok_hash")) lombok_hash = "c5178b18caaa1a15e17b99ba5e4023d2de2ebc18b58cde0f5a04ca4b31c10e6d"
     if (!project.hasProperty("spotBugs_version")) spotBugs_version = "3.1.2"
+    if (!project.hasProperty("mockito_version")) mockito_version = "2.18.0"
+    if (!project.hasProperty("powerMock_version")) powerMock_version = "2.0.0-beta.5"
 
     if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.12-SNAPSHOT"
     if (!project.hasProperty("spigot_version")) spigot_version = "1.12.2-R0.1-SNAPSHOT"
@@ -480,6 +487,12 @@ dependencies {
 
     if (project.hasProperty("codacyApiToken"))
         codacy "com.codacy:codacy-coverage-reporter:2.0.0"
+
+    if (enableMockTesting) {
+        testCompile "org.mockito:mockito-core:${mockito_version}"
+        testCompile "org.powermock:powermock-api-mockito2:${powerMock_version}"
+        testCompile "org.powermock:powermock-module-junit4:${powerMock_version}"
+    }
 }
 
 if (type == SPONGE) {
