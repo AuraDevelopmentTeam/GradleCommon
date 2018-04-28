@@ -40,12 +40,15 @@ ext {
         buildOffset = 0
 
     gitDescription = "git describe --tags --dirty".execute(null, projectDir).text.trim()
+
+    isSnapshot = getBuildType() == "SNAPSHOT"
+    isDev = isSnapshot || getBuildType() == "DEV"
 }
 
 def getBuild() {
     def commits = "git rev-list --count HEAD".execute(null, projectDir).text.trim()
 
-    return (project.buildOffset + commits.toInteger()).toString()
+    return (project.buildOffset + commits.toInteger() + (isSnapshot? 1 : 0)).toString()
 }
 def getBuildType() {
     if (project.gitDescription.endsWith("dirty"))
@@ -58,6 +61,22 @@ def getBuildType() {
 def getVersion() {
     def baseVersion = gitDescription.replaceAll("^v|-.*", "") + ".${project.buildNum}"
     def branch = project.hasProperty("branchName")? branchName : ("git describe --all".execute().text.trim().replaceFirst(".*/", ""))
+    def tempVersion = Arrays.stream(gitDescription.replaceAll("^v|-.*", "").split("\\."), 0, 3).map{num -> Integer.parseInt(num)}.toArray()
+
+    if (isDev) {
+        if (project.hasProperty("major")) {
+            tempVersion[0]++;
+            tempVersion[1] = 0;
+            tempVersion[2] = 0;
+        } else if (project.hasProperty("minor")) {
+            tempVersion[1]++;
+            tempVersion[2] = 0;
+        } else {
+            tempVersion[2]++;
+        }
+    }
+
+    def baseVersion = Arrays.stream(tempVersion).map{num -> Integer.toString(num)}.collect(Collectors.joining(".")) + ".${project.buildNum}"
 
     if ((branch != "master") && !branch.matches("^v\\d+\\.\\d+.\\d+\$"))
         baseVersion += "-${branch}"
@@ -923,24 +942,11 @@ Specify "-Pminor" to update the minor version.
 Specify "-Pmajor" to update the major version."""
 
         doLast {
-            def newVersion = Arrays.stream(project.version.split("\\."), 0, 3).map{num -> Integer.parseInt(num)}.toArray()
-
-            if (project.hasProperty("major")) {
-                newVersion[0]++;
-                newVersion[1] = 0;
-                newVersion[2] = 0;
-            } else if (project.hasProperty("minor")) {
-                newVersion[1]++;
-                newVersion[2] = 0;
-            } else {
-                newVersion[2]++;
-            }
-
-            newVersion = Arrays.stream(newVersion).map{num -> Integer.toString(num)}.collect(Collectors.joining("."))
+            def tagVersion = Arrays.stream(project.version.split("\\."), 0, 3).collect(Collectors.joining("."))
 
             exec {
                 executable "git"
-                args "tag", "-a", "v${newVersion}", "-m", getChangelog().replace("\"", "\\\"")
+                args "tag", "-a", "v${tagVersion}", "-m", getChangelog().replace("\"", "\\\"")
             }
         }
     }
