@@ -587,6 +587,7 @@ processResources {
     inputs.property "description", baseProject.description
     inputs.property "buildNum", baseProject.buildNum
     inputs.property "buildType", baseProject.buildType
+    inputs.property "minecraftVersion", baseProject.minecraft_version
 
     from(sourceSets.main.resources.srcDirs) {
         exclude "lang"
@@ -599,7 +600,8 @@ processResources {
             "group": baseProject.group,
             "description": baseProject.description,
             "build": baseProject.buildNum,
-            "buildType": baseProject.buildType
+            "buildType": baseProject.buildType,
+            "minecraftVersion": baseProject.minecraft_version
     }
 
     rename "(.+_at.cfg)", "META-INF/\$1"
@@ -622,6 +624,7 @@ task processSources (type: Sync) {
     inputs.property "description", baseProject.description
     inputs.property "buildNum", baseProject.buildNum
     inputs.property "buildType", baseProject.buildType
+    inputs.property "minecraftVersion", baseProject.minecraft_version
     ext.outputDir = file("$buildDir/generated-src/main")
 
     from sourceSets.main.allSource
@@ -633,7 +636,8 @@ task processSources (type: Sync) {
         "group": baseProject.group,
         "description": baseProject.description,
         "build": baseProject.buildNum,
-        "buildType": baseProject.buildType
+        "buildType": baseProject.buildType,
+        "minecraftVersion": baseProject.minecraft_version
     ])
 }
 
