@@ -296,7 +296,7 @@ buildscript {
         classpath "io.freefair.gradle:gradle-plugins:2.0.2"
         
         if (!project.hasProperty("enableShadow") || Boolean.parseBoolean(enableShadow.toString()))
-            classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+            classpath "com.github.jengelman.gradle.plugins:shadow:2.0.3"
 
         if (type == "sponge")
             classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
@@ -791,7 +791,7 @@ task uploadArchivesToMavenCentral(type: Upload) {
 // =====================================================
 
 jacoco {
-    toolVersion = "0.7.10-SNAPSHOT"
+    toolVersion = "0.8.1"
 }
 
 jacocoTestReport {
