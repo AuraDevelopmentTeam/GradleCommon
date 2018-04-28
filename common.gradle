@@ -453,6 +453,11 @@ idea {
     }
 }
 
+if (type == FORGE) {
+    tasks.eclipseClasspath.dependsOn setupDecompWorkspace
+    tasks.ideaModule.dependsOn setupDecompWorkspace
+}
+
 configurations {
     codacy
 
