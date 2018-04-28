@@ -608,7 +608,7 @@ jar {
     from sourceSets.main.output
     from mainDirResources
 
-    classifier = "dev"
+    classifier = enableShadow? "dev" : null
 }
 
 task sourceJar (type: Jar, dependsOn: processSources) {
