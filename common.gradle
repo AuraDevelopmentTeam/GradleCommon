@@ -388,6 +388,8 @@ if (type == SPONGE)
 if (type == FORGE) {
     apply plugin: net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin
     apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
+
+    tasks.remove(sourceJar)
 }
 
 // ==============================================================================
