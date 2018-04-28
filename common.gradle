@@ -31,6 +31,7 @@ final String NONE = "none"
 final String BUNGEECORD = "bungeecord"
 final String SPIGOT = "spigot"
 final String SPONGE = "sponge"
+final String FORGE = "forge"
 
 ext {
     if (project.hasProperty("buildOffset")) {
@@ -157,8 +158,8 @@ apply plugin: "idea"
 
 if (!project.hasProperty("type")) {
     throw new NoSuchElementException("No type is specified!")
-} else if ((type != NONE) && (type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE)) {
-    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${NONE}\", \"${BUNGEECORD}\", \"${SPIGOT}\" or \"${SPONGE}\"")
+} else if ((type != NONE) && (type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE) && (type != FORGE)) {
+    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${NONE}\", \"${BUNGEECORD}\", \"${SPIGOT}\", \"${SPONGE}\" or \"${FORGE}\"")
 } else if (!project.hasProperty("pluginId")) {
     throw new NoSuchElementException("No pluginId is specified!")
 }
@@ -189,7 +190,7 @@ ext {
         if (useStats instanceof String)
             useStats = Boolean.parseBoolean(useStats)
     } else
-        useStats = (type != NONE)
+        useStats = (type != NONE) && (type != FORGE)
     if (project.hasProperty("customCharts")) {
         if (customCharts instanceof String)
             customCharts = Boolean.parseBoolean(customCharts)
@@ -204,7 +205,7 @@ ext {
         if (enableShadow instanceof String)
             enableShadow = Boolean.parseBoolean(enableShadow)
     } else
-        enableShadow = true
+        enableShadow = useStats
     if (project.hasProperty("enableMockTesting")) {
         if (enableMockTesting instanceof String)
             enableMockTesting = Boolean.parseBoolean(enableMockTesting)
@@ -328,6 +329,10 @@ buildscript {
             name "Gradle-Plugins"
             url "https://plugins.gradle.org/m2/"
         }
+        maven {
+            name "forge"
+            url "http://files.minecraftforge.net/maven"
+        }
     }
 
     dependencies {
@@ -344,6 +349,11 @@ buildscript {
 
         if (type == "sponge")
             classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
+
+        if (type == "forge") {
+            classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+            classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.0.10"
+        }
     }
 }
 
@@ -355,6 +365,10 @@ allprojects {
             maven {
                 name "Gradle-Plugins"
                 url "https://plugins.gradle.org/m2/"
+            }
+            maven {
+                name "forge"
+                url "http://files.minecraftforge.net/maven"
             }
         }
     }
@@ -371,6 +385,11 @@ if (enableShadow)
 
 if (type == SPONGE)
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
+
+if (type == FORGE) {
+    apply plugin: net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin
+    apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
+}
 
 // ==============================================================================
 //
@@ -531,6 +550,18 @@ if (type == SPONGE) {
     }
 }
 
+if (type == FORGE) {
+    minecraft {
+        version = "${minecraft_version}-${forge_version}"
+        runDir = "run"
+        mappings = mapping_version
+        useDepAts = true
+
+        clientJvmArgs += "-Xmx2G"
+        serverJvmArgs += "-Xmx2G"
+    }
+}
+
 lombok {
     version = lombok_version
     sha256 = lombok_hash
@@ -671,6 +702,10 @@ jar {
     from mainDirResources
 
     classifier = enableShadow? "dev" : null
+
+    if (type == FORGE) {
+        finalizedBy reobfJar
+    }
 }
 
 task sourceJar (type: Jar, dependsOn: processSources) {
@@ -699,6 +734,25 @@ if (enableShadow) {
                     relocate(group, "${project.group}.shadow.${group}")
                 }
             }
+        }
+    }
+}
+
+if (type == FORGE) {
+    reobfJar {
+        doLast {
+            signJar(jar)
+        }
+    }
+
+    task deobfJar(type: Jar) {
+        from sourceSets.main.output
+        from mainDirResources
+
+        classifier = "deobf"
+
+        doLast {
+            signJar(deobfJar.archivePath)
         }
     }
 }
@@ -795,6 +849,9 @@ artifacts {
 
     if (enableShadow)
         archives shadowJar
+
+    if (type == FORGE)
+        archives deobfJar
 }
 
 signing {
@@ -837,6 +894,40 @@ task uploadArchivesToMavenCentral(type: Upload) {
             }
 
             pom = commonPom
+        }
+    }
+}
+
+if (type == FORGE) {
+    curseforge {
+        apiKey = project.hasProperty("curseForgeApiKey")? project.curseForgeApiKey : "empty"
+
+        project {
+            id = curseforge_project_id
+            changelog = file("CHANGELOG.md")
+            changelogType = "markdown"
+            releaseType = isSnapshot? "alpha" : (isDev? "beta" : "release")
+            addGameVersion "${minecraft_version}"
+            addGameVersion "Java 8"
+
+            curseforge_additional_versions.splitEachLine(','){ addGameVersion it }
+
+            mainArtifact(jar) {
+                displayName = jar.archiveName.replace(".jar", "")
+            }
+            addArtifact(deobfJar) {
+                displayName = deobfJar.archiveName.replace(".jar", "")
+                changelog = "*This is a file for mod developers. If you don't know what to do with it, don't use it!*"
+            }
+            addArtifact(sourceJar) {
+                displayName = sourceJar.archiveName.replace(".jar", "")
+                changelog = "*This is a file for mod developers. If you don't know what to do with it, don't use it!*"
+            }
+
+            relations {
+                curseforge_required_libraries.splitEachLine(','){ requiredLibrary it }
+                curseforge_optional_libraries.splitEachLine(','){ optionalLibrary it }
+            }
         }
     }
 }
