@@ -237,6 +237,9 @@ if (description == null) description = "Empty description"
 if (project != rootProject) ext.baseGroup = project.parent.group
 group = "${baseGroup}.${pluginId}".toString()
 
+if (type == FORGE)
+    archivesBaseName += "-${minecraft_version}"
+
 ext {
     // bStats
     if (useStats) bStatsName = "bstats-" + ((type == SPIGOT)? "bukkit" : type) + (customCharts? "" : "-lite")
