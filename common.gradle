@@ -496,10 +496,10 @@ repositories {
     jcenter()
     mavenCentral()
 
-    maven {
+    /*maven {
         name "Aura Dev"
         url "https://maven.jnc.world"
-    }
+    }*/
     maven {
         name "bungeecord"
         url "https://oss.sonatype.org/content/repositories/snapshots"
