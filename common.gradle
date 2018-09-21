@@ -888,30 +888,10 @@ uploadArchives {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
             }
 
-            if (project.hasProperty("local_maven")) {
-                repository(url: "file://${local_maven}")
+            if (project.hasProperty("auradev_maven")) {
+                repository(url: auradev_maven)
             } else {
                 repository(url: "file://${rootProject.projectDir}/maven")
-            }
-
-            pom = commonPom
-        }
-    }
-}
-
-task uploadArchivesToMavenCentral(type: Upload) {
-    onlyIf {
-        project.hasProperty("ossrhUser") && project.hasProperty("ossrhPassword") && shouldSign
-    }
-
-    configuration = uploadArchives.configuration
-
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: project.findProperty("ossrhUser"), password: project.findProperty("ossrhPassword"))
             }
 
             pom = commonPom
@@ -950,6 +930,24 @@ if (type == FORGE) {
                 if (!curseforge_optional_libraries.isEmpty()) curseforge_optional_libraries.split(',').each{ optionalLibrary it }
             }
         }
+    }
+}
+
+task releaseSnapshot(dependsOn: uploadArchives) {
+    if (type == FORGE) {
+        dependsOn curseforge
+    }
+}
+
+task release(dependsOn: uploadArchives) {
+    if (type == FORGE) {
+        dependsOn curseforge
+    }
+}
+
+gradle.taskGraph.whenReady {
+    if (gradle.taskGraph.hasTask(project.release) && (project.hasProperty("auradev_maven") && project.hasProperty("auradev_release_maven"))) {
+        project.auradev_maven = project.auradev_release_maven
     }
 }
 
