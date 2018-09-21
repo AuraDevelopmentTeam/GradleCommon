@@ -305,13 +305,6 @@ ext {
                         role "former developer"
                     }
                 }
-                developer {
-                    id "ryada"
-                    name "Ryada"
-                    roles {
-                        role "former developer"
-                    }
-                }
             }
         }
     }
