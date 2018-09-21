@@ -343,23 +343,23 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.xlson.groovycsv:groovycsv:1.2"
+        classpath "com.xlson.groovycsv:groovycsv:1.3"
 
-        classpath "io.franzbecker:gradle-lombok:1.11"
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.15.0"
-        classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.5"
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.5.2"
+        classpath "io.franzbecker:gradle-lombok:1.14"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.20.0"
+        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.3"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.14.0"
         classpath "io.freefair.gradle:gradle-plugins:2.0.2"
 
         if (!project.hasProperty("enableShadow") || Boolean.parseBoolean(enableShadow.toString()))
             classpath "com.github.jengelman.gradle.plugins:shadow:2.0.3"
 
         if (type == "sponge")
-            classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
+            classpath "gradle.plugin.org.spongepowered:spongegradle:0.9.0"
 
         if (type == "forge") {
             classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
-            classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.0.10"
+            classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
         }
     }
 }
