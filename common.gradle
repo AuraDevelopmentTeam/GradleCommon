@@ -385,8 +385,10 @@ apply plugin: io.freefair.gradle.plugins.javadoc.JavadocLinksPlugin
 if (enableShadow)
     apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 
-if (type == SPONGE)
+if (type == SPONGE) {
+    apply plugin: org.spongepowered.gradle.meta.MetadataPlugin
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
+}
 
 if (type == FORGE) {
     apply plugin: net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin
