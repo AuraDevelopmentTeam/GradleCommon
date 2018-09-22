@@ -352,7 +352,9 @@ buildscript {
 
         if (type == "forge") {
             classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
-            classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
+            
+            if (project.hasProperty("curseForgeApiKey"))
+                classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
         }
     }
 }
@@ -388,7 +390,9 @@ if (type == SPONGE)
 
 if (type == FORGE) {
     apply plugin: net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin
-    apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
+    
+    if (project.hasProperty("curseForgeApiKey"))
+        apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
 
     tasks.remove(sourceJar)
 }
@@ -894,7 +898,7 @@ uploadArchives {
     }
 }
 
-if (type == FORGE) {
+if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
     curseforge {
         apiKey = project.hasProperty("curseForgeApiKey")? project.curseForgeApiKey : "empty"
 
