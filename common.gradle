@@ -224,7 +224,7 @@ ext {
 
     if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.13-SNAPSHOT"
     if (!project.hasProperty("spigot_version")) spigot_version = "1.13.1-R0.1-SNAPSHOT"
-    if (!project.hasProperty("sponge_version")) sponge_version = "7.1.0-SNAPSHOT"
+    if (!project.hasProperty("sponge_version")) sponge_version = "7.1.0"
     if (!project.hasProperty("minecraft_version")) minecraft_version = "1.12.2"
     if (!project.hasProperty("forge_version")) forge_version = "14.23.4.2705"
     if (!project.hasProperty("mapping_version")) mapping_version = "stable_39"
