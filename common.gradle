@@ -388,11 +388,14 @@ if (enableShadow)
 if (type == SPONGE) {
     apply plugin: org.spongepowered.gradle.meta.MetadataPlugin
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
+
+    if (project.hasProperty("oreDeploy.apiKey"))
+        apply plugin: org.spongepowered.gradle.ore.OreDeployPlugin
 }
 
 if (type == FORGE) {
     apply plugin: net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin
-    
+
     if (project.hasProperty("curseForgeApiKey"))
         apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
 
@@ -900,6 +903,13 @@ uploadArchives {
     }
 }
 
+if((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
+    oreDeploy {
+        channel = isSnapshot? "alpha" : (isDev? "beta" : "release")
+        recommended = !isDev
+    }
+}
+
 if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
     curseforge {
         apiKey = project.hasProperty("curseForgeApiKey")? project.curseForgeApiKey : "empty"
@@ -935,12 +945,20 @@ if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
 }
 
 task releaseSnapshot(dependsOn: uploadArchives) {
+    if (type == SPONGE) {
+        dependsOn oreDeploy
+    }
+    
     if (type == FORGE) {
         dependsOn curseforge
     }
 }
 
 task release(dependsOn: uploadArchives) {
+    if (type == SPONGE) {
+        dependsOn oreDeploy
+    }
+
     if (type == FORGE) {
         dependsOn curseforge
     }
