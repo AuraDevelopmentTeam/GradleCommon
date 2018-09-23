@@ -903,7 +903,7 @@ uploadArchives {
     }
 }
 
-if((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
+if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
     oreDeploy {
         channel = isSnapshot? "alpha" : (isDev? "beta" : "release")
         recommended = !isDev
@@ -945,21 +945,21 @@ if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
 }
 
 task releaseSnapshot(dependsOn: uploadArchives) {
-    if (type == SPONGE) {
+    if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
         dependsOn oreDeploy
     }
     
-    if (type == FORGE) {
+    if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
         dependsOn curseforge
     }
 }
 
 task release(dependsOn: uploadArchives) {
-    if (type == SPONGE) {
+    if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
         dependsOn oreDeploy
     }
 
-    if (type == FORGE) {
+    if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
         dependsOn curseforge
     }
 }
