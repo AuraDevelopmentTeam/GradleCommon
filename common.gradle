@@ -169,6 +169,8 @@ ext {
     if (System.env.password != null) ext."signing.password" = System.env.password
     if (System.env.secretKeyRingFile != null) ext."signing.secretKeyRingFile" = System.env.secretKeyRingFile
     if (System.env.codacyApiToken != null) codacyApiToken = System.env.codacyApiToken
+    if (System.env.oreDeployApiKey != null) ext."oreDeploy.apiKey" = System.env.oreDeployApiKey
+    if (System.env.curseForgeApiKey != null) curseForgeApiKey = System.env.curseForgeApiKey
     if (System.env.testSecrets != null)
         testSecrets = System.env.testSecrets
     else
