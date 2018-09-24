@@ -966,7 +966,15 @@ task release(dependsOn: uploadArchives) {
 
 gradle.taskGraph.whenReady {
     if (gradle.taskGraph.hasTask(project.release) && (project.hasProperty("auradev_maven") && project.hasProperty("auradev_release_maven"))) {
-        project.auradev_maven = project.auradev_release_maven
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    repository(url: auradev_release_maven) {
+                        authentication(userName: project.findProperty("maven_user"), password: project.findProperty("maven_password"))
+                    }
+                }
+            }
+        }
     }
 }
 
