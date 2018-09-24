@@ -354,7 +354,7 @@ buildscript {
 
         if (type == "forge") {
             classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
-            
+
             if (project.hasProperty("curseForgeApiKey"))
                 classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
         }
@@ -519,6 +519,10 @@ repositories {
     maven {
         name "bstats"
         url "http://repo.bstats.org/content/repositories/releases"
+    }
+
+    removeIf {
+        it.name.startsWith('MavenLocal')
     }
 }
 
@@ -950,7 +954,7 @@ task releaseSnapshot(dependsOn: uploadArchives) {
     if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
         dependsOn oreDeploy
     }
-    
+
     if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
         dependsOn curseforge
     }
