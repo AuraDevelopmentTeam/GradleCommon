@@ -891,7 +891,7 @@ uploadArchives {
             }
 
             if (project.hasProperty("auradev_maven")) {
-                repository(url: auradev_maven) {
+                repository(url: "${-> auradev_maven}") {
                     authentication(userName: project.findProperty("maven_user"), password: project.findProperty("maven_password"))
                 }
             } else {
