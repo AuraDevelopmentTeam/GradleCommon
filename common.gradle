@@ -913,6 +913,7 @@ if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
     oreDeploy {
         channel = isSnapshot? "alpha" : (isDev? "beta" : "release")
         recommended = !isDev
+        changelog = file("CHANGELOG.md")
     }
 }
 
