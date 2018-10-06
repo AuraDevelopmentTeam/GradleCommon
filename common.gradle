@@ -60,7 +60,7 @@ def getBuildType() {
         return "RELEASE"
 }
 def getVersion() {
-    def branch = (project.hasProperty("branchName")? branchName : ("git describe --all".execute().text.trim().replaceFirst(".*/", ""))).replaceAll("/|\\\\", "_")
+    def branch = (project.hasProperty("branchName")? branchName : ("git describe --all".execute().text.trim().replaceFirst(".*?/", ""))).replaceAll("/|\\\\", "_")
     def tempVersion = Arrays.stream(gitDescription.replaceAll("^v|-.*", "").split("\\."), 0, 3).map{num -> Integer.parseInt(num)}.toArray()
 
     if (isDev) {
