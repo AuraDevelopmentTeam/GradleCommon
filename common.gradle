@@ -376,6 +376,10 @@ allprojects {
                 url "http://files.minecraftforge.net/maven"
             }
         }
+        dependencies {
+            if ((type == "forge") || (type == "spongeforge"))
+                classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        }
     }
 }
 
