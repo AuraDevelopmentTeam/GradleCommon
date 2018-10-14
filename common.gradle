@@ -32,6 +32,7 @@ final String BUNGEECORD = "bungeecord"
 final String SPIGOT = "spigot"
 final String SPONGE = "sponge"
 final String FORGE = "forge"
+final String SPONGEFORGE = "spongeforge"
 
 ext {
     if (project.hasProperty("buildOffset")) {
@@ -157,8 +158,8 @@ apply plugin: "idea"
 
 if (!project.hasProperty("type")) {
     throw new NoSuchElementException("No type is specified!")
-} else if ((type != NONE) && (type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE) && (type != FORGE)) {
-    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${NONE}\", \"${BUNGEECORD}\", \"${SPIGOT}\", \"${SPONGE}\" or \"${FORGE}\"")
+} else if ((type != NONE) && (type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE) && (type != FORGE) && (type != SPONGEFORGE)) {
+    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${NONE}\", \"${BUNGEECORD}\", \"${SPIGOT}\", \"${SPONGE}\", \"${FORGE}\" or \"${SPONGEFORGE}\"")
 } else if (!project.hasProperty("pluginId")) {
     throw new NoSuchElementException("No pluginId is specified!")
 }
@@ -244,7 +245,7 @@ if (type == FORGE)
 
 ext {
     // bStats
-    if (useStats) bStatsName = "bstats-" + ((type == SPIGOT)? "bukkit" : type) + (customCharts? "" : "-lite")
+    if (useStats) bStatsName = "bstats-" + ((type == SPIGOT)? "bukkit" : ((type == SPONGEFORGE)? "sponge" : type)) + (customCharts? "" : "-lite")
 
     // Common Manifest
     commonManifest = {
@@ -349,10 +350,10 @@ buildscript {
         if (!project.hasProperty("enableShadow") || Boolean.parseBoolean(enableShadow.toString()))
             classpath "com.github.jengelman.gradle.plugins:shadow:2.0.3"
 
-        if (type == "sponge")
+        if ((type == "sponge") || (type == "spongeforge"))
             classpath "gradle.plugin.org.spongepowered:spongegradle:0.9.0"
 
-        if (type == "forge") {
+        if ((type == "forge") || (type == "spongeforge")) {
             classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
 
             if (project.hasProperty("curseForgeApiKey"))
@@ -387,7 +388,7 @@ apply plugin: io.freefair.gradle.plugins.javadoc.JavadocLinksPlugin
 if (enableShadow)
     apply plugin: com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 
-if (type == SPONGE) {
+if ((type == SPONGE) || (type == SPONGEFORGE)) {
     apply plugin: org.spongepowered.gradle.meta.MetadataPlugin
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
 
@@ -395,7 +396,7 @@ if (type == SPONGE) {
         apply plugin: org.spongepowered.gradle.ore.OreDeployPlugin
 }
 
-if (type == FORGE) {
+if ((type == FORGE) || (type == SPONGEFORGE)) {
     apply plugin: net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin
 
     if (project.hasProperty("curseForgeApiKey"))
@@ -467,7 +468,7 @@ idea {
     }
 }
 
-if (type == FORGE) {
+if ((type == FORGE) || (type == SPONGEFORGE)) {
     tasks.eclipseClasspath.dependsOn setupDecompWorkspace
     tasks.ideaModule.dependsOn setupDecompWorkspace
 }
@@ -531,7 +532,7 @@ dependencies {
         compile "net.md-5:bungeecord-api:${bungeecoord_version}"
     } else if (type == SPIGOT) {
         compile "org.spigotmc:spigot-api:${spigot_version}"
-    } else if (type == SPONGE) {
+    } else if ((type == SPONGE) || (type == SPONGEFORGE)) {
         compile "org.spongepowered:spongeapi:${sponge_version}"
     }
 
@@ -554,7 +555,7 @@ dependencies {
     }
 }
 
-if (type == SPONGE) {
+if ((type == SPONGE) || (type == SPONGEFORGE)) {
     sponge {
         plugin {
             meta {
@@ -572,7 +573,7 @@ if (type == SPONGE) {
     }
 }
 
-if (type == FORGE) {
+if ((type == FORGE) || (type == SPONGEFORGE)) {
     minecraft {
         version = "${minecraft_version}-${forge_version}"
         runDir = "run"
@@ -732,7 +733,7 @@ jar {
 
     classifier = enableShadow? "dev" : null
 
-    if (type == FORGE) {
+    if ((type == FORGE) || (type == SPONGEFORGE)) {
         finalizedBy reobfJar
     }
 }
@@ -767,7 +768,7 @@ if (enableShadow) {
     }
 }
 
-if (type == FORGE) {
+if ((type == FORGE) || (type == SPONGEFORGE)) {
     reobfJar {
         doLast {
             signJar(jar)
@@ -879,7 +880,7 @@ artifacts {
     if (enableShadow)
         archives shadowJar
 
-    if (type == FORGE)
+    if ((type == FORGE) || (type == SPONGEFORGE))
         archives deobfJar
 }
 
@@ -909,7 +910,7 @@ uploadArchives {
     }
 }
 
-if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
+if (((type == SPONGE) || (type == SPONGEFORGE)) && project.hasProperty("oreDeploy.apiKey")) {
     oreDeploy {
         channel = isSnapshot? "alpha" : (isDev? "beta" : "release")
         recommended = !isDev
@@ -917,7 +918,7 @@ if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
     }
 }
 
-if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
+if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey")) {
     curseforge {
         apiKey = project.hasProperty("curseForgeApiKey")? project.curseForgeApiKey : "empty"
 
@@ -952,21 +953,21 @@ if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
 }
 
 task releaseSnapshot(dependsOn: uploadArchives) {
-    if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
+    if (((type == SPONGE) || (type == SPONGEFORGE)) && project.hasProperty("oreDeploy.apiKey")) {
         dependsOn oreDeploy
     }
 
-    if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
+    if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey")) {
         dependsOn curseforge
     }
 }
 
 task release(dependsOn: uploadArchives) {
-    if ((type == SPONGE) && project.hasProperty("oreDeploy.apiKey")) {
+    if (((type == SPONGE) || (type == SPONGEFORGE)) && project.hasProperty("oreDeploy.apiKey")) {
         dependsOn oreDeploy
     }
 
-    if ((type == FORGE) && project.hasProperty("curseForgeApiKey")) {
+    if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey")) {
         dependsOn curseforge
     }
 }
