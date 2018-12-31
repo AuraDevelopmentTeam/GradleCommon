@@ -232,7 +232,7 @@ ext {
     if (!project.hasProperty("forge_version")) forge_version = "14.23.4.2705"
     if (!project.hasProperty("mapping_version")) mapping_version = "stable_39"
 
-    if (!project.hasProperty("bStats_version")) bStats_version = "1.2"
+    if (!project.hasProperty("bStats_version")) bStats_version = "1.4"
 }
 
 version = getVersion()
@@ -541,7 +541,11 @@ dependencies {
     }
 
     if (useStats) {
-        shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
+        if ((type == SPONGE) || (type == SPONGEFORGE)) {
+            compile "org.bstats:${bStatsName}:${bStats_version}"
+        } else {
+            shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
+        }
     }
 
     compileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
