@@ -938,7 +938,7 @@ if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForg
             addGameVersion "${minecraft_version}"
             addGameVersion "Java 8"
 
-            if (!curseforge_additional_versions.isEmpty()) curseforge_additional_versions.split(',').each{ addGameVersion it }
+            if (project.hasProperty("curseforge_additional_versions") && !curseforge_additional_versions.isEmpty()) curseforge_additional_versions.split(',').each{ addGameVersion it }
 
             mainArtifact(jar) {
                 displayName = jar.archiveName.replace(".jar", "")
