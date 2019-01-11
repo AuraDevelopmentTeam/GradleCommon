@@ -356,7 +356,7 @@ buildscript {
         if ((type == "forge") || (type == "spongeforge")) {
             classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
 
-            if (project.hasProperty("curseForgeApiKey"))
+            if (project.hasProperty("curseForgeApiKey") || (System.env.curseForgeApiKey != null))
                 classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
         }
     }
@@ -953,8 +953,8 @@ if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForg
             }
 
             relations {
-                if (!curseforge_required_libraries.isEmpty()) curseforge_required_libraries.split(',').each{ requiredLibrary it }
-                if (!curseforge_optional_libraries.isEmpty()) curseforge_optional_libraries.split(',').each{ optionalLibrary it }
+                if (project.hasProperty("curseforge_required_libraries") && !curseforge_required_libraries.isEmpty()) curseforge_required_libraries.split(',').each{ requiredLibrary it }
+                if (project.hasProperty("curseforge_optional_libraries") && !curseforge_optional_libraries.isEmpty()) curseforge_optional_libraries.split(',').each{ optionalLibrary it }
             }
         }
     }
