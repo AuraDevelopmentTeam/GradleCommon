@@ -166,6 +166,9 @@ if (!project.hasProperty("type")) {
 
 ext {
     // Environment Variables
+    if (System.env.keyStoreAlias != null) keyStoreAlias = System.env.keyStoreAlias
+    if (System.env.keyStore != null) keyStore = System.env.keyStore
+    if (System.env.keyStorePass != null) keyStorePass = System.env.keyStorePass
     if (System.env.keyId != null) ext."signing.keyId" = System.env.keyId
     if (System.env.password != null) ext."signing.password" = System.env.password
     if (System.env.secretKeyRingFile != null) ext."signing.secretKeyRingFile" = System.env.secretKeyRingFile
