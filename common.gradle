@@ -969,7 +969,7 @@ task releaseSnapshot(dependsOn: uploadArchives) {
     }
 
     if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey")) {
-        dependsOn curseforge
+        dependsOn tasks.curseforge
     }
 }
 
@@ -979,7 +979,7 @@ task release(dependsOn: uploadArchives) {
     }
 
     if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey")) {
-        dependsOn curseforge
+        dependsOn tasks.curseforge
     }
 }
 
