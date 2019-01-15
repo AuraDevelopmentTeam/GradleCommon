@@ -929,7 +929,7 @@ if (((type == SPONGE) || (type == SPONGEFORGE)) && project.hasProperty("oreDeplo
     }
 }
 
-if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey")) {
+if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey") && project.hasProperty("curseforge_project_id")) {
     curseforge {
         apiKey = project.hasProperty("curseForgeApiKey")? project.curseForgeApiKey : "empty"
 
@@ -968,7 +968,7 @@ task releaseSnapshot(dependsOn: uploadArchives) {
         dependsOn oreDeploy
     }
 
-    if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey")) {
+    if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey") && project.hasProperty("curseforge_project_id")) {
         dependsOn tasks.curseforge
     }
 }
@@ -978,7 +978,7 @@ task release(dependsOn: uploadArchives) {
         dependsOn oreDeploy
     }
 
-    if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey")) {
+    if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForgeApiKey") && project.hasProperty("curseforge_project_id")) {
         dependsOn tasks.curseforge
     }
 }
