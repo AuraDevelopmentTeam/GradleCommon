@@ -618,6 +618,7 @@ processResources {
         exclude "lang"
         exclude "*.conf"
         exclude pngPatterns
+        exclude "**/*.ogg"
 
         expand \
             "id": baseProject.pluginId,
