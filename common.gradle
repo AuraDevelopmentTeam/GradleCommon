@@ -616,6 +616,7 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         exclude "lang"
+        exclude "assets/*/lang"
         exclude "*.conf"
         exclude pngPatterns
         exclude "**/*.ogg"
