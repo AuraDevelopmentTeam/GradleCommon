@@ -828,6 +828,12 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     version = jar.version
 }
 
+cleanTest {
+    doLast {
+        file("${projectDir}/run/logs/unit-test.log").delete()
+    }
+}
+
 test {
     beforeTest { descriptor ->
         logger.lifecycle("Running test: " + descriptor)
@@ -852,6 +858,7 @@ test {
 
 task generateTestReport(type: Zip) {
     from file("${buildDir}/reports/tests/test")
+    from file("${projectDir}/run/logs/unit-test.log")
     archiveName "${project.name}-TestReport.zip"
     destinationDir rootProject.projectDir
 
