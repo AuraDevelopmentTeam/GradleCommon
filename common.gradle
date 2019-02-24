@@ -269,27 +269,29 @@ ext {
 
     // Common POM
     commonPom = project.pom {
-        groupId = rootProject.group
-        version = project.version
-        artifactId = project.archivesBaseName
+        def baseProject = useRootValues? rootProject : project
+
+        groupId = baseProject.group
+        version = baseProject.version
+        artifactId = baseProject.archivesBaseName
         project {
-            name project.archivesBaseName
+            name baseProject.archivesBaseName
             packaging "jar"
-            description project.description
-            url "https://gitlab.project-creative.de/AuraDev/${project.archivesBaseName}"
+            description baseProject.description
+            url "https://gitlab.project-creative.de/AuraDev/${rootProject.archivesBaseName}"
             scm {
-                url "https://gitlab.project-creative.de/AuraDev/${project.archivesBaseName}"
-                connection "scm:git:git@gitlab.project-creative.de:AuraDev/${project.archivesBaseName}.git"
-                developerConnection "scm:git:gitlab.project-creative.de:AuraDev/${project.archivesBaseName}.git"
+                url "https://gitlab.project-creative.de/AuraDev/${rootProject.archivesBaseName}"
+                connection "scm:git:git@gitlab.project-creative.de:AuraDev/${rootProject.archivesBaseName}.git"
+                developerConnection "scm:git:gitlab.project-creative.de:AuraDev/${rootProject.archivesBaseName}.git"
             }
             issueManagement {
                 system "github"
-                url "https://github.com/AuraDevelopmentTeam/${project.archivesBaseName}/issues"
+                url "https://github.com/AuraDevelopmentTeam/${rootProject.archivesBaseName}/issues"
             }
             licenses {
                 license {
                     name "License"
-                    url "https://github.com/AuraDevelopmentTeam/${project.archivesBaseName}/blob/master/LICENSE.md"
+                    url "https://github.com/AuraDevelopmentTeam/${rootProject.archivesBaseName}/blob/master/LICENSE.md"
                     distribution "repo"
                 }
             }
