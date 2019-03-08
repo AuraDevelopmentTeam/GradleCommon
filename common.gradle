@@ -206,6 +206,11 @@ ext {
             useRootValues = Boolean.parseBoolean(useRootValues)
     } else
         useRootValues = false
+    if (project.hasProperty("hasApi")) {
+        if (hasApi instanceof String)
+            hasApi = Boolean.parseBoolean(hasApi)
+    } else
+        hasApi = false
     if (project.hasProperty("enableShadow")) {
         if (enableShadow instanceof String)
             enableShadow = Boolean.parseBoolean(enableShadow)
@@ -671,6 +676,35 @@ task processSources (type: Sync) {
     ])
 }
 
+if (hasApi) {
+    task processApiSources (type: Sync) {
+        def baseProject = useRootValues? rootProject : project
+
+        inputs.property "pluginId", baseProject.pluginId
+        inputs.property "pluginName", baseProject.pluginName
+        inputs.property "version", baseProject.version
+        inputs.property "group", baseProject.group
+        inputs.property "description", baseProject.description
+        inputs.property "buildNum", baseProject.buildNum
+        inputs.property "buildType", baseProject.buildType
+        inputs.property "minecraftVersion", baseProject.minecraft_version
+        ext.outputDir = file("$buildDir/generated-src/api")
+
+        from sourceSets.api.allSource
+        into outputDir
+        filter (ReplaceTokens, tokens: [
+            "id": baseProject.pluginId,
+            "name": baseProject.pluginName,
+            "version": baseProject.version,
+            "group": baseProject.group,
+            "description": baseProject.description,
+            "build": baseProject.buildNum,
+            "buildType": baseProject.buildType,
+            "minecraftVersion": baseProject.minecraft_version
+        ])
+    }
+}
+
 task processTestSources (type: Sync) {
     def baseProject = useRootValues? rootProject : project
 
@@ -711,6 +745,13 @@ task delombok(type: DelombokTask, dependsOn: compileJava) {
     inputs.dir(processSources.outputDir)
     args(processSources.outputDir, "-d", outputDir)
 
+    if (hasApi) {
+        inputs.dir(processApiSources.outputDir)
+        args(processApiSources.outputDir, "-d", outputDir)
+
+        dependsOn compileApiJava
+    }
+
     doLast {
         fileTree(dir: outputDir, exclude: "**/*.java").forEach{file -> file.delete()}
     }
@@ -719,6 +760,13 @@ task delombok(type: DelombokTask, dependsOn: compileJava) {
 compileJava {
     source = processSources.outputs
     dependsOn processSources
+}
+
+if (hasApi) {
+    compileApiJava {
+        source = processApiSources.outputs
+        dependsOn processApiSources
+    }
 }
 
 compileTestJava {
@@ -746,10 +794,28 @@ jar {
     from sourceSets.main.output
     from mainDirResources
 
+    if (hasApi) {
+        from sourceSets.api.output
+
+        dependsOn compileApiJava
+    }
+
     classifier = enableShadow? "dev" : null
 
     if ((type == FORGE) || (type == SPONGEFORGE)) {
         finalizedBy reobfJar
+    }
+}
+
+if (hasApi) {
+    task apiJar(type: Jar, dependsOn: processApiSources) {
+        group "build"
+
+        from sourceSets.api.output
+        from mainDirResources
+
+        classifier = "api"
+        version = jar.version
     }
 }
 
@@ -759,6 +825,12 @@ task sourceJar (type: Jar, dependsOn: processSources) {
     from sourceSets.main.allSource
     from mainDirResources
 
+    if (hasApi) {
+        from sourceSets.api.allSource
+
+        dependsOn processApiSources
+    }
+
     classifier = "sources"
     version = jar.version
 }
@@ -767,6 +839,12 @@ if (enableShadow) {
     shadowJar {
         from sourceSets.main.output
         from mainDirResources
+
+        if (hasApi) {
+            from sourceSets.api.output
+
+            dependsOn compileApiJava
+        }
 
         classifier = null
         version = jar.version
@@ -790,9 +868,15 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
         }
     }
 
-    task deobfJar(type: Jar) {
+    task deobfJar(type: Jar, dependsOn: compileJava) {
         from sourceSets.main.output
         from mainDirResources
+
+        if (hasApi) {
+            from sourceSets.api.output
+
+            dependsOn compileApiJava
+        }
 
         classifier = "deobf"
 
@@ -807,6 +891,11 @@ javadoc {
 
     source = delombok.outputDir
     classpath = sourceSets.main.compileClasspath
+
+    if (hasApi) {
+        classpath += sourceSets.api.compileClasspath
+    }
+
     def appName = "${pluginName} - ${version}"
 
     project.configure(options) {
@@ -899,6 +988,9 @@ artifacts {
     archives sourceJar
     archives javadocJar
 
+    if (hasApi)
+        archives apiJar
+
     if (enableShadow)
         archives shadowJar
 
@@ -957,6 +1049,14 @@ if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForg
             mainArtifact(jar) {
                 displayName = jar.archiveName.replace(".jar", "")
             }
+
+            if (hasApi) {
+                addArtifact(apiJar) {
+                    displayName = apiJar.archiveName.replace(".jar", "")
+                    changelog = "*This is a file for mod developers. If you don't know what to do with it, don't use it!*"
+                }
+            }
+
             addArtifact(deobfJar) {
                 displayName = deobfJar.archiveName.replace(".jar", "")
                 changelog = "*This is a file for mod developers. If you don't know what to do with it, don't use it!*"
