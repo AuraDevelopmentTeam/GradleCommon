@@ -283,11 +283,11 @@ ext {
             name baseProject.archivesBaseName
             packaging "jar"
             description baseProject.description
-            url "https://gitlab.project-creative.de/AuraDev/${rootProject.archivesBaseName}"
+            url "https://gitlab.aura-dev.team/AuraDev/${rootProject.archivesBaseName}"
             scm {
-                url "https://gitlab.project-creative.de/AuraDev/${rootProject.archivesBaseName}"
-                connection "scm:git:git@gitlab.project-creative.de:AuraDev/${rootProject.archivesBaseName}.git"
-                developerConnection "scm:git:gitlab.project-creative.de:AuraDev/${rootProject.archivesBaseName}.git"
+                url "https://gitlab.aura-dev.team/AuraDev/${rootProject.archivesBaseName}"
+                connection "scm:git:git@gitlab.aura-dev.team:AuraDev/${rootProject.archivesBaseName}.git"
+                developerConnection "scm:git:gitlab.aura-dev.team:AuraDev/${rootProject.archivesBaseName}.git"
             }
             issueManagement {
                 system "github"
@@ -517,7 +517,7 @@ repositories {
 
     maven {
         name "Aura Dev"
-        url "https://maven.project-creative.de/repository/auradev-snapshots/"
+        url "https://maven.aura-dev.team/repository/auradev-snapshots/"
     }
     maven {
         name "BungeeCord"
