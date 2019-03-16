@@ -859,6 +859,22 @@ if (enableShadow) {
             }
         }
     }
+
+    if ((type == FORGE) || (type == SPONGEFORGE)) {
+        reobf {
+          	shadowJar {
+          		  mappingType = "SEARGE"
+          	}
+        }
+
+        reobfShadowJar {
+            doLast {
+                signJar(shadowJar)
+            }
+        }
+
+        shadowJar.finalizedBy reobfShadowJar
+    }
 }
 
 if ((type == FORGE) || (type == SPONGEFORGE)) {
