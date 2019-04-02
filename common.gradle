@@ -1156,15 +1156,6 @@ if (project == rootProject) {
     }
 
     task printFinalCoverage {
-        onlyIf {
-            for(Task task : taskDependencies.getDependencies(printFinalCoverage)) {
-                if (task.didWork)
-                    return true;
-            }
-
-            return false;
-        }
-
         doLast {
             printCoverageText("all projects", coverageInstructions, coverageBranches, coverageLines, coverageComplexity, coverageMethods)
         }
@@ -1219,7 +1210,7 @@ task printCoverage(dependsOn: jacocoTestReport) {
     }
 
     shouldRunAfter generateCoverageReport
-    rootProject.printFinalCoverage.dependsOn printCoverage
+    finalizedBy rootProject.printFinalCoverage
 }
 
 task sendCoverageToCodacy(type: JavaExec) {
@@ -1242,7 +1233,7 @@ task sendCoverageToCodacy(type: JavaExec) {
     }
 }
 
-task coverage(dependsOn: [rootProject.printFinalCoverage, jacocoTestCoverageVerification]) {}
+task coverage(dependsOn: [printCoverage, jacocoTestCoverageVerification]) {}
 
 check.dependsOn coverage
 jacocoTestReport.dependsOn test
