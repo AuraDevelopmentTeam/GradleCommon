@@ -564,7 +564,7 @@ dependencies {
     testCompileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
     if (project.hasProperty("codacyApiToken"))
-        codacy "com.codacy:codacy-coverage-reporter:2.0.0"
+        codacy "com.codacy:codacy-coverage-reporter:6.0.0"
 
     if (enableMockTesting) {
         testCompile "org.mockito:mockito-core:${mockito_version}"
@@ -1160,6 +1160,20 @@ if (project == rootProject) {
             printCoverageText("all projects", coverageInstructions, coverageBranches, coverageLines, coverageComplexity, coverageMethods)
         }
     }
+    
+    task sendFinalCoverageToCodacy(type: JavaExec) {
+        if (project.hasProperty("codacyApiToken")) {
+            enabled = true
+
+            main = "com.codacy.CodacyCoverageReporter"
+            classpath = configurations.codacy
+            args = [
+                "final"
+            ]
+        } else {
+            enabled = false
+        }
+    }
 }
 
 task generateCoverageReport(type: Zip) {
@@ -1210,6 +1224,7 @@ task printCoverage(dependsOn: jacocoTestReport) {
     }
 
     shouldRunAfter generateCoverageReport
+    rootProject.printFinalCoverage.dependsOn printCoverage
     finalizedBy rootProject.printFinalCoverage
 }
 
@@ -1217,16 +1232,20 @@ task sendCoverageToCodacy(type: JavaExec) {
     if (project.hasProperty("codacyApiToken")) {
         enabled = true
         dependsOn jacocoTestReport
+        rootProject.sendFinalCoverageToCodacy.dependsOn sendCoverageToCodacy
+        finalizedBy rootProject.sendFinalCoverageToCodacy
 
         main = "com.codacy.CodacyCoverageReporter"
         classpath = configurations.codacy
         args = [
-            "-l",
+            "report",
+            "--language",
             "Java",
-            "-r",
+            "--coverage-report",
             "${buildDir}/reports/jacoco/test/jacocoTestReport.xml",
-            "--projectToken",
-            project.codacyApiToken
+            "--project-token",
+            project.codacyApiToken,
+            "--partial"
         ]
     } else {
         enabled = false
