@@ -1160,7 +1160,7 @@ if (project == rootProject) {
             printCoverageText("all projects", coverageInstructions, coverageBranches, coverageLines, coverageComplexity, coverageMethods)
         }
     }
-    
+
     task sendFinalCoverageToCodacy(type: JavaExec) {
         if (project.hasProperty("codacyApiToken")) {
             enabled = true
@@ -1168,7 +1168,9 @@ if (project == rootProject) {
             main = "com.codacy.CodacyCoverageReporter"
             classpath = configurations.codacy
             args = [
-                "final"
+                "final",
+                "--project-token",
+                project.codacyApiToken
             ]
         } else {
             enabled = false
