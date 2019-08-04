@@ -29,6 +29,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 final String NONE = "none"
 final String BUNGEECORD = "bungeecord"
+final String VELOCITY = "velocity"
 final String SPIGOT = "spigot"
 final String SPONGE = "sponge"
 final String FORGE = "forge"
@@ -158,8 +159,8 @@ apply plugin: "idea"
 
 if (!project.hasProperty("type")) {
     throw new NoSuchElementException("No type is specified!")
-} else if ((type != NONE) && (type != BUNGEECORD) && (type != SPIGOT) && (type != SPONGE) && (type != FORGE) && (type != SPONGEFORGE)) {
-    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${NONE}\", \"${BUNGEECORD}\", \"${SPIGOT}\", \"${SPONGE}\", \"${FORGE}\" or \"${SPONGEFORGE}\"")
+} else if ((type != NONE) && (type != BUNGEECORD) && (type != VELOCITY) && (type != SPIGOT) && (type != SPONGE) && (type != FORGE) && (type != SPONGEFORGE)) {
+    throw new IllegalArgumentException("The type \"${type}\" is unknown.\nUse either \"${NONE}\", \"${BUNGEECORD}\", \"${VELOCITY}\", \"${SPIGOT}\", \"${SPONGE}\", \"${FORGE}\" or \"${SPONGEFORGE}\"")
 } else if (!project.hasProperty("pluginId")) {
     throw new NoSuchElementException("No pluginId is specified!")
 }
@@ -234,6 +235,7 @@ ext {
     if (!project.hasProperty("powerMock_version")) powerMock_version = "2.0.0"
 
     if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.14-SNAPSHOT"
+    if (!project.hasProperty("velocity_version")) velocity_version = "1.0.3-SNAPSHOT"
     if (!project.hasProperty("spigot_version")) spigot_version = "1.14.4-R0.1-SNAPSHOT"
     if (!project.hasProperty("sponge_version")) sponge_version = "7.1.0"
     if (!project.hasProperty("minecraft_version")) minecraft_version = "1.12.2"
@@ -524,6 +526,10 @@ repositories {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
     maven {
+        name "Velocity"
+        url "https://repo.velocitypowered.com/snapshots/"
+    }
+    maven {
         name "Spigot"
         url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
     }
@@ -544,6 +550,8 @@ repositories {
 dependencies {
     if (type == BUNGEECORD) {
         compile "net.md-5:bungeecord-api:${bungeecoord_version}"
+    } else if (type == VELOCITY) {
+        compile "com.velocitypowered:velocity-api:${velocity_version}"
     } else if (type == SPIGOT) {
         compile "org.spigotmc:spigot-api:${spigot_version}"
     } else if ((type == SPONGE) || (type == SPONGEFORGE)) {
