@@ -281,9 +281,9 @@ ext {
     commonPom = project.pom {
         def baseProject = useRootValues? rootProject : project
 
-        groupId = baseProject.group
-        version = baseProject.version
-        artifactId = baseProject.archivesBaseName
+        groupId = group
+        version = version
+        artifactId = archivesBaseName
         project {
             name baseProject.archivesBaseName
             packaging "jar"
