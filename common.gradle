@@ -577,10 +577,12 @@ if ((type == SPONGE) || (type == SPONGEFORGE)) {
     sponge {
         plugin {
             meta {
-                id = pluginId
-                name = pluginName
-                version = version
-                description = description
+                def baseProject = useRootValues? rootProject : project
+
+                id = baseProject.pluginId
+                name = baseProject.pluginName
+                version = baseProject.version
+                description = baseProject.description
             }
         }
     }
