@@ -224,7 +224,10 @@ ext {
         enableMockTesting = false
 
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
-    mainDirResources = fileTree(dir: file(projectDir), includes: ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"])
+    baseMainDirResources = ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"]
+    mainDirResources =
+        fileTree(dir: file(projectDir), includes: baseMainDirResources) + 
+        fileTree(dir: file(rootProject.projectDir), includes: baseMainDirResources)
 
     // default versions
 
