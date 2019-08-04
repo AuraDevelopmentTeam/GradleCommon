@@ -785,6 +785,8 @@ tasks.withType(JavaCompile) {
 tasks.withType(Jar) {
     manifest commonManifest
 
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     if (signJar) {
         doLast {
             signJar(jar)
