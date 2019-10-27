@@ -37,7 +37,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir destiontionDir
 
         executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
-        args "-Dorg.gradle.daemon=false", "init", "wrapper"
+        args "-Dorg.gradle.daemon=false", "--console=plain", "init", "wrapper"
 
         shouldRunAfter setGitTag
     }
@@ -94,7 +94,7 @@ if (project.hasProperty("newProjectDir")) {
         workingDir destiontionDir
 
         executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
-        args "-Dorg.gradle.daemon=false", "addGitHooks"
+        args "-Dorg.gradle.daemon=false", "--console=plain", "addGitHooks"
 
         shouldRunAfter createFirstTag
     }
@@ -156,14 +156,14 @@ task updateGradleWrapper1(type: Exec, dependsOn: updateTemplateFiles) {
     workingDir project.file("..")
 
     executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
-    args "-Dorg.gradle.daemon=false", "wrapper", "--gradle-version=${-> gradleVersion}"
+    args "-Dorg.gradle.daemon=false", "--console=plain", "wrapper", "--gradle-version=${-> gradleVersion}"
 }
 
 task updateGradleWrapper2(type: Exec, dependsOn: updateGradleWrapper1) {
     workingDir project.file("..")
 
     executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
-    args "-Dorg.gradle.daemon=false", "wrapper"
+    args "-Dorg.gradle.daemon=false", "--console=plain", "wrapper"
 }
 
 task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
