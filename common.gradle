@@ -1247,6 +1247,8 @@ task printCoverage(dependsOn: jacocoTestReport) {
 
 task sendCoverageToCodacy(type: JavaExec) {
     if (project.hasProperty("codacyApiToken")) {
+        onlyIf { jacocoTestReport.didWork }
+
         enabled = true
         dependsOn jacocoTestReport
         rootProject.sendFinalCoverageToCodacy.dependsOn sendCoverageToCodacy
