@@ -575,7 +575,7 @@ dependencies {
     testCompileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
     if (project.hasProperty("codacyApiToken"))
-        codacy "com.codacy:codacy-coverage-reporter:6.0.0"
+        codacy "com.codacy:codacy-coverage-reporter:6.0.7"
 
     if (enableMockTesting) {
         testCompile "org.mockito:mockito-core:${mockito_version}"
