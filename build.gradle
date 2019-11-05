@@ -51,7 +51,7 @@ if (project.hasProperty("newProjectDir")) {
         from (projectDir) {
             include ".gitattributes"
             include ".gitignore"
-            include ".github"
+            include ".github/FUNDING.yml"
         }
 
         from "template"
@@ -138,7 +138,7 @@ task updateTemplateFiles(dependsOn: checkoutLatestTag) {
             from (project.file(".")) {
                 include ".gitignore"
                 include ".gitattributes"
-                include ".github/funding.yml"
+                include ".github/FUNDING.yml"
             }
 
             into project.file("..")
@@ -173,7 +173,7 @@ task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
     workingDir project.file("..")
 
     executable "git"
-    args "add", "GradleCommon", ".gitlab-ci.yml", ".travis.yml", ".gitignore", ".gitattributes", "gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties", ".github/funding.yml"
+    args "add", "GradleCommon", ".gitlab-ci.yml", ".travis.yml", ".gitignore", ".gitattributes", "gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties", ".github/FUNDING.yml"
 }
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
