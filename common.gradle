@@ -139,7 +139,7 @@ def signJar(archivePath) {
 //
 // ==========================================
 
-apply plugin: "java"
+apply plugin: "java-library"
 apply plugin: "jacoco"
 apply plugin: "maven"
 apply plugin: "maven-publish"
@@ -500,7 +500,11 @@ configurations {
     if (enableShadow) {
         shadowRelocate
         shadow.extendsFrom shadowRelocate
-        compile.extendsFrom shadow
+        api.extendsFrom shadow
+    }
+
+    testImplementation {
+        transitive = true
     }
 }
 
@@ -558,15 +562,15 @@ repositories {
 
 dependencies {
     if (type == BUNGEECORD) {
-        compile "net.md-5:bungeecord-api:${bungeecoord_version}"
+        api "net.md-5:bungeecord-api:${bungeecoord_version}"
     } else if (type == VELOCITY) {
-        compile "com.velocitypowered:velocity-api:${velocity_version}"
+        api "com.velocitypowered:velocity-api:${velocity_version}"
     } else if (type == SPIGOT) {
-        compile "org.spigotmc:spigot-api:${spigot_version}"
+        api "org.spigotmc:spigot-api:${spigot_version}"
     } else if ((type == SPONGE) || (type == SPONGEFORGE)) {
-        compile "org.spongepowered:spongeapi:${sponge_version}"
+        api "org.spongepowered:spongeapi:${sponge_version}"
     } else if (type == NUKKIT) {
-        compile "cn.nukkit:nukkit:${nukkit_version}"
+        api "cn.nukkit:nukkit:${nukkit_version}"
     }
 
     if (useStats) {
@@ -579,16 +583,16 @@ dependencies {
 
     compileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
-    testCompile "junit:junit:4.12"
+    testImplementation "junit:junit:4.12"
     testCompileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
     if (project.hasProperty("codacyApiToken"))
         codacy "com.codacy:codacy-coverage-reporter:6.0.7"
 
     if (enableMockTesting) {
-        testCompile "org.mockito:mockito-core:${mockito_version}"
-        testCompile "org.powermock:powermock-api-mockito2:${powerMock_version}"
-        testCompile "org.powermock:powermock-module-junit4:${powerMock_version}"
+        testImplementation "org.mockito:mockito-core:${mockito_version}"
+        testImplementation "org.powermock:powermock-api-mockito2:${powerMock_version}"
+        testImplementation "org.powermock:powermock-module-junit4:${powerMock_version}"
     }
 }
 
