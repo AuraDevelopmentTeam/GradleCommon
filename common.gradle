@@ -518,8 +518,8 @@ spotless {
     java {
         googleJavaFormat()
 
-        var headerFile = file("LICENSE-header.txt")
-        var rootHeaderFile = rootProject.file("LICENSE-header.txt")
+        File headerFile = file("LICENSE-header.txt")
+        File rootHeaderFile = rootProject.file("LICENSE-header.txt")
 
         if (headerFile.exists())
             licenseHeaderFile headerFile
