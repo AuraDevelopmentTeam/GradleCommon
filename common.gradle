@@ -1360,11 +1360,11 @@ task optimizePng {
 
 task checkTranslations {
     File baseDir = file("src/main/resources/assets/${pluginId}/lang")
-    
+
     onlyIf {
         new File(baseDir, "en_US.lang").exists()
     }
-    
+
     doLast {
         boolean langs_ok = true
         Boolean use_equals = null
