@@ -1417,14 +1417,14 @@ task checkTranslations {
                     outfile.delete()
                 } else {
                     println "Lang file " + langfile.getName() + " is not ok!"
-                    println "Created translation report ${outfile}"
+                    println "\t-> Created translation report ${outfile}"
                     langs_ok = false
                 }
             }
         }
 
         if(!langs_ok)
-            println "\nSome language files are not up to date. See log above!"
+            throw new GradleException("Some language files are not up to date. See log above!")
     }
 }
 
