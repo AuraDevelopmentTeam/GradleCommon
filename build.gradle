@@ -133,6 +133,7 @@ task updateTemplateFiles(dependsOn: checkoutLatestTag) {
             from (project.file("template")) {
                 include ".gitlab-ci.yml"
                 include ".travis.yml"
+                include ".github/CONTRIBUTING.md"
             }
 
             from (project.file(".")) {
@@ -173,7 +174,7 @@ task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
     workingDir project.file("..")
 
     executable "git"
-    args "add", "GradleCommon", ".gitlab-ci.yml", ".travis.yml", ".gitignore", ".gitattributes", "gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties", ".github/FUNDING.yml"
+    args "add", "GradleCommon", ".gitlab-ci.yml", ".travis.yml", ".gitignore", ".gitattributes", "gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties", ".github/FUNDING.yml", ".github/CONTRIBUTING.md"
 }
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
