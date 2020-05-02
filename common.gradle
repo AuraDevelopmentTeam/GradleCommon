@@ -1188,6 +1188,7 @@ if (project == rootProject) {
         doLast {
             printCoverageText("all projects", coverageInstructions, coverageBranches, coverageLines, coverageComplexity, coverageMethods)
         }
+        outputs.upToDateWhen { false }
     }
 
     task sendFinalCoverageToCodacy(type: JavaExec) {
@@ -1253,6 +1254,7 @@ task printCoverage(dependsOn: jacocoTestReport) {
         rootProject.coverageMethods[0] += methods[0]
         rootProject.coverageMethods[1] += methods[1]
     }
+    outputs.upToDateWhen { false }
 
     shouldRunAfter generateCoverageReport
     rootProject.printFinalCoverage.dependsOn printCoverage
