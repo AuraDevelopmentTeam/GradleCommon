@@ -51,7 +51,7 @@ if (project.hasProperty("newProjectDir")) {
         from (projectDir) {
             include ".gitattributes"
             include ".gitignore"
-            include ".github/FUNDING.yml"
+            include ".github"
         }
 
         from "template"
@@ -133,13 +133,13 @@ task updateTemplateFiles(dependsOn: checkoutLatestTag) {
             from (project.file("template")) {
                 include ".gitlab-ci.yml"
                 include ".travis.yml"
-                include ".github/CONTRIBUTING.md"
+                include ".github"
             }
 
             from (project.file(".")) {
                 include ".gitignore"
                 include ".gitattributes"
-                include ".github/FUNDING.yml"
+                include ".github"
             }
 
             into project.file("..")
