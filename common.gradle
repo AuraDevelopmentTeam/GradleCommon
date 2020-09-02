@@ -234,7 +234,7 @@ ext {
 
     if (!project.hasProperty("lombok_version")) lombok_version = "1.18.10"
     if (!project.hasProperty("lombok_hash")) lombok_hash = "2836e954823bfcbad45e78c18896e3d01058e6f643749810c608b7005ee7b2fa"
-    if (!project.hasProperty("spotBugs_version")) spotBugs_version = "4.1.2"
+    if (!project.hasProperty("spotBugs_version")) spotBugs_version = "4.1.1"
     if (!project.hasProperty("mockito_version")) mockito_version = "2.25.1"
     if (!project.hasProperty("powerMock_version")) powerMock_version = "2.0.0"
 
