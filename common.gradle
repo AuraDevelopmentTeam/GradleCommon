@@ -575,6 +575,7 @@ dependencies {
         api "org.spigotmc:spigot-api:${spigot_version}"
     } else if ((type == SPONGE) || (type == SPONGEFORGE)) {
         api "org.spongepowered:spongeapi:${sponge_version}"
+        annotationProcessor "org.spongepowered:spongeapi:${sponge_version}"
     } else if (type == NUKKIT) {
         api "cn.nukkit:nukkit:${nukkit_version}"
     }
