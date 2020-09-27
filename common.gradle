@@ -244,7 +244,7 @@ ext {
     if (!project.hasProperty("sponge_version")) sponge_version = "7.2.0"
     if (!project.hasProperty("nukkit_version")) nukkit_version = "1.0-SNAPSHOT"
     if (!project.hasProperty("minecraft_version")) minecraft_version = "1.12.2"
-    if (!project.hasProperty("forge_version")) forge_version = "14.23.5.2768"
+    if (!project.hasProperty("forge_version")) forge_version = "14.23.5.2854"
     if (!project.hasProperty("mapping_version")) mapping_version = "stable_39"
 
     if (!project.hasProperty("bStats_version")) bStats_version = "1.7"
@@ -372,7 +372,7 @@ buildscript {
             classpath "gradle.plugin.org.spongepowered:spongegradle:0.9.0"
 
         if ((type == "forge") || (type == "spongeforge")) {
-            classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+            classpath "net.minecraftforge.gradle:ForgeGradle:3.+"
 
             if (project.hasProperty("curseForgeApiKey") || (System.env.curseForgeApiKey != null))
                 classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
@@ -396,7 +396,7 @@ allprojects {
         }
         dependencies {
             if ((type == "forge") || (type == "spongeforge"))
-                classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+                classpath "net.minecraftforge.gradle:ForgeGradle:3.+"
         }
     }
 }
@@ -419,12 +419,12 @@ if ((type == SPONGE) || (type == SPONGEFORGE)) {
 }
 
 if ((type == FORGE) || (type == SPONGEFORGE)) {
-    apply plugin: net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin
+    apply plugin: net.minecraftforge.gradle.userdev.UserDevPlugin
 
     if (project.hasProperty("curseForgeApiKey"))
         apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
 
-    tasks.remove(sourceJar)
+    //tasks.remove(sourceJar)
 }
 
 // ==============================================================================
@@ -491,8 +491,8 @@ idea {
 }
 
 if ((type == FORGE) || (type == SPONGEFORGE)) {
-    tasks.eclipseClasspath.dependsOn setupDecompWorkspace
-    tasks.ideaModule.dependsOn setupDecompWorkspace
+    //tasks.eclipseClasspath.dependsOn setupDecompWorkspace
+    //tasks.ideaModule.dependsOn setupDecompWorkspace
 }
 
 configurations {
@@ -569,14 +569,21 @@ repositories {
 dependencies {
     if (type == BUNGEECORD) {
         api "net.md-5:bungeecord-api:${bungeecoord_version}"
-    } else if (type == VELOCITY) {
+    }
+    if (type == VELOCITY) {
         api "com.velocitypowered:velocity-api:${velocity_version}"
-    } else if (type == SPIGOT) {
+    }
+    if (type == SPIGOT) {
         api "org.spigotmc:spigot-api:${spigot_version}"
-    } else if ((type == SPONGE) || (type == SPONGEFORGE)) {
+    }
+    if ((type == SPONGE) || (type == SPONGEFORGE)) {
         api "org.spongepowered:spongeapi:${sponge_version}"
         annotationProcessor "org.spongepowered:spongeapi:${sponge_version}"
-    } else if (type == NUKKIT) {
+    }
+    if ((type == FORGE) || (type == SPONGEFORGE)) {
+        minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    }
+    if (type == NUKKIT) {
         api "cn.nukkit:nukkit:${nukkit_version}"
     }
 
@@ -625,13 +632,32 @@ if ((type == SPONGE) || (type == SPONGEFORGE)) {
 
 if ((type == FORGE) || (type == SPONGEFORGE)) {
     minecraft {
-        version = "${minecraft_version}-${forge_version}"
-        runDir = "run"
-        mappings = mapping_version
-        useDepAts = true
+        mappings channel: proj.mapping_version.split('_', 2)[0], version: proj.mapping_version.split('_', 2)[1]
+        //makeObfSourceJar = false
+        //useDepAts = true
 
-        clientJvmArgs += "-Xmx2G"
-        serverJvmArgs += "-Xmx2G"
+        //clientJvmArgs += "-Xmx2G"
+        //serverJvmArgs += "-Xmx2G"
+        
+        runs {
+            client {
+                workingDirectory project.file('run')
+    
+                // Recommended logging data for a userdev environment
+                property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+    
+                // Recommended logging level for the console
+                property 'forge.logging.console.level', 'debug'
+            }
+    
+            server {
+                // Recommended logging data for a userdev environment
+                property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+    
+                // Recommended logging level for the console
+                property 'forge.logging.console.level', 'debug'
+            }
+        }
     }
 }
 
@@ -837,7 +863,7 @@ jar {
     classifier = enableShadow? "dev" : null
 
     if ((type == FORGE) || (type == SPONGEFORGE)) {
-        finalizedBy reobfJar
+        //finalizedBy reobfJar
     }
 }
 
@@ -897,7 +923,7 @@ if (enableShadow) {
     if ((type == FORGE) || (type == SPONGEFORGE)) {
         reobf {
           	shadowJar {
-          		  mappingType = "SEARGE"
+          		  //mappingType = "SEARGE"
           	}
         }
 
@@ -912,11 +938,11 @@ if (enableShadow) {
 }
 
 if ((type == FORGE) || (type == SPONGEFORGE)) {
-    reobfJar {
+    /*reobfJar {
         doLast {
             signJar(jar)
         }
-    }
+    }*/
 
     task deobfJar(type: Jar, dependsOn: compileJava) {
         from sourceSets.main.output
