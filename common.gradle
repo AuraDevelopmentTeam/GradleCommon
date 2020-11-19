@@ -128,6 +128,9 @@ def signJar(archivePath) {
     }
 }
 
+// Print JVM version etc
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+
 // ==========================================
 //
 //     ____   __               _
@@ -227,7 +230,7 @@ ext {
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
     baseMainDirResources = ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"]
     mainDirResources =
-        fileTree(dir: file(projectDir), includes: baseMainDirResources) + 
+        fileTree(dir: file(projectDir), includes: baseMainDirResources) +
         fileTree(dir: file(rootProject.projectDir), includes: baseMainDirResources)
 
     // default versions
@@ -638,24 +641,49 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
 
         //clientJvmArgs += "-Xmx2G"
         //serverJvmArgs += "-Xmx2G"
-        
+
+        if (Integer.parseInt(minecraft_version.split('\\.')[1]) > 12) {
+            accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+        } else {
+            def ats = fileTree(dir: 'src/main/resources', include: '*_at.cfg')
+
+            if (!ats.empty) accessTransformer = ats.first()
+        }
+
         runs {
             client {
                 workingDirectory project.file('run')
-    
-                // Recommended logging data for a userdev environment
                 property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-    
-                // Recommended logging level for the console
                 property 'forge.logging.console.level', 'debug'
+
+                mods {
+                    "${pluginId}" {
+                        source sourceSets.main
+                    }
+                }
             }
-    
             server {
-                // Recommended logging data for a userdev environment
+                workingDirectory project.file('run')
                 property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-    
-                // Recommended logging level for the console
                 property 'forge.logging.console.level', 'debug'
+
+                mods {
+                    "${pluginId}" {
+                        source sourceSets.main
+                    }
+                }
+            }
+            data {
+                workingDirectory project.file('run')
+                property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+                property 'forge.logging.console.level', 'debug'
+                args '--mod', pluginId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+
+                mods {
+                    "${pluginId}" {
+                        source sourceSets.main
+                    }
+                }
             }
         }
     }
@@ -1397,7 +1425,7 @@ task checkTranslations {
     doLast {
         boolean langs_ok = true
         Boolean use_equals = null
-        
+
         Map<String, String> map_en = new LinkedHashMap<String, String>()
         (new File(baseDir, "en_US.lang")).eachLine {
             if (it.startsWith("#")) {return}
