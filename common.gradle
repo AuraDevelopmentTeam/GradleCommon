@@ -493,11 +493,6 @@ idea {
     }
 }
 
-if ((type == FORGE) || (type == SPONGEFORGE)) {
-    //tasks.eclipseClasspath.dependsOn setupDecompWorkspace
-    //tasks.ideaModule.dependsOn setupDecompWorkspace
-}
-
 configurations {
     codacy
 
