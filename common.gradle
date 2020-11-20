@@ -637,7 +637,7 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
         //clientJvmArgs += "-Xmx2G"
         //serverJvmArgs += "-Xmx2G"
 
-        if (Integer.parseInt(minecraft_version.split('\\.')[1]) > 12) {
+        if (Integer.parseInt(minecraft_version.split('\\.')[1]) >= 13) {
             accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
         } else {
             def ats = fileTree(dir: 'src/main/resources', include: '*_at.cfg')
@@ -668,15 +668,18 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
                     }
                 }
             }
-            data {
-                workingDirectory project.file('run')
-                property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-                property 'forge.logging.console.level', 'debug'
-                args '--mod', pluginId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
-                mods {
-                    "${pluginId}" {
-                        source sourceSets.main
+            if (Integer.parseInt(minecraft_version.split('\\.')[1]) >= 14) {
+                data {
+                    workingDirectory project.file('run')
+                    property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+                    property 'forge.logging.console.level', 'debug'
+                    args '--mod', pluginId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+    
+                    mods {
+                        "${pluginId}" {
+                            source sourceSets.main
+                        }
                     }
                 }
             }
