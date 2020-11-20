@@ -375,7 +375,7 @@ buildscript {
             classpath "gradle.plugin.org.spongepowered:spongegradle:0.9.0"
 
         if ((type == "forge") || (type == "spongeforge")) {
-            classpath "net.minecraftforge.gradle:ForgeGradle:3.+"
+            classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
 
             if (project.hasProperty("curseForgeApiKey") || (System.env.curseForgeApiKey != null))
                 classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
