@@ -552,9 +552,10 @@ repositories {
     }
     maven {
         name "Nukkit"
-        url "https://repo.nukkitx.com/maven-snapshots"
+        url "https://repo.opencollab.dev/maven-snapshots"
         content {
             includeGroup "cn.nukkit"
+            includeGroup "com.nukkitx"
         }
     }
 
