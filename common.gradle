@@ -526,6 +526,15 @@ spotless {
     }
 }
 
+sourceSets {
+    if (hasApi) {
+        api {
+            java {
+            }
+        }
+    }
+}
+
 repositories {
     jcenter()
     mavenCentral()
