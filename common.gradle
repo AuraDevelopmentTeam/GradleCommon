@@ -493,20 +493,6 @@ idea {
     }
 }
 
-configurations {
-    codacy
-
-    if (enableShadow) {
-        shadowRelocate
-        shadow.extendsFrom shadowRelocate
-        api.extendsFrom shadow
-    }
-
-    testImplementation {
-        transitive = true
-    }
-}
-
 spotbugs {
     toolVersion = spotBugs_version
     effort = "max"
@@ -523,6 +509,20 @@ spotless {
             licenseHeaderFile headerFile
         else if (rootHeaderFile.exists())
             licenseHeaderFile rootHeaderFile
+    }
+}
+
+configurations {
+    codacy
+
+    if (enableShadow) {
+        shadowRelocate
+        shadow.extendsFrom shadowRelocate
+        api.extendsFrom shadow
+    }
+
+    testImplementation {
+        transitive = true
     }
 }
 
