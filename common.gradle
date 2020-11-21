@@ -551,12 +551,24 @@ repositories {
         url "https://repo.spongepowered.org/maven"
     }
     maven {
-        name "Nukkit"
-        url "https://repo.nukkitx.com/maven-snapshots"
-    }
-    maven {
         name "CodeMC"
         url "https://repo.codemc.org/repository/maven-public"
+    }
+
+    // Limited repos
+    maven {
+        name "CurseMaven"
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    maven {
+        name "Nukkit"
+        url "https://repo.nukkitx.com/maven-snapshots"
+        content {
+            includeGroup "cn.nukkit"
+        }
     }
 
     removeIf {
@@ -675,7 +687,7 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
                     property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
                     property 'forge.logging.console.level', 'debug'
                     args '--mod', pluginId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-    
+
                     mods {
                         "${pluginId}" {
                             source sourceSets.main
