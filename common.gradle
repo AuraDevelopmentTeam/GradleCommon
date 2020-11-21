@@ -378,7 +378,7 @@ buildscript {
             classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
 
             if (project.hasProperty("curseForgeApiKey") || (System.env.curseForgeApiKey != null))
-                classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
+                classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         }
     }
 }
