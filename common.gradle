@@ -273,12 +273,13 @@ ext {
     // Common Manifest
     commonManifest = {
         attributes(
-            "Specification-Title": pluginName,
-            "Specification-Version": version,
+            "Specification-Title": pluginId,
+            "Specification-Version": "1",
             "Specification-Vendor": "Aura Development Team",
             "Implementation-Title": pluginName,
             "Implementation-Version": version,
-            "Implementation-Vendor": "Aura Development Team"
+            "Implementation-Vendor": "Aura Development Team",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         )
     }
 
