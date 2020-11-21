@@ -1069,6 +1069,8 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
 javadoc {
     dependsOn delombok
 
+    failOnError = false
+
     source = delombok.outputDir
     classpath = sourceSets.main.compileClasspath
 
