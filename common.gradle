@@ -512,6 +512,12 @@ spotless {
     }
 }
 
+sourceSets {
+    if (hasApi) {
+        api
+    }
+}
+
 configurations {
     codacy
 
@@ -526,11 +532,11 @@ configurations {
     }
 }
 
-sourceSets {
-    if (hasApi) {
-        api {
-            java {
-            }
+if (hasApi && ((type == FORGE) || (type == SPONGEFORGE))) {
+    configurations {
+        apiImplementation {
+             extendsFrom minecraft
+             transitive = true
         }
     }
 }
@@ -588,6 +594,12 @@ repositories {
 }
 
 dependencies {
+    if (hasApi) {
+        implementation sourceSets.api.output
+
+        apiCompileOnly "org.projectlombok:lombok:${lombok_version}"
+    }
+
     if (type == BUNGEECORD) {
         api "net.md-5:bungeecord-api:${bungeecoord_version}"
     }
@@ -617,6 +629,9 @@ dependencies {
     }
 
     compileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
+
+    if (hasApi)
+        apiCompileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
     testImplementation "junit:junit:4.12"
     testCompileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
