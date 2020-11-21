@@ -636,7 +636,7 @@ dependencies {
     if ((type == FORGE) || (type == SPONGEFORGE)) {
         minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-        // Handled through configurations
+        // API dependency handled through configurations
     }
     if (type == NUKKIT) {
         api "cn.nukkit:nukkit:${nukkit_version}"
@@ -950,10 +950,6 @@ jar {
     }
 
     classifier = enableShadow? "dev" : null
-
-    if ((type == FORGE) || (type == SPONGEFORGE)) {
-        //finalizedBy reobfJar
-    }
 }
 
 if (hasApi) {
@@ -965,6 +961,20 @@ if (hasApi) {
 
         classifier = "api"
         version = jar.version
+    }
+
+    if (apiDependsOnPlatform && ((type == FORGE) || (type == SPONGEFORGE))) {
+        reobf {
+          	apiJar { classpath = sourceSets.api.compileClasspath }
+        }
+
+        reobfApiJar {
+            doLast {
+                signJar(apiJar)
+            }
+        }
+
+        apiJar.finalizedBy reobfApiJar
     }
 }
 
@@ -1011,9 +1021,7 @@ if (enableShadow) {
 
     if ((type == FORGE) || (type == SPONGEFORGE)) {
         reobf {
-          	shadowJar {
-          		  //mappingType = "SEARGE"
-          	}
+          	shadowJar {}
         }
 
         reobfShadowJar {
@@ -1027,11 +1035,17 @@ if (enableShadow) {
 }
 
 if ((type == FORGE) || (type == SPONGEFORGE)) {
-    /*reobfJar {
+    reobf {
+      	jar {}
+    }
+
+    reobfJar {
         doLast {
             signJar(jar)
         }
-    }*/
+    }
+
+    jar.finalizedBy reobfJar
 
     task deobfJar(type: Jar, dependsOn: compileJava) {
         from sourceSets.main.output
