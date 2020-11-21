@@ -405,7 +405,7 @@ allprojects {
         }
         dependencies {
             if ((type == "forge") || (type == "spongeforge"))
-                classpath "net.minecraftforge.gradle:ForgeGradle:3.+"
+                classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
         }
     }
 }
@@ -432,8 +432,6 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
 
     if (project.hasProperty("curseForgeApiKey"))
         apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
-
-    //tasks.remove(sourceJar)
 }
 
 // ==============================================================================
