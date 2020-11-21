@@ -774,6 +774,7 @@ processResources {
         exclude "*.conf"
         exclude pngPatterns
         exclude "**/*.ogg"
+        exclude "**/*.nbt"
 
         expand \
             "id": baseProject.pluginId,
