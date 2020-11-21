@@ -216,6 +216,11 @@ ext {
             hasApi = Boolean.parseBoolean(hasApi)
     } else
         hasApi = false
+    if (project.hasProperty("apiDependsOnPlatform")) {
+        if (apiDependsOnPlatform instanceof String)
+            apiDependsOnPlatform = Boolean.parseBoolean(apiDependsOnPlatform)
+    } else
+        apiDependsOnPlatform = true
     if (project.hasProperty("enableShadow")) {
         if (enableShadow instanceof String)
             enableShadow = Boolean.parseBoolean(enableShadow)
@@ -532,7 +537,7 @@ configurations {
     }
 }
 
-if (hasApi && ((type == FORGE) || (type == SPONGEFORGE))) {
+if (hasApi && apiDependsOnPlatform && ((type == FORGE) || (type == SPONGEFORGE))) {
     configurations {
         apiImplementation {
              extendsFrom minecraft
@@ -599,26 +604,46 @@ dependencies {
         implementation sourceSets.api.output
 
         apiCompileOnly "org.projectlombok:lombok:${lombok_version}"
+        apiAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
     }
 
     if (type == BUNGEECORD) {
         api "net.md-5:bungeecord-api:${bungeecoord_version}"
+
+        if (hasApi && apiDependsOnPlatform)
+            apiImplementation "net.md-5:bungeecord-api:${bungeecoord_version}"
     }
     if (type == VELOCITY) {
         api "com.velocitypowered:velocity-api:${velocity_version}"
+
+        if (hasApi && apiDependsOnPlatform)
+            apiImplementation "com.velocitypowered:velocity-api:${velocity_version}"
     }
     if (type == SPIGOT) {
         api "org.spigotmc:spigot-api:${spigot_version}"
+
+        if (hasApi && apiDependsOnPlatform)
+            apiImplementation "org.spigotmc:spigot-api:${spigot_version}"
     }
     if ((type == SPONGE) || (type == SPONGEFORGE)) {
         api "org.spongepowered:spongeapi:${sponge_version}"
         annotationProcessor "org.spongepowered:spongeapi:${sponge_version}"
+
+        if (hasApi && apiDependsOnPlatform) {
+            apiImplementation "org.spongepowered:spongeapi:${sponge_version}"
+            apiAnnotationProcessor "org.spongepowered:spongeapi:${sponge_version}"
+        }
     }
     if ((type == FORGE) || (type == SPONGEFORGE)) {
         minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+        // Handled through configurations
     }
     if (type == NUKKIT) {
         api "cn.nukkit:nukkit:${nukkit_version}"
+
+        if (hasApi && apiDependsOnPlatform)
+            apiImplementation "cn.nukkit:nukkit:${nukkit_version}"
     }
 
     if (useStats) {
