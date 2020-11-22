@@ -240,20 +240,20 @@ ext {
 
     // default versions
 
-    if (!project.hasProperty("lombok_version")) lombok_version = "1.18.10"
-    if (!project.hasProperty("lombok_hash")) lombok_hash = "2836e954823bfcbad45e78c18896e3d01058e6f643749810c608b7005ee7b2fa"
-    if (!project.hasProperty("spotBugs_version")) spotBugs_version = "4.1.1"
-    if (!project.hasProperty("mockito_version")) mockito_version = "2.25.1"
-    if (!project.hasProperty("powerMock_version")) powerMock_version = "2.0.0"
+    if (!project.hasProperty("lombok_version")) lombok_version = "1.18.16"
+    if (!project.hasProperty("lombok_hash")) lombok_hash = "7206cbbfd6efd5e85bceff29545633645650be58d58910a23b0d4835fbd15ed7"
+    if (!project.hasProperty("spotBugs_version")) spotBugs_version = "4.1.4"
+    if (!project.hasProperty("mockito_version")) mockito_version = "3.6.0"
+    if (!project.hasProperty("powerMock_version")) powerMock_version = "2.0.9"
 
-    if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.16-R0.2-SNAPSHOT"
-    if (!project.hasProperty("velocity_version")) velocity_version = "1.0.10-SNAPSHOT"
-    if (!project.hasProperty("spigot_version")) spigot_version = "1.16.2-R0.1-SNAPSHOT"
+    if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.16-R0.3-SNAPSHOT"
+    if (!project.hasProperty("velocity_version")) velocity_version = "1.1.2"
+    if (!project.hasProperty("spigot_version")) spigot_version = "1.16.4-R0.1-SNAPSHOT"
     if (!project.hasProperty("sponge_version")) sponge_version = "7.2.0"
-    if (!project.hasProperty("nukkit_version")) nukkit_version = "1.0-SNAPSHOT"
+    if (!project.hasProperty("nukkit_version")) nukkit_version = "2.0.0-SNAPSHOT"
     if (!project.hasProperty("minecraft_version")) minecraft_version = "1.12.2"
     if (!project.hasProperty("forge_version")) forge_version = "14.23.5.2854"
-    if (!project.hasProperty("mapping_version")) mapping_version = "stable_39"
+    if (!project.hasProperty("mapping_version")) mapping_version = "stable_39-1.12"
 
     if (!project.hasProperty("bStats_version")) bStats_version = "1.7"
 }
