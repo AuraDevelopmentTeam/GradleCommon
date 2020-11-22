@@ -359,6 +359,10 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
         maven {
+            name "TimeConqueror's Maven"
+            url "https://repo.repsy.io/mvn/timeconqueror/mc/"
+        }
+        maven {
             name "forge"
             url "https://files.minecraftforge.net/maven"
         }
@@ -381,7 +385,7 @@ buildscript {
             classpath "gradle.plugin.org.spongepowered:spongegradle:0.9.0"
 
         if ((type == "forge") || (type == "spongeforge")) {
-            classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+            classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.0.187-patched'
 
             if (project.hasProperty("curseForgeApiKey") || (System.env.curseForgeApiKey != null))
                 classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
@@ -399,13 +403,17 @@ allprojects {
                 url "https://plugins.gradle.org/m2/"
             }
             maven {
+                name "TimeConqueror's Maven"
+                url "https://repo.repsy.io/mvn/timeconqueror/mc/"
+            }
+            maven {
                 name "forge"
                 url "https://files.minecraftforge.net/maven"
             }
         }
         dependencies {
             if ((type == "forge") || (type == "spongeforge"))
-                classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+                classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.0.187-patched'
         }
     }
 }
