@@ -445,8 +445,9 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
 //
 // ==============================================================================
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+// Force java 8
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
 Project proj = project
 
 eclipse {
