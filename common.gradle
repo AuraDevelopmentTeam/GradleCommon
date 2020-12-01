@@ -1444,7 +1444,12 @@ Specify "-Pmajor" to update the major version."""
 
 task formatJson {
     doLast {
-        sourceSets.main.resources.srcDirs.each {
+        def srcDirs = []
+        srcDirs += sourceSets.main.resources.srcDirs
+        srcDirs += sourceSets.test.resources.srcDirs
+        if (hasApi) srcDirs += sourceSets.api.resources.srcDirs
+
+        srcDirs.each {
             dir -> fileTree(dir: dir, includes: jsonPatterns).each {
                 File file -> file.text = JsonOutput.prettyPrint(file.text) + "\n"
             }
