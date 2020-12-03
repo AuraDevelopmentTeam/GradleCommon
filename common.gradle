@@ -378,7 +378,6 @@ buildscript {
             url "https://repo.spongepowered.org/maven"
         }
     }
-
     dependencies {
         classpath "com.xlson.groovycsv:groovycsv:1.3"
         classpath "com.google.guava:guava:28.1-jre"
@@ -648,8 +647,15 @@ dependencies {
             shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
         }
     }
-    if (useMixins)
+    if (useMixins) {
         api "org.spongepowered:mixin:${mixin_version}"
+        annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+
+        if (hasApi && apiDependsOnPlatform) {
+            apiImplementation "org.spongepowered:mixin:${mixin_version}"
+            apiAnnotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+        }
+    }
 
     compileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
