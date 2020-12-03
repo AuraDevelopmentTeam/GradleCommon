@@ -424,10 +424,10 @@ allprojects {
                 name "forge"
                 url "https://files.minecraftforge.net/maven"
             }
-        }
-        dependencies {
-            if ((type == "forge") || (type == "spongeforge"))
-                classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.0.187-patched'
+            maven {
+                name "sponge"
+                url "https://repo.spongepowered.org/maven"
+            }
         }
     }
 }
@@ -953,7 +953,7 @@ jar {
 
         dependsOn compileApiJava
     }
-    
+
     if (useMixins) {
         manifest += attributes([
             "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
