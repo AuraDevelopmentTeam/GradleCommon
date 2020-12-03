@@ -965,7 +965,7 @@ jar {
     if (useMixins) {
         manifest.attributes += [
             "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-            "MixinConfigs": "${pluginId}.mixins.json",
+            "MixinConfigs": "mixins.${pluginId}.json",
             "FMLCorePluginContainsFMLMod": "true",
         ]
     }
