@@ -229,7 +229,7 @@ ext {
     if (project.hasProperty("useMixins")) {
         if (useMixins instanceof String)
             useMixins = Boolean.parseBoolean(useMixins)
-        useMixins = useMixins && (type != SPONGEFORGE)
+        useMixins = useMixins && (type == SPONGEFORGE)
     } else
         useMixins = false
     if (project.hasProperty("enableMockTesting")) {
@@ -955,11 +955,11 @@ jar {
     }
 
     if (useMixins) {
-        manifest += attributes([
+        manifest.attributes += [
             "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
             "MixinConfigs": "${pluginId}.mixins.json",
             "FMLCorePluginContainsFMLMod": "true",
-        ])
+        ]
     }
 
     classifier = enableShadow? "dev" : null
@@ -1594,7 +1594,7 @@ Group:\t\t${group}
 Settings:
 ---------
 
-Type:\t\t${type}
+Type:\t\t${type + (useMixins? "+mixins" : "")}
 Use Stats:\t${useStats}
 Custom Charts:\t${customCharts}
 """
