@@ -407,6 +407,31 @@ buildscript {
     }
 }
 
+allprojects {
+    buildscript {
+        repositories {
+            jcenter()
+            mavenCentral()
+            maven {
+                name "Gradle-Plugins"
+                url "https://plugins.gradle.org/m2/"
+            }
+            maven {
+                name "TimeConqueror's Maven"
+                url "https://repo.repsy.io/mvn/timeconqueror/mc/"
+            }
+            maven {
+                name "forge"
+                url "https://files.minecraftforge.net/maven"
+            }
+        }
+        dependencies {
+            if ((type == "forge") || (type == "spongeforge"))
+                classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.0.187-patched'
+        }
+    }
+}
+
 apply plugin: io.franzbecker.gradle.lombok.LombokPlugin
 apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
 apply plugin: com.github.spotbugs.snom.SpotBugsPlugin
