@@ -226,6 +226,12 @@ ext {
             enableShadow = Boolean.parseBoolean(enableShadow)
     } else
         enableShadow = useStats
+    if (project.hasProperty("useMixins")) {
+        if (useMixins instanceof String)
+            useMixins = Boolean.parseBoolean(useMixins)
+        useMixins = useMixins && (type != SPONGEFORGE)
+    } else
+        useMixins = false
     if (project.hasProperty("enableMockTesting")) {
         if (enableMockTesting instanceof String)
             enableMockTesting = Boolean.parseBoolean(enableMockTesting)
@@ -254,6 +260,7 @@ ext {
     if (!project.hasProperty("minecraft_version")) minecraft_version = "1.12.2"
     if (!project.hasProperty("forge_version")) forge_version = "14.23.5.2854"
     if (!project.hasProperty("mapping_version")) mapping_version = "stable_39-1.12"
+    if (!project.hasProperty("mixin_version")) mixin_version = "0.8.1-SNAPSHOT"
 
     if (!project.hasProperty("bStats_version")) bStats_version = "1.7"
 }
@@ -366,6 +373,10 @@ buildscript {
             name "forge"
             url "https://files.minecraftforge.net/maven"
         }
+        maven {
+            name "sponge"
+            url "https://repo.spongepowered.org/maven"
+        }
     }
 
     dependencies {
@@ -390,6 +401,9 @@ buildscript {
             if (project.hasProperty("curseForgeApiKey") || (System.env.curseForgeApiKey != null))
                 classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         }
+
+        if ((type == "spongeforge") && (!project.hasProperty("useMixins") || Boolean.parseBoolean(useMixins.toString())))
+            classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
     }
 }
 
@@ -416,6 +430,9 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
     if (project.hasProperty("curseForgeApiKey"))
         apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
 }
+
+if (useMixins)
+    apply plugin: org.spongepowered.asm.gradle.plugins.MixinGradlePlugin
 
 // ==============================================================================
 //
@@ -606,6 +623,8 @@ dependencies {
             shadowRelocate "org.bstats:${bStatsName}:${bStats_version}"
         }
     }
+    if (useMixins)
+        api "org.spongepowered:mixin:${mixin_version}"
 
     compileOnly "com.github.spotbugs:spotbugs-annotations:${spotBugs_version}"
 
@@ -701,6 +720,12 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
                 }
             }
         }
+    }
+}
+
+if (useMixins) {
+    mixin {
+        add sourceSets.main, "mixins.${pluginId}.refmap.json"
     }
 }
 
@@ -902,6 +927,14 @@ jar {
         from sourceSets.api.output
 
         dependsOn compileApiJava
+    }
+    
+    if (useMixins) {
+        manifest += attributes([
+            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+            "MixinConfigs": "${pluginId}.mixins.json",
+            "FMLCorePluginContainsFMLMod": "true",
+        ])
     }
 
     classifier = enableShadow? "dev" : null
