@@ -13,7 +13,6 @@ import static com.xlson.groovycsv.CsvParser.parseCsv
 import com.github.spotbugs.snom.SpotBugsTask
 import groovy.json.*
 import io.franzbecker.gradle.lombok.task.DelombokTask
-import java.security.SecureRandom
 import java.util.regex.*
 import java.util.stream.Collectors
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -397,7 +396,7 @@ buildscript {
         if ((type == "forge") || (type == "spongeforge")) {
             classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.0.187-patched'
 
-            if (project.hasProperty("curseForgeApiKey") || (System.env.curseForgeApiKey != null))
+            if ((project.hasProperty("curseForgeApiKey") || (System.env.curseForgeApiKey != null)) && project.hasProperty("curseforge_project_id"))
                 classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         }
 
@@ -451,7 +450,7 @@ if ((type == SPONGE) || (type == SPONGEFORGE)) {
 if ((type == FORGE) || (type == SPONGEFORGE)) {
     apply plugin: net.minecraftforge.gradle.userdev.UserDevPlugin
 
-    if (project.hasProperty("curseForgeApiKey"))
+    if (project.hasProperty("curseForgeApiKey") && project.hasProperty("curseforge_project_id"))
         apply plugin: com.matthewprenger.cursegradle.CurseGradlePlugin
 }
 
