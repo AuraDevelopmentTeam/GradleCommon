@@ -1343,8 +1343,7 @@ if (project.findProperty("devUpdateWebHook")) {
                 "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}" +
                 "${project.group.replace('.', '/')}/${project.version}/${project.name}-${project.version}.jar"
 
-        releaseSnapshot.dependsOn this
-        release.dependsOn this
+        uploadArchives.dependsOn this
     }
 }
 
