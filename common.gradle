@@ -1345,12 +1345,13 @@ if (project.findProperty("devUpdateWebHook")) {
 
 if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
-        def changelogPieces = file("CHANGELOG.md").text.split("(?m)(?=^(?:Version )?\\d+\\.\\d+\\.\\d+\\S*\\R[-=]+\$)", 3);
+        def changelogPieces = file("CHANGELOG.md").text.split("(?m)^(?:Version )?\\d+\\.\\d+\\.\\d+\\S*\\R[-=]+\$", 3);
 
         configuration.webHook = releaseWebHook
 
+        // TODO: Ping role by name, not ID of find a way to provide ID mapping
         configuration.header = "@${project.name} - **New Version: ${project.version}**"
-        configuration.description = "__Changelog:__\n\n${(changelogPieces.length >= 2)? changelogPieces[1].trim() : "*Unknown*"}"
+        configuration.description = "\n__Changelog:__\n\n${(changelogPieces.length >= 2)? changelogPieces[1].trim() : "*Unknown*"}"
 
         release.finalizedBy postReleaseDiscordMessage
     }
