@@ -16,8 +16,6 @@ import io.franzbecker.gradle.lombok.task.DelombokTask
 import java.util.regex.*
 import java.util.stream.Collectors
 import org.apache.tools.ant.filters.ReplaceTokens
-import de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask
-import de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask
 
 // =============================================================
 //     ____         ____ _         _  __   _
@@ -386,10 +384,6 @@ buildscript {
             name "sponge"
             url "https://repo.spongepowered.org/maven"
         }
-        maven {
-            name "Jitpack"
-            url "https://jitpack.io"
-        }
     }
     dependencies {
         classpath "com.xlson.groovycsv:groovycsv:1.3"
@@ -420,7 +414,7 @@ buildscript {
         if (((project.hasProperty("oreDeployApiKey") || (System.env.oreDeployApiKey != null)) && (project.hasProperty("isOnOre") && Boolean.parseBoolean(isOnOre.toString()))) ||
                 (project.hasProperty("devUpdateWebHook") || (System.env.devUpdateWebHook != null)) ||
                 (project.hasProperty("releaseWebHook") || (System.env.releaseWebHook != null))) {
-            classpath "com.github.DosMike:PluginPublisher:1.1.0"
+            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.1.1"
         }
     }
 }
@@ -445,10 +439,6 @@ allprojects {
             maven {
                 name "sponge"
                 url "https://repo.spongepowered.org/maven"
-            }
-            maven {
-                name "Jitpack"
-                url "https://jitpack.io"
             }
         }
     }
@@ -1249,7 +1239,7 @@ uploadArchives {
 }
 
 if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
-    task oreDeploy(type: PublishToOreTask) {
+    task oreDeploy(type: de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask) {
         configuration.apiKey = oreDeployApiKey
         configuration.project = pluginId
         configuration.channel = isSnapshot? "alpha" : (isDev? "beta" : "release")
@@ -1335,7 +1325,7 @@ gradle.taskGraph.whenReady {
 }
 
 if (project.findProperty("devUpdateWebHook")) {
-    task postDevUpdateDiscordMessage(type: NotifyDiscordTask) {
+    task postDevUpdateDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
         configuration.webHook = devUpdateWebHook
 
         configuration.header = "A new dev version for ${project.name} just released:"
@@ -1348,7 +1338,7 @@ if (project.findProperty("devUpdateWebHook")) {
 }
 
 if (project.findProperty("releaseWebHook")) {
-    task postReleaseDiscordMessage(type: NotifyDiscordTask) {
+    task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
         configuration.webHook = releaseWebHook
 
         configuration.header = "TODO"
