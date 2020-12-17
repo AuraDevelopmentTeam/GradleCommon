@@ -1341,7 +1341,7 @@ if (project.findProperty("devUpdateWebHook")) {
         configuration.header = "A new dev version for ${project.name} just released:"
         configuration.description = "${project.version}\n" +
                 "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}" +
-                "${project.group.replace('.', '/')}/${project.version}/${project.name}-${project.version}.jar"
+                "${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
 
         uploadArchives.dependsOn postDevUpdateDiscordMessage
     }
