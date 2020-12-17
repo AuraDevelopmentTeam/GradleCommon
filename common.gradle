@@ -400,7 +400,7 @@ buildscript {
                 classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         }
 
-        if ((type == "spongeforge") && (!project.hasProperty("useMixins") || Boolean.parseBoolean(useMixins.toString())))
+        if ((type == "spongeforge") && (project.hasProperty("useMixins") && Boolean.parseBoolean(useMixins.toString())))
             classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
     }
 }
