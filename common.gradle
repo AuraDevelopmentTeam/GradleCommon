@@ -181,6 +181,8 @@ ext {
     if (System.env.codacyApiToken != null) codacyApiToken = System.env.codacyApiToken
     if (System.env.oreDeployApiKey != null) ext.oreDeployApiKey = System.env.oreDeployApiKey
     if (System.env.curseForgeApiKey != null) curseForgeApiKey = System.env.curseForgeApiKey
+    if (System.env.devUpdateWebHook != null) devUpdateWebHook = System.env.devUpdateWebHook
+    if (System.env.releaseWebHook != null) releaseWebHook = System.env.releaseWebHook
     if (System.env.testSecrets != null)
         testSecrets = System.env.testSecrets
     else
@@ -415,7 +417,9 @@ buildscript {
         if ((type == "spongeforge") && (project.hasProperty("useMixins") && Boolean.parseBoolean(useMixins.toString())))
             classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
 
-        if ((project.hasProperty("oreDeployApiKey") || (System.env.oreDeployApiKey != null)) && (project.hasProperty("isOnOre") && Boolean.parseBoolean(isOnOre.toString()))) {
+        if (((project.hasProperty("oreDeployApiKey") || (System.env.oreDeployApiKey != null)) && (project.hasProperty("isOnOre") && Boolean.parseBoolean(isOnOre.toString()))) ||
+                (project.hasProperty("devUpdateWebHook") || (System.env.devUpdateWebHook != null)) ||
+                (project.hasProperty("releaseWebHook") || (System.env.releaseWebHook != null))) {
             classpath "com.github.DosMike:PluginPublisher:1.1.0"
         }
     }
@@ -474,7 +478,9 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
 if (useMixins)
     apply plugin: org.spongepowered.asm.gradle.plugins.MixinGradlePlugin
 
-if (project.hasProperty("oreDeployApiKey") && isOnOre)
+if ((project.hasProperty("oreDeployApiKey") && isOnOre) ||
+        project.hasProperty("devUpdateWebHook") ||
+        project.hasProperty("releaseWebHook"))
     apply plugin: de.dosmike.sponge.pluginpublisher.gradle.PluginPublisherPlugin
 
 // ==============================================================================
@@ -1325,6 +1331,31 @@ gradle.taskGraph.whenReady {
                 }
             }
         }
+    }
+}
+
+if (project.findProperty("devUpdateWebHook")) {
+    task postDevUpdateDiscordMessage(type: NotifyDiscordTask) {
+        configuration.webHook = devUpdateWebHook
+
+        configuration.header = "A new dev version for ${project.name} just released:"
+        configuration.description = "${project.version}\n" +
+                "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}" +
+                "${project.group.replace('.', '/')}/${project.version}/${project.name}-${project.version}.jar"
+
+        releaseSnapshot.dependsOn this
+        release.dependsOn this
+    }
+}
+
+if (project.findProperty("releaseWebHook")) {
+    task postReleaseDiscordMessage(type: NotifyDiscordTask) {
+        configuration.webHook = releaseWebHook
+
+        configuration.header = "TODO"
+        configuration.description = "TODO"
+
+        release.dependsOn this
     }
 }
 
