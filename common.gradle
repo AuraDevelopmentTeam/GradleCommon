@@ -16,6 +16,8 @@ import io.franzbecker.gradle.lombok.task.DelombokTask
 import java.util.regex.*
 import java.util.stream.Collectors
 import org.apache.tools.ant.filters.ReplaceTokens
+import de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask
+import de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask
 
 // =============================================================
 //     ____         ____ _         _  __   _
@@ -177,7 +179,7 @@ ext {
     if (System.env.password != null) ext."signing.password" = System.env.password
     if (System.env.secretKeyRingFile != null) ext."signing.secretKeyRingFile" = System.env.secretKeyRingFile
     if (System.env.codacyApiToken != null) codacyApiToken = System.env.codacyApiToken
-    if (System.env.oreDeployApiKey != null) ext."oreDeploy.apiKey" = System.env.oreDeployApiKey
+    if (System.env.oreDeployApiKey != null) ext.oreDeployApiKey = System.env.oreDeployApiKey
     if (System.env.curseForgeApiKey != null) curseForgeApiKey = System.env.curseForgeApiKey
     if (System.env.testSecrets != null)
         testSecrets = System.env.testSecrets
@@ -231,6 +233,12 @@ ext {
         useMixins = useMixins && (type == SPONGEFORGE)
     } else
         useMixins = false
+    if (project.hasProperty("isOnOre")) {
+        if (isOnOre instanceof String)
+            isOnOre = Boolean.parseBoolean(isOnOre)
+        isOnOre = isOnOre && ((type == SPONGE) || (type == SPONGEFORGE))
+    } else
+        isOnOre = false
     if (project.hasProperty("enableMockTesting")) {
         if (enableMockTesting instanceof String)
             enableMockTesting = Boolean.parseBoolean(enableMockTesting)
@@ -376,6 +384,10 @@ buildscript {
             name "sponge"
             url "https://repo.spongepowered.org/maven"
         }
+        maven {
+            name "Jitpack"
+            url "https://jitpack.io"
+        }
     }
     dependencies {
         classpath "com.xlson.groovycsv:groovycsv:1.3"
@@ -402,6 +414,10 @@ buildscript {
 
         if ((type == "spongeforge") && (project.hasProperty("useMixins") && Boolean.parseBoolean(useMixins.toString())))
             classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
+
+        if ((project.hasProperty("oreDeployApiKey") || (System.env.oreDeployApiKey != null)) && (project.hasProperty("isOnOre") && Boolean.parseBoolean(isOnOre.toString()))) {
+            classpath "com.github.DosMike:PluginPublisher:1.1.0"
+        }
     }
 }
 
@@ -426,6 +442,10 @@ allprojects {
                 name "sponge"
                 url "https://repo.spongepowered.org/maven"
             }
+            maven {
+                name "Jitpack"
+                url "https://jitpack.io"
+            }
         }
     }
 }
@@ -442,9 +462,6 @@ if (enableShadow)
 if ((type == SPONGE) || (type == SPONGEFORGE)) {
     apply plugin: org.spongepowered.gradle.meta.MetadataPlugin
     apply plugin: org.spongepowered.gradle.plugin.SpongePluginPlugin
-
-    if (project.hasProperty("oreDeploy.apiKey"))
-        apply plugin: org.spongepowered.gradle.ore.OreDeployPlugin
 }
 
 if ((type == FORGE) || (type == SPONGEFORGE)) {
@@ -456,6 +473,9 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
 
 if (useMixins)
     apply plugin: org.spongepowered.asm.gradle.plugins.MixinGradlePlugin
+
+if (project.hasProperty("oreDeployApiKey") && isOnOre)
+    apply plugin: de.dosmike.sponge.pluginpublisher.gradle.PluginPublisherPlugin
 
 // ==============================================================================
 //
@@ -1222,11 +1242,13 @@ uploadArchives {
     }
 }
 
-if (((type == SPONGE) || (type == SPONGEFORGE)) && project.hasProperty("oreDeploy.apiKey")) {
-    oreDeploy {
-        channel = isSnapshot? "alpha" : (isDev? "beta" : "release")
-        recommended = !isDev
-        changelog = file("CHANGELOG.md")
+if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
+    task oreDeploy(type: PublishToOreTask) {
+        configuration.apiKey = oreDeployApiKey
+        configuration.project = pluginId
+        configuration.channel = isSnapshot? "alpha" : (isDev? "beta" : "release")
+        configuration.asset = enableShadow? shadowJar.outputs.files : jar.outputs.files
+        configuration.description = file("CHANGELOG.md").text
     }
 }
 
@@ -1273,7 +1295,7 @@ if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForg
 }
 
 task releaseSnapshot(dependsOn: uploadArchives) {
-    if (((type == SPONGE) || (type == SPONGEFORGE)) && project.hasProperty("oreDeploy.apiKey")) {
+    if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
         dependsOn oreDeploy
     }
 
@@ -1283,7 +1305,7 @@ task releaseSnapshot(dependsOn: uploadArchives) {
 }
 
 task release(dependsOn: uploadArchives) {
-    if (((type == SPONGE) || (type == SPONGEFORGE)) && project.hasProperty("oreDeploy.apiKey")) {
+    if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
         dependsOn oreDeploy
     }
 
