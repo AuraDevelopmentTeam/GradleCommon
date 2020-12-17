@@ -1326,6 +1326,11 @@ gradle.taskGraph.whenReady {
 
 if (project.findProperty("devUpdateWebHook")) {
     task postDevUpdateDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
+        onlyIf {
+            // Late eval on purpos
+            !"${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}".startsWith("file://")
+        }
+
         configuration.webHook = devUpdateWebHook
 
         configuration.header = "A new dev version for ${project.name} just released:"
