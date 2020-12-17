@@ -1343,7 +1343,7 @@ if (project.findProperty("devUpdateWebHook")) {
                 "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}" +
                 "${project.group.replace('.', '/')}/${project.version}/${project.name}-${project.version}.jar"
 
-        uploadArchives.dependsOn this
+        uploadArchives.dependsOn postDevUpdateDiscordMessage
     }
 }
 
@@ -1354,7 +1354,7 @@ if (project.findProperty("releaseWebHook")) {
         configuration.header = "TODO"
         configuration.description = "TODO"
 
-        release.dependsOn this
+        release.dependsOn postReleaseDiscordMessage
     }
 }
 
