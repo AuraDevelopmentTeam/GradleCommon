@@ -1326,17 +1326,18 @@ gradle.taskGraph.whenReady {
 
 if (project.findProperty("devUpdateWebHook")) {
     task postDevUpdateDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
+        def url = "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}";
+
         onlyIf {
-            // Late eval on purpos
-            !"${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}".startsWith("file://")
+            // Late eval on purpose
+            !url.startsWith("file://")
         }
 
         configuration.webHook = devUpdateWebHook
 
-        configuration.header = "A new dev version for ${project.name} just released:"
+        configuration.header = "**A new dev version for ${project.name} just released:**"
         configuration.description = "${project.version}\n" +
-                "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}" +
-                "${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
+                "${-> url}${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
 
         uploadArchives.finalizedBy postDevUpdateDiscordMessage
     }
@@ -1344,10 +1345,12 @@ if (project.findProperty("devUpdateWebHook")) {
 
 if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
+        def changelogPieces = file("CHANGELOG.md").text.split("(?m)(?=^(?:Version )?\\d+\\.\\d+\\.\\d+\\S*\\R[-=]+\$)", 3);
+
         configuration.webHook = releaseWebHook
 
-        configuration.header = "TODO"
-        configuration.description = "TODO"
+        configuration.header = "@${project.name} - **New Version: ${project.version}**"
+        configuration.description = "__Changelog:__\n\n${(changelogPieces.length >= 2)? changelogPieces[1].trim() : "*Unknown*"}"
 
         release.finalizedBy postReleaseDiscordMessage
     }
