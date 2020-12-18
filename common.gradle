@@ -1357,6 +1357,8 @@ if (project.findProperty("releaseWebHook")) {
         configuration.description = "\n__Changelog:__\n\n${getChangelog()}"
 
         release.finalizedBy postReleaseDiscordMessage
+        if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre))
+            oreDeploy.finalizedBy postReleaseDiscordMessage
     }
 }
 
