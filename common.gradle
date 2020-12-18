@@ -89,22 +89,27 @@ def getVersion() {
     return baseVersion
 }
 def getChangelog() {
+    final String noChangelog = "*No Changelog*"
+
     try {
         File file = file("CHANGELOG.md")
 
-        if (!file.exists())
-            return "*No Changelog*"
+        if (!file.exists()) {
+            file = file("CHANGELOG.txt")
+            
+            if (!file.exists())
+                return noChangelog
+        }
 
-        Pattern pattern = Pattern.compile("^Version .*?(?= {0,2}\\n{0,3}Version)", Pattern.DOTALL);
-        Matcher match = pattern.matcher(file.text.replaceAll("\r", ""));
+        def text = file.text
+        def changelogPieces = text.split("(?m)^(?:Version )?\\d+\\.\\d+\\.\\d+\\S*\\R[-=]+\$", 3);
 
-        if (match.find())
-            return match.group();
+        return (changelogPieces.length >= 2)? changelogPieces[1].trim() : text
     } catch(IOException e) {
         println e
     }
 
-    return "*No Changelog*";
+    return noChangelog
 }
 def printCoverageText(projectName, coverageInstructions, coverageBranches, coverageLines, coverageComplexity, coverageMethods) {
     println String.format("Covered %.2f%% of instructions for ${projectName}.", ((double)coverageInstructions[1] / (double)coverageInstructions[0]) * 100.0)
@@ -1345,13 +1350,11 @@ if (project.findProperty("devUpdateWebHook")) {
 
 if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
-        def changelogPieces = file("CHANGELOG.md").text.split("(?m)^(?:Version )?\\d+\\.\\d+\\.\\d+\\S*\\R[-=]+\$", 3);
-
         configuration.webHook = releaseWebHook
 
         // TODO: Ping role by name, not ID of find a way to provide ID mapping
         configuration.header = "@${project.name} - **New Version: ${project.version}**"
-        configuration.description = "\n__Changelog:__\n\n${(changelogPieces.length >= 2)? changelogPieces[1].trim() : "*Unknown*"}"
+        configuration.description = "\n__Changelog:__\n\n${getChangelog()}"
 
         release.finalizedBy postReleaseDiscordMessage
     }
