@@ -131,6 +131,9 @@ def signJar(archivePath) {
         println "WARNING!!!\tCannot sign jar!"
     }
 }
+def getDiscordGroupPing(groupName) {
+    return (discordGroupIdMapping.containsKey(groupName))? "<@&${discordGroupIdMapping.getProperty(groupName)}>" : "@$groupName"
+}
 
 // Print JVM version etc
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -186,6 +189,7 @@ ext {
     if (System.env.curseForgeApiKey != null) curseForgeApiKey = System.env.curseForgeApiKey
     if (System.env.devUpdateWebHook != null) devUpdateWebHook = System.env.devUpdateWebHook
     if (System.env.releaseWebHook != null) releaseWebHook = System.env.releaseWebHook
+    if (System.env.releaseWebHook != null) discordGroupIdMapping = System.env.discordGroupIdMapping
     if (System.env.testSecrets != null)
         testSecrets = System.env.testSecrets
     else
@@ -275,6 +279,15 @@ ext {
     if (!project.hasProperty("mixin_version")) mixin_version = "0.8.2"
 
     if (!project.hasProperty("bStats_version")) bStats_version = "1.7"
+
+    // Processing variables
+    if (project.hasProperty("discordGroupIdMapping")) {
+        def textMapping = discordGroupIdMapping
+        discordGroupIdMapping = new Properties()
+
+        discordGroupIdMapping.load(new StringReader(textMapping))
+    } else
+        discordGroupIdMapping = new Properties()
 }
 
 version = getVersion()
@@ -1352,8 +1365,8 @@ if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
         configuration.webHook = releaseWebHook
 
-        // TODO: Ping role by name, not ID of find a way to provide ID mapping
-        configuration.header = "@${project.name} - **New Version: ${project.version}**"
+        // TODO: Ping role by name, not ID or find a way to provide ID mapping
+        configuration.header = "${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**"
         configuration.description = "\n__Changelog:__\n\n${getChangelog()}"
 
         release.finalizedBy postReleaseDiscordMessage
