@@ -1242,7 +1242,7 @@ if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDepl
     task oreDeploy(type: de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask) {
         configuration.apiKey = oreDeployApiKey
         configuration.project = pluginId
-        configuration.channel = isSnapshot? "alpha" : (isDev? "beta" : "release")
+        configuration.channel = isSnapshot? "Alpha" : (isDev? "Beta" : "Release")
         configuration.asset = enableShadow? shadowJar.outputs.files : jar.outputs.files
         configuration.description = file("CHANGELOG.md").text
     }
