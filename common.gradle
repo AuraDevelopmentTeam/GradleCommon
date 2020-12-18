@@ -414,7 +414,7 @@ buildscript {
         if (((project.hasProperty("oreDeployApiKey") || (System.env.oreDeployApiKey != null)) && (project.hasProperty("isOnOre") && Boolean.parseBoolean(isOnOre.toString()))) ||
                 (project.hasProperty("devUpdateWebHook") || (System.env.devUpdateWebHook != null)) ||
                 (project.hasProperty("releaseWebHook") || (System.env.releaseWebHook != null))) {
-            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.1.1"
+            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.1.2"
         }
     }
 }
