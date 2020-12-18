@@ -419,7 +419,7 @@ buildscript {
         if (((project.hasProperty("oreDeployApiKey") || (System.env.oreDeployApiKey != null)) && (project.hasProperty("isOnOre") && Boolean.parseBoolean(isOnOre.toString()))) ||
                 (project.hasProperty("devUpdateWebHook") || (System.env.devUpdateWebHook != null)) ||
                 (project.hasProperty("releaseWebHook") || (System.env.releaseWebHook != null))) {
-            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.1.2"
+            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.2.0"
         }
     }
 }
@@ -1245,11 +1245,11 @@ uploadArchives {
 
 if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
     task oreDeploy(type: de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask) {
-        configuration.apiKey = oreDeployApiKey
-        configuration.project = pluginId
-        configuration.channel = isSnapshot? "Alpha" : (isDev? "Beta" : "Release")
-        configuration.asset = enableShadow? shadowJar.outputs.files : jar.outputs.files
-        configuration.description = file("CHANGELOG.md").text
+        apiKey = oreDeployApiKey
+        projectId = pluginId
+        channel = isSnapshot? "Alpha" : (isDev? "Beta" : "Release")
+        uploadAsset = enableShadow? shadowJar.outputs.files : jar.outputs.files
+        messageBody = file("CHANGELOG.md").text
     }
 }
 
@@ -1338,10 +1338,10 @@ if (project.findProperty("devUpdateWebHook")) {
             !url.startsWith("file://")
         }
 
-        configuration.webHook = devUpdateWebHook
+        webHookUrl = devUpdateWebHook
 
-        configuration.header = "**A new dev version for ${project.name} just released:**"
-        configuration.description = "${project.version}\n" +
+        messageHeader = "**A new dev version for ${project.name} just released:**"
+        messageBody = "${project.version}\n" +
                 "${-> url}${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
 
         uploadArchives.finalizedBy postDevUpdateDiscordMessage
@@ -1350,11 +1350,11 @@ if (project.findProperty("devUpdateWebHook")) {
 
 if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
-        configuration.webHook = releaseWebHook
+        webHookUrl = releaseWebHook
 
         // TODO: Ping role by name, not ID of find a way to provide ID mapping
-        configuration.header = "@${project.name} - **New Version: ${project.version}**"
-        configuration.description = "\n__Changelog:__\n\n${getChangelog()}"
+        messageHeader = "@${project.name} - **New Version: ${project.version}**"
+        messageBody = "\n__Changelog:__\n\n${getChangelog()}"
 
         release.finalizedBy postReleaseDiscordMessage
     }
