@@ -13,7 +13,6 @@ import static com.xlson.groovycsv.CsvParser.parseCsv
 import com.github.spotbugs.snom.SpotBugsTask
 import groovy.json.*
 import io.franzbecker.gradle.lombok.task.DelombokTask
-import java.util.regex.*
 import java.util.stream.Collectors
 import org.apache.tools.ant.filters.ReplaceTokens
 
@@ -821,15 +820,16 @@ processResources {
         exclude "**/*.ogg"
         exclude "**/*.nbt"
 
-        expand \
-            "id": baseProject.pluginId,
-        "name": baseProject.pluginName,
-        "version": baseProject.version,
-        "group": baseProject.group,
-        "description": baseProject.description,
-        "build": baseProject.buildNum,
-        "buildType": baseProject.buildType,
-        "minecraftVersion": baseProject.minecraft_version
+        expand(
+                "id": baseProject.pluginId,
+                "name": baseProject.pluginName,
+                "version": baseProject.version,
+                "group": baseProject.group,
+                "description": baseProject.description,
+                "build": baseProject.buildNum,
+                "buildType": baseProject.buildType,
+                "minecraftVersion": baseProject.minecraft_version
+        )
     }
 
     rename "(.+_at.cfg)", "META-INF/\$1"
