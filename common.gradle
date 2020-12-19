@@ -302,7 +302,8 @@ ext {
         try {
             def oreProjectData = null
 
-            if (cacheFile.exists()) {
+            if (cacheFile.exists() &&
+                    (groovy.time.TimeCategory.minus(new Date(), new Date(cacheFile.lastModified())).days < 7)) {
                 try {
                     oreProjectData = new JsonSlurper().parse(cacheFile);
                 } catch (IOException e) {
