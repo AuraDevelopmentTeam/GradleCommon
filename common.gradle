@@ -243,11 +243,11 @@ ext {
     } else
         useMixins = false
     if (project.hasProperty("isOnOre")) {
-        if (isOnOre instanceof String)
+        if ((isOnOre instanceof String) && (isOnOre != "auto"))
             isOnOre = Boolean.parseBoolean(isOnOre)
-        isOnOre = isOnOre && ((type == SPONGE) || (type == SPONGEFORGE))
+        isOnOre = ((type == SPONGE) || (type == SPONGEFORGE)) ? isOnOre : false
     } else
-        isOnOre = false
+        isOnOre = "auto"
     if (project.hasProperty("enableMockTesting")) {
         if (enableMockTesting instanceof String)
             enableMockTesting = Boolean.parseBoolean(enableMockTesting)
@@ -288,6 +288,18 @@ ext {
         discordGroupIdMapping.load(new StringReader(textMapping))
     } else
         discordGroupIdMapping = new Properties()
+
+    if ((isOnOre == "auto") || ((isOnOre instanceof Boolean) && isOnOre) {
+        try {
+            // TODO: Use actual call once added
+            def oreProjectData = null
+
+            isOnOre = true
+            oreNamespace = oreProjectData.namespace.owner
+        } catch(Exception e) {
+            isOnOre = false
+        }
+    }
 }
 
 version = getVersion()
