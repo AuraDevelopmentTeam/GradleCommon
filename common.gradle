@@ -1296,11 +1296,11 @@ uploadArchives {
 
 if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
     task oreDeploy(type: de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask) {
-        apiKey = oreDeployApiKey
-        projectId = pluginId
-        channel = isSnapshot? "Alpha" : (isDev? "Beta" : "Release")
-        uploadAsset = enableShadow? shadowJar.outputs.files : jar.outputs.files
-        messageBody = file("CHANGELOG.md").text
+        apiKey.set(oreDeployApiKey)
+        projectId.set(pluginId)
+        channel.set(isSnapshot? "Alpha" : (isDev? "Beta" : "Release"))
+        uploadAsset.set(enableShadow? shadowJar.outputs.files : jar.outputs.files)
+        messageBody.set(file("CHANGELOG.md").text)
     }
 }
 
@@ -1387,10 +1387,10 @@ if (project.findProperty("devUpdateWebHook")) {
             !isLocalMaven()
         }
 
-        webHookUrl = devUpdateWebHook
+        webHookUrl.set(devUpdateWebHook)
 
-        messageHeader = "**A new dev version for ${project.name} just released:**"
-        messageBody = "${project.version}\n${getMavenUrl()}"
+        messageHeader.set("**A new dev version for ${project.name} just released:**")
+        messageBody.set("${project.version}\n${getMavenUrl()}")
 
         uploadArchives.finalizedBy postDevUpdateDiscordMessage
     }
@@ -1407,13 +1407,15 @@ if (project.findProperty("releaseWebHook")) {
             downloadLinks += getMavenUrl()
         }
 
-        webHookUrl = releaseWebHook
+        webHookUrl.set(releaseWebHook)
 
-        messageHeader = "${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**"
-        messageBody = "\n__Changelog:__\n\n${getChangelog()}"
+        messageHeader.set("${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**")
+        def _messageBody = "\n__Changelog:__\n\n${getChangelog()}"
 
         if (!downloadLinks.empty)
-            messageBody += "\n\n__Download:__\n* ${downloadLinks.join("\n* ")}"
+            _messageBody += "\n\n__Download:__\n* ${downloadLinks.join("\n* ")}"
+
+        messageBody.set(_messageBody)
 
         release.finalizedBy postReleaseDiscordMessage
         if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre))
