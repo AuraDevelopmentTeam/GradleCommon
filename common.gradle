@@ -311,7 +311,7 @@ ext {
             }
 
             if (oreProjectData == null) {
-                oreProjectData = de.dosmike.sponge.pluginpublisher.tasks.TaskFunctors.runOreProjectLookup(oreDeployApiKey, pluginId)
+                oreProjectData = de.dosmike.sponge.pluginpublisher.tasks.TaskFunctors.runOreProjectLookup(null, pluginId)
 
                 cacheFile.text = oreProjectData
             }
