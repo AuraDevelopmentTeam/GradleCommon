@@ -317,8 +317,8 @@ ext {
                 cacheFile.text = oreProjectData
             }
 
-            isOnOre = true
             oreNamespace = oreProjectData.namespace.owner.asString
+            isOnOre = true
         } catch (Exception e) {
             if ((isOnOre instanceof Boolean) && isOnOre)
                 println "WARNING: isOnOre was set to true, but the project couldn't be found on Ore, or your API key is missing the \"view_public_info\" permission!"
