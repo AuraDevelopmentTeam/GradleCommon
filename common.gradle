@@ -503,7 +503,7 @@ if ((project.hasProperty("oreDeployApiKey") && isOnOre) ||
 // ==============================================================================
 
 // Force java 8
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = JavaVersion.VERSION_1_8
 
 Project proj = project
 
