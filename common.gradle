@@ -296,7 +296,8 @@ ext {
         discordGroupIdMapping = new Properties()
 
     if ((isOnOre == "auto") || ((isOnOre instanceof Boolean) && isOnOre)) {
-        def cacheFile = new File(project.buildDir, "oreProjectData.json")
+        File cacheFile = new File(project.buildDir, "oreProjectData.json")
+        cacheFile.parentFile.mkdirs()
 
         try {
             def oreProjectData = null
