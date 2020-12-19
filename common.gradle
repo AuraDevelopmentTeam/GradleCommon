@@ -321,6 +321,7 @@ ext {
             }
 
             oreNamespace = oreProjectData.namespace.owner
+            oreSlug = oreProjectData.namespace.slug
             isOnOre = true
         } catch (Exception e) {
             if ((isOnOre instanceof Boolean) && isOnOre)
@@ -1406,7 +1407,7 @@ if (project.findProperty("releaseWebHook")) {
         def downloadLinks = []
 
         if (project.hasProperty("oreDeployApiKey") && isOnOre) {
-            downloadLinks += "https://ore.spongepowered.org/${project.oreNamespace}/${project.name}/versions/${project.version}"
+            downloadLinks += "https://ore.spongepowered.org/${project.oreNamespace}/${project.oreSlug}/versions/${project.version}"
         }
         if (!isLocalMaven()) {
             downloadLinks += getMavenUrl()
