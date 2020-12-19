@@ -1395,7 +1395,7 @@ if (project.findProperty("devUpdateWebHook")) {
         webHookUrl.set(devUpdateWebHook)
 
         messageHeader.set("**A new dev version for ${project.name} just released:**")
-        messageBody.set("${project.version}\n${getMavenUrl()}")
+        messageBody.set("${project.version}\n${-> getMavenUrl()}")
 
         uploadArchives.finalizedBy postDevUpdateDiscordMessage
     }
@@ -1418,7 +1418,7 @@ if (project.findProperty("releaseWebHook")) {
         def _messageBody = "\n__Changelog:__\n\n${getChangelog()}"
 
         if (!downloadLinks.empty)
-            _messageBody += "\n\n__Download:__\n* ${downloadLinks.join("\n* ")}"
+            _messageBody += "\n\n__Download:__\n* ${-> downloadLinks.join("\n* ")}"
 
         messageBody.set(_messageBody)
 
