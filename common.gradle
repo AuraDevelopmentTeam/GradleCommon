@@ -134,6 +134,13 @@ def signJar(archivePath) {
 def getDiscordGroupPing(groupName) {
     return (discordGroupIdMapping.containsKey(groupName))? "<@&${discordGroupIdMapping.getProperty(groupName)}>" : "@$groupName"
 }
+def getMavenUrl() {
+    return "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}" +
+            "${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
+}
+def isLocalMaven() {
+    return project.tasks.uploadArchives.repositories.mavenDeployer.repository.url.startsWith("file://")
+}
 
 // Print JVM version etc
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -289,7 +296,7 @@ ext {
     } else
         discordGroupIdMapping = new Properties()
 
-    if ((isOnOre == "auto") || ((isOnOre instanceof Boolean) && isOnOre) {
+    if ((isOnOre == "auto") || ((isOnOre instanceof Boolean) && isOnOre)) {
         try {
             // TODO: Use actual call once added
             def oreProjectData = null
@@ -1356,18 +1363,15 @@ gradle.taskGraph.whenReady {
 
 if (project.findProperty("devUpdateWebHook")) {
     task postDevUpdateDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
-        def url = "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}";
-
         onlyIf {
             // Late eval on purpose
-            !url.startsWith("file://")
+            !isLocalMaven()
         }
 
         webHookUrl = devUpdateWebHook
 
         messageHeader = "**A new dev version for ${project.name} just released:**"
-        messageBody = "${project.version}\n" +
-                "${-> url}${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
+        messageBody = "${project.version}\n${getMavenUrl()}"
 
         uploadArchives.finalizedBy postDevUpdateDiscordMessage
     }
@@ -1375,10 +1379,22 @@ if (project.findProperty("devUpdateWebHook")) {
 
 if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
+        def downloadLinks = []
+
+        if (project.hasProperty("oreDeployApiKey") && isOnOre) {
+            downloadLinks += "https://ore.spongepowered.org/${project.oreNamespace}/${project.name}/versions/${project.version}"
+        }
+        if (!isLocalMaven()) {
+            downloadLinks += getMavenUrl()
+        }
+
         webHookUrl = releaseWebHook
 
         messageHeader = "${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**"
         messageBody = "\n__Changelog:__\n\n${getChangelog()}"
+
+        if (!downloadLinks.empty)
+            messageBody += "\n\n__Download:__\n* ${downloadLinks.join("\n* ")}"
 
         release.finalizedBy postReleaseDiscordMessage
         if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre))
