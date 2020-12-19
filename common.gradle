@@ -315,9 +315,12 @@ ext {
                 oreProjectData = de.dosmike.sponge.pluginpublisher.tasks.TaskFunctors.runOreProjectLookup(null, pluginId)
 
                 cacheFile.text = oreProjectData
+
+                // Converting into a Groovy JSON object
+                oreProjectData = new JsonSlurper().parseText(oreProjectData.toString())
             }
 
-            oreNamespace = oreProjectData.namespace.owner.asString
+            oreNamespace = oreProjectData.namespace.owner
             isOnOre = true
         } catch (Exception e) {
             if ((isOnOre instanceof Boolean) && isOnOre)
