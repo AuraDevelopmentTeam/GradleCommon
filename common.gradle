@@ -133,6 +133,13 @@ def signJar(archivePath) {
 def getDiscordGroupPing(groupName) {
     return (discordGroupIdMapping.containsKey(groupName))? "<@&${discordGroupIdMapping.getProperty(groupName)}>" : "@$groupName"
 }
+def getMavenUrl() {
+    return "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}" +
+            "${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
+}
+def isLocalMaven() {
+    return project.tasks.uploadArchives.repositories.mavenDeployer.repository.url.startsWith("file://")
+}
 
 // Print JVM version etc
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -242,11 +249,11 @@ ext {
     } else
         useMixins = false
     if (project.hasProperty("isOnOre")) {
-        if (isOnOre instanceof String)
+        if ((isOnOre instanceof String) && (isOnOre != "auto"))
             isOnOre = Boolean.parseBoolean(isOnOre)
-        isOnOre = isOnOre && ((type == SPONGE) || (type == SPONGEFORGE))
+        isOnOre = ((type == SPONGE) || (type == SPONGEFORGE)) ? isOnOre : false
     } else
-        isOnOre = false
+        isOnOre = "auto"
     if (project.hasProperty("enableMockTesting")) {
         if (enableMockTesting instanceof String)
             enableMockTesting = Boolean.parseBoolean(enableMockTesting)
@@ -287,6 +294,37 @@ ext {
         discordGroupIdMapping.load(new StringReader(textMapping))
     } else
         discordGroupIdMapping = new Properties()
+
+    if ((isOnOre == "auto") || ((isOnOre instanceof Boolean) && isOnOre)) {
+        def cacheFile = new File(project.buildDir, "oreProjectData.json")
+
+        try {
+            def oreProjectData = null
+
+            if (cacheFile.exists()) {
+                try {
+                    oreProjectData = new JsonSlurper().parse(cacheFile);
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+
+            if (oreProjectData == null) {
+                oreProjectData = de.dosmike.sponge.pluginpublisher.tasks.TaskFunctors.runOreProjectLookup(null, pluginId)
+
+                cacheFile.text = oreProjectData
+            }
+
+            isOnOre = true
+            oreNamespace = oreProjectData.namespace.owner.asString
+        } catch (Exception e) {
+            if ((isOnOre instanceof Boolean) && isOnOre)
+                println "WARNING: isOnOre was set to true, but the project couldn't be found on Ore, or your API key is missing the \"view_public_info\" permission!"
+
+            cacheFile.text = "{\"error\":\"${StringEscapeUtils.escapeJava(e.getMessage())}\"}"
+            isOnOre = false
+        }
+    }
 }
 
 version = getVersion()
@@ -428,10 +466,10 @@ buildscript {
         if ((type == "spongeforge") && (project.hasProperty("useMixins") && Boolean.parseBoolean(useMixins.toString())))
             classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
 
-        if (((project.hasProperty("oreDeployApiKey") || (System.env.oreDeployApiKey != null)) && (project.hasProperty("isOnOre") && Boolean.parseBoolean(isOnOre.toString()))) ||
+        if ((project.hasProperty("isOnOre") && ((isOnOre == "auto") || Boolean.parseBoolean(isOnOre.toString()))) ||
                 (project.hasProperty("devUpdateWebHook") || (System.env.devUpdateWebHook != null)) ||
                 (project.hasProperty("releaseWebHook") || (System.env.releaseWebHook != null))) {
-            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.1.2"
+            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.2.1"
         }
     }
 }
@@ -1258,11 +1296,11 @@ uploadArchives {
 
 if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
     task oreDeploy(type: de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask) {
-        configuration.apiKey = oreDeployApiKey
-        configuration.project = pluginId
-        configuration.channel = isSnapshot? "Alpha" : (isDev? "Beta" : "Release")
-        configuration.asset = enableShadow? shadowJar.outputs.files : jar.outputs.files
-        configuration.description = file("CHANGELOG.md").text
+        apiKey.set(oreDeployApiKey)
+        projectId.set(pluginId)
+        channel.set(isSnapshot? "Alpha" : (isDev? "Beta" : "Release"))
+        uploadAsset.set(enableShadow? shadowJar.outputs.files : jar.outputs.files)
+        messageBody.set(file("CHANGELOG.md").text)
     }
 }
 
@@ -1344,18 +1382,15 @@ gradle.taskGraph.whenReady {
 
 if (project.findProperty("devUpdateWebHook")) {
     task postDevUpdateDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
-        def url = "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}";
-
         onlyIf {
             // Late eval on purpose
-            !url.startsWith("file://")
+            !isLocalMaven()
         }
 
-        configuration.webHook = devUpdateWebHook
+        webHookUrl.set(devUpdateWebHook)
 
-        configuration.header = "**A new dev version for ${project.name} just released:**"
-        configuration.description = "${project.version}\n" +
-                "${-> url}${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
+        messageHeader.set("**A new dev version for ${project.name} just released:**")
+        messageBody.set("${project.version}\n${getMavenUrl()}")
 
         uploadArchives.finalizedBy postDevUpdateDiscordMessage
     }
@@ -1363,10 +1398,24 @@ if (project.findProperty("devUpdateWebHook")) {
 
 if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
-        configuration.webHook = releaseWebHook
+        def downloadLinks = []
 
-        configuration.header = "${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**"
-        configuration.description = "\n__Changelog:__\n\n${getChangelog()}"
+        if (project.hasProperty("oreDeployApiKey") && isOnOre) {
+            downloadLinks += "https://ore.spongepowered.org/${project.oreNamespace}/${project.name}/versions/${project.version}"
+        }
+        if (!isLocalMaven()) {
+            downloadLinks += getMavenUrl()
+        }
+
+        webHookUrl.set(releaseWebHook)
+
+        messageHeader.set("${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**")
+        def _messageBody = "\n__Changelog:__\n\n${getChangelog()}"
+
+        if (!downloadLinks.empty)
+            _messageBody += "\n\n__Download:__\n* ${downloadLinks.join("\n* ")}"
+
+        messageBody.set(_messageBody)
 
         release.finalizedBy postReleaseDiscordMessage
         if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre))
