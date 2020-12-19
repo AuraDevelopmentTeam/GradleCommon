@@ -96,7 +96,7 @@ def getChangelog() {
 
         if (!file.exists()) {
             file = file("CHANGELOG.txt")
-            
+
             if (!file.exists())
                 return noChangelog
         }
@@ -121,15 +121,18 @@ def printCoverageText(projectName, coverageInstructions, coverageBranches, cover
 def signJar(archivePath) {
     if (project.hasProperty("keyStoreAlias") && project.hasProperty("keyStore") && project.hasProperty("keyStorePass")) {
         ant.signjar(
-            jar:                  archivePath,
-            alias:                project.keyStoreAlias,
-            keystore:             project.keyStore,
-            storepass:            project.keyStorePass,
-            preservelastmodified: true
+                jar:                  archivePath,
+                alias:                project.keyStoreAlias,
+                keystore:             project.keyStore,
+                storepass:            project.keyStorePass,
+                preservelastmodified: true
         )
     } else {
         println "WARNING!!!\tCannot sign jar!"
     }
+}
+def getDiscordGroupPing(groupName) {
+    return (discordGroupIdMapping.containsKey(groupName))? "<@&${discordGroupIdMapping.getProperty(groupName)}>" : "@$groupName"
 }
 
 // Print JVM version etc
@@ -186,6 +189,7 @@ ext {
     if (System.env.curseForgeApiKey != null) curseForgeApiKey = System.env.curseForgeApiKey
     if (System.env.devUpdateWebHook != null) devUpdateWebHook = System.env.devUpdateWebHook
     if (System.env.releaseWebHook != null) releaseWebHook = System.env.releaseWebHook
+    if (System.env.releaseWebHook != null) discordGroupIdMapping = System.env.discordGroupIdMapping
     if (System.env.testSecrets != null)
         testSecrets = System.env.testSecrets
     else
@@ -253,8 +257,8 @@ ext {
     shouldSign = project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")
     baseMainDirResources = ["CHANGELOG", "CHANGELOG.md", "CHANGELOG.txt", "LICENSE", "LICENSE.md", "LICENSE.txt", "README", "README.md", "README.txt"]
     mainDirResources =
-        fileTree(dir: file(projectDir), includes: baseMainDirResources) +
-        fileTree(dir: file(rootProject.projectDir), includes: baseMainDirResources)
+            fileTree(dir: file(projectDir), includes: baseMainDirResources) +
+                    fileTree(dir: file(rootProject.projectDir), includes: baseMainDirResources)
 
     // default versions
 
@@ -275,6 +279,15 @@ ext {
     if (!project.hasProperty("mixin_version")) mixin_version = "0.8.2"
 
     if (!project.hasProperty("bStats_version")) bStats_version = "1.7"
+
+    // Processing variables
+    if (project.hasProperty("discordGroupIdMapping")) {
+        def textMapping = discordGroupIdMapping
+        discordGroupIdMapping = new Properties()
+
+        discordGroupIdMapping.load(new StringReader(textMapping))
+    } else
+        discordGroupIdMapping = new Properties()
 }
 
 version = getVersion()
@@ -292,13 +305,13 @@ ext {
     // Common Manifest
     commonManifest = {
         attributes(
-            "Specification-Title": pluginId,
-            "Specification-Version": "1",
-            "Specification-Vendor": "Aura Development Team",
-            "Implementation-Title": pluginName,
-            "Implementation-Version": version,
-            "Implementation-Vendor": "Aura Development Team",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Specification-Title": pluginId,
+                "Specification-Version": "1",
+                "Specification-Vendor": "Aura Development Team",
+                "Implementation-Title": pluginName,
+                "Implementation-Version": version,
+                "Implementation-Vendor": "Aura Development Team",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         )
     }
 
@@ -490,7 +503,7 @@ if ((project.hasProperty("oreDeployApiKey") && isOnOre) ||
 // ==============================================================================
 
 // Force java 8
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = JavaVersion.VERSION_1_8
 
 Project proj = project
 
@@ -554,8 +567,8 @@ configurations {
 if (hasApi && apiDependsOnPlatform && ((type == FORGE) || (type == SPONGEFORGE))) {
     configurations {
         apiImplementation {
-             extendsFrom minecraft
-             transitive = true
+            extendsFrom minecraft
+            transitive = true
         }
     }
 }
@@ -810,13 +823,13 @@ processResources {
 
         expand \
             "id": baseProject.pluginId,
-            "name": baseProject.pluginName,
-            "version": baseProject.version,
-            "group": baseProject.group,
-            "description": baseProject.description,
-            "build": baseProject.buildNum,
-            "buildType": baseProject.buildType,
-            "minecraftVersion": baseProject.minecraft_version
+        "name": baseProject.pluginName,
+        "version": baseProject.version,
+        "group": baseProject.group,
+        "description": baseProject.description,
+        "build": baseProject.buildNum,
+        "buildType": baseProject.buildType,
+        "minecraftVersion": baseProject.minecraft_version
     }
 
     rename "(.+_at.cfg)", "META-INF/\$1"
@@ -845,14 +858,14 @@ task processSources (type: Sync) {
     from sourceSets.main.allSource
     into outputDir
     filter (ReplaceTokens, tokens: [
-        "id": baseProject.pluginId,
-        "name": baseProject.pluginName,
-        "version": baseProject.version,
-        "group": baseProject.group,
-        "description": baseProject.description,
-        "build": baseProject.buildNum,
-        "buildType": baseProject.buildType,
-        "minecraftVersion": baseProject.minecraft_version
+            "id": baseProject.pluginId,
+            "name": baseProject.pluginName,
+            "version": baseProject.version,
+            "group": baseProject.group,
+            "description": baseProject.description,
+            "build": baseProject.buildNum,
+            "buildType": baseProject.buildType,
+            "minecraftVersion": baseProject.minecraft_version
     ])
 }
 
@@ -873,14 +886,14 @@ if (hasApi) {
         from sourceSets.api.allSource
         into outputDir
         filter (ReplaceTokens, tokens: [
-            "id": baseProject.pluginId,
-            "name": baseProject.pluginName,
-            "version": baseProject.version,
-            "group": baseProject.group,
-            "description": baseProject.description,
-            "build": baseProject.buildNum,
-            "buildType": baseProject.buildType,
-            "minecraftVersion": baseProject.minecraft_version
+                "id": baseProject.pluginId,
+                "name": baseProject.pluginName,
+                "version": baseProject.version,
+                "group": baseProject.group,
+                "description": baseProject.description,
+                "build": baseProject.buildNum,
+                "buildType": baseProject.buildType,
+                "minecraftVersion": baseProject.minecraft_version
         ])
     }
 }
@@ -902,15 +915,15 @@ task processTestSources (type: Sync) {
     from sourceSets.test.allSource
     into outputDir
     filter (ReplaceTokens, tokens: [
-        "id": baseProject.pluginId,
-        "name": baseProject.pluginName,
-        "version": baseProject.version,
-        "group": baseProject.group,
-        "description": baseProject.description,
-        "build": baseProject.buildNum,
-        "buildType": baseProject.buildType,
-        "minecraftVersion": baseProject.minecraft_version,
-        "testSecrets": baseProject.testSecrets
+            "id": baseProject.pluginId,
+            "name": baseProject.pluginName,
+            "version": baseProject.version,
+            "group": baseProject.group,
+            "description": baseProject.description,
+            "build": baseProject.buildNum,
+            "buildType": baseProject.buildType,
+            "minecraftVersion": baseProject.minecraft_version,
+            "testSecrets": baseProject.testSecrets
     ])
 }
 
@@ -984,10 +997,10 @@ jar {
 
     if (useMixins) {
         manifest.attributes += [
-            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-            "MixinConfigs": "mixins.${pluginId}.json",
-            "FMLCorePluginContainsFMLMod": "true",
-            "ForceLoadAsMod": "true"
+                "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+                "MixinConfigs": "mixins.${pluginId}.json",
+                "FMLCorePluginContainsFMLMod": "true",
+                "ForceLoadAsMod": "true"
         ]
     }
 
@@ -1007,7 +1020,7 @@ if (hasApi) {
 
     if (apiDependsOnPlatform && ((type == FORGE) || (type == SPONGEFORGE))) {
         reobf {
-          	apiJar { classpath = sourceSets.api.compileClasspath }
+            apiJar { classpath = sourceSets.api.compileClasspath }
         }
 
         reobfApiJar {
@@ -1063,7 +1076,7 @@ if (enableShadow) {
 
     if ((type == FORGE) || (type == SPONGEFORGE)) {
         reobf {
-          	shadowJar {}
+            shadowJar {}
         }
 
         reobfShadowJar {
@@ -1078,7 +1091,7 @@ if (enableShadow) {
 
 if ((type == FORGE) || (type == SPONGEFORGE)) {
     reobf {
-      	jar {}
+        jar {}
     }
 
     reobfJar {
@@ -1154,7 +1167,7 @@ test {
     }
 
     onOutput { descriptor, event ->
-       logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+        logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
     }
 
     if (gradle.startParameter.isParallelProjectExecutionEnabled()) {
@@ -1352,11 +1365,12 @@ if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
         webHookUrl = releaseWebHook
 
-        // TODO: Ping role by name, not ID of find a way to provide ID mapping
-        messageHeader = "@${project.name} - **New Version: ${project.version}**"
+        messageHeader = "${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**"
         messageBody = "\n__Changelog:__\n\n${getChangelog()}"
 
         release.finalizedBy postReleaseDiscordMessage
+        if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre))
+            oreDeploy.finalizedBy postReleaseDiscordMessage
     }
 }
 
@@ -1405,9 +1419,9 @@ if (project == rootProject) {
             main = "com.codacy.CodacyCoverageReporter"
             classpath = configurations.codacy
             args = [
-                "final",
-                "--project-token",
-                project.codacyApiToken
+                    "final",
+                    "--project-token",
+                    project.codacyApiToken
             ]
         } else {
             enabled = false
@@ -1480,14 +1494,14 @@ task sendCoverageToCodacy(type: JavaExec) {
         main = "com.codacy.CodacyCoverageReporter"
         classpath = configurations.codacy
         args = [
-            "report",
-            "--language",
-            "Java",
-            "--coverage-report",
-            "${buildDir}/reports/jacoco/test/jacocoTestReport.xml",
-            "--project-token",
-            project.codacyApiToken,
-            "--partial"
+                "report",
+                "--language",
+                "Java",
+                "--coverage-report",
+                "${buildDir}/reports/jacoco/test/jacocoTestReport.xml",
+                "--project-token",
+                project.codacyApiToken,
+                "--partial"
         ]
     } else {
         enabled = false
