@@ -297,15 +297,32 @@ ext {
         discordGroupIdMapping = new Properties()
 
     if ((isOnOre == "auto") || ((isOnOre instanceof Boolean) && isOnOre)) {
+        def cacheFile = new File(project.buildDir, "oreProjectData.json")
+
         try {
-            def oreProjectData = de.dosmike.sponge.pluginpublisher.tasks.TaskFunctors.runOreProjectLookup(oreDeployApiKey, pluginId)
+            def oreProjectData = null
+
+            if (cacheFile.exists()) {
+                try {
+                    oreProjectData = new JsonSlurper().parse(cacheFile);
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+
+            if (oreProjectData == null) {
+                oreProjectData = de.dosmike.sponge.pluginpublisher.tasks.TaskFunctors.runOreProjectLookup(oreDeployApiKey, pluginId)
+
+                cacheFile.text = oreProjectData
+            }
 
             isOnOre = true
             oreNamespace = oreProjectData.namespace.owner.asString
         } catch (Exception e) {
             if ((isOnOre instanceof Boolean) && isOnOre)
                 println "WARNING: isOnOre was set to true, but the project couldn't be found on Ore, or your API key is missing the \"view_public_info\" permission!"
-            
+
+            cacheFile.text = "{\"error\":\"${StringEscapeUtils.escapeJava(e.getMessage())}\"}"
             isOnOre = false
         }
     }
