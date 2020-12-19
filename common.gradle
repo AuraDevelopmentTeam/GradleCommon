@@ -298,12 +298,14 @@ ext {
 
     if ((isOnOre == "auto") || ((isOnOre instanceof Boolean) && isOnOre)) {
         try {
-            // TODO: Use actual call once added
-            def oreProjectData = null
+            def oreProjectData = de.dosmike.sponge.pluginpublisher.tasks.TaskFunctors.runOreProjectLookup(oreDeployApiKey, pluginId)
 
             isOnOre = true
-            oreNamespace = oreProjectData.namespace.owner
-        } catch(Exception e) {
+            oreNamespace = oreProjectData.namespace.owner.asString
+        } catch (Exception e) {
+            if ((isOnOre instanceof Boolean) && isOnOre)
+                println "WARNING: isOnOre was set to true, but the project couldn't be found on Ore, or your API key is missing the \"view_public_info\" permission!"
+            
             isOnOre = false
         }
     }
@@ -448,10 +450,10 @@ buildscript {
         if ((type == "spongeforge") && (project.hasProperty("useMixins") && Boolean.parseBoolean(useMixins.toString())))
             classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
 
-        if (((project.hasProperty("oreDeployApiKey") || (System.env.oreDeployApiKey != null)) && (project.hasProperty("isOnOre") && Boolean.parseBoolean(isOnOre.toString()))) ||
+        if ((project.hasProperty("isOnOre") && ((isOnOre == "auto") || Boolean.parseBoolean(isOnOre.toString()))) ||
                 (project.hasProperty("devUpdateWebHook") || (System.env.devUpdateWebHook != null)) ||
                 (project.hasProperty("releaseWebHook") || (System.env.releaseWebHook != null))) {
-            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.2.0"
+            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.2.1"
         }
     }
 }
