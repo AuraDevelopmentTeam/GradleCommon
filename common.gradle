@@ -1365,7 +1365,6 @@ if (project.findProperty("releaseWebHook")) {
     task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
         configuration.webHook = releaseWebHook
 
-        // TODO: Ping role by name, not ID or find a way to provide ID mapping
         configuration.header = "${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**"
         configuration.description = "\n__Changelog:__\n\n${getChangelog()}"
 
