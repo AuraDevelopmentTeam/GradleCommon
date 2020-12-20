@@ -8,6 +8,7 @@ env:
   GRADLE_CMD_OPTS: >-
     -PbranchName=${{ github.ref }}
     --console=plain
+    --continue
     --no-daemon
     --parallel
 

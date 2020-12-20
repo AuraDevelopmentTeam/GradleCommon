@@ -10,8 +10,10 @@ env:
   GRADLE_OPTS: >-
     -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
   GRADLE_CMD_OPTS: >-
-    --no-daemon
     --console=plain
+    --continue
+    --no-daemon
+    --parallel
 
 install: "./gradlew $GRADLE_CMD_OPTS assemble compileTest"
 script:  "./gradlew $GRADLE_CMD_OPTS build"
