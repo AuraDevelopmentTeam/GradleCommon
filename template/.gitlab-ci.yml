@@ -74,7 +74,6 @@ checkFormatting:
   script:
   - ./gradlew --continue --console=plain spotlessCheck
   allow_failure: true
-  needs: []
   when: on_success
 
 checkTranslations:
