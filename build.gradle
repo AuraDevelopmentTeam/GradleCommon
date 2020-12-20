@@ -131,10 +131,9 @@ task updateTemplateFiles(dependsOn: checkoutLatestTag) {
 
         copy {
             from (project.file("template")) {
-                include ".gitlab-ci.yml"
-                include ".travis.yml"
-                include ".github/CONTRIBUTING.md"
-                include ".github/workflows/*"
+                exclude "build.gradle"
+                exclude "gradle.properties"
+                exclude "settings.gradle"
             }
 
             from (project.file(".")) {
