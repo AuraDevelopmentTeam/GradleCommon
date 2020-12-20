@@ -7,8 +7,9 @@ env:
     -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
   GRADLE_CMD_OPTS: >-
     -PbranchName=${{ github.ref }}
-    --no-daemon
     --console=plain
+    --no-daemon
+    --parallel
 
 jobs:
   spotless:
