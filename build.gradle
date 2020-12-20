@@ -36,7 +36,7 @@ if (project.hasProperty("newProjectDir")) {
     task initGradle(type: Exec) {
         workingDir destiontionDir
 
-        executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
+        executable file(Os.isFamily(Os.FAMILY_WINDOWS) ? "gradlew.bat" : "gradlew")
         args "-Dorg.gradle.daemon=false", "--console=plain", "init", "wrapper"
 
         shouldRunAfter setGitTag
@@ -48,7 +48,7 @@ if (project.hasProperty("newProjectDir")) {
             DirectoryScanner.addDefaultExclude "something has to be in here or everything gets excluded"
         }
 
-        from (projectDir) {
+        from(projectDir) {
             include ".gitattributes"
             include ".gitignore"
             include ".github/FUNDING.yml"
@@ -94,7 +94,7 @@ if (project.hasProperty("newProjectDir")) {
     task addGitHooks(type: Exec, dependsOn: initGradle) {
         workingDir destiontionDir
 
-        executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
+        executable file(Os.isFamily(Os.FAMILY_WINDOWS) ? "gradlew.bat" : "gradlew")
         args "-Dorg.gradle.daemon=false", "--console=plain", "addGitHooks"
 
         shouldRunAfter createFirstTag
@@ -130,13 +130,13 @@ task updateTemplateFiles(dependsOn: checkoutLatestTag) {
         DirectoryScanner.addDefaultExclude "something has to be in here or everything gets excluded"
 
         copy {
-            from (project.file("template")) {
+            from(project.file("template")) {
                 exclude "build.gradle"
                 exclude "gradle.properties"
                 exclude "settings.gradle"
             }
 
-            from (project.file(".")) {
+            from(project.file(".")) {
                 include ".gitignore"
                 include ".gitattributes"
                 include ".github/FUNDING.yml"
@@ -151,22 +151,22 @@ task updateTemplateFiles(dependsOn: checkoutLatestTag) {
 
 task updateGradleWrapper1(type: Exec, dependsOn: updateTemplateFiles) {
     def gradleVersion
-    
+
     doFirst {
         gradleVersion = file("gradle/wrapper/gradle-wrapper.properties").text =~ /(?<=gradle-)\d+(?:\.\d+){1,2}/
-        gradleVersion = gradleVersion.find()? gradleVersion.group() : gradle.gradleVersion
+        gradleVersion = gradleVersion.find() ? gradleVersion.group() : gradle.gradleVersion
     }
-    
+
     workingDir project.file("..")
 
-    executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
+    executable file(Os.isFamily(Os.FAMILY_WINDOWS) ? "gradlew.bat" : "gradlew")
     args "-Dorg.gradle.daemon=false", "--console=plain", "wrapper", "--gradle-version=${-> gradleVersion}"
 }
 
 task updateGradleWrapper2(type: Exec, dependsOn: updateGradleWrapper1) {
     workingDir project.file("..")
 
-    executable file(Os.isFamily(Os.FAMILY_WINDOWS)? "gradlew.bat" : "gradlew")
+    executable file(Os.isFamily(Os.FAMILY_WINDOWS) ? "gradlew.bat" : "gradlew")
     args "-Dorg.gradle.daemon=false", "--console=plain", "wrapper"
 }
 
@@ -174,7 +174,19 @@ task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
     workingDir project.file("..")
 
     executable "git"
-    args "add", "GradleCommon", ".gitlab-ci.yml", ".travis.yml", ".gitignore", ".gitattributes", "gradlew", "gradlew.bat", "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties", ".github/FUNDING.yml", ".github/CONTRIBUTING.md", ".github/workflows/checks.yml"
+    args "add",
+            "GradleCommon",
+            ".gitlab-ci.yml",
+            ".travis.yml",
+            ".gitignore",
+            ".gitattributes",
+            "gradlew",
+            "gradlew.bat",
+            "gradle/wrapper/gradle-wrapper.jar",
+            "gradle/wrapper/gradle-wrapper.properties",
+            ".github/FUNDING.yml",
+            ".github/CONTRIBUTING.md",
+            ".github/workflows/checks.yml"
 }
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
