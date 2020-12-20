@@ -6,5 +6,12 @@ jdk:
 git:
   depth: false
 
-install: "./gradlew assemble --refresh-dependencies"
-script:  "./gradlew build --refresh-dependencies"
+env:
+  GRADLE_OPTS: >-
+    -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
+  GRADLE_CMD_OPTS: >-
+    --no-daemon
+    --console=plain
+
+install: "./gradlew $GRADLE_CMD_OPTS assemble compileTest"
+script:  "./gradlew $GRADLE_CMD_OPTS build"
