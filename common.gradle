@@ -290,7 +290,7 @@ ext {
 
     // Processing variables
     if (project.hasProperty("discordGroupIdMapping")) {
-        def textMapping = discordGroupIdMapping
+        String textMapping = discordGroupIdMapping
         discordGroupIdMapping = new Properties()
 
         discordGroupIdMapping.load(new StringReader(textMapping))
