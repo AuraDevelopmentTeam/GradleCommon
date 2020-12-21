@@ -93,16 +93,16 @@ def getChangelog() {
     final String noChangelog = "*No Changelog*"
 
     try {
-        File file = file("CHANGELOG.md")
+        File changelogFile = file("CHANGELOG.md")
 
-        if (!file.exists()) {
-            file = file("CHANGELOG.txt")
+        if (!changelogFile.exists()) {
+            changelogFile = file("CHANGELOG.txt")
 
-            if (!file.exists())
+            if (!changelogFile.exists())
                 return noChangelog
         }
 
-        def text = file.text
+        def text = changelogFile.text
         def changelogPieces = text.split("(?m)^(?:Version )?\\d+\\.\\d+\\.\\d+\\S*\\R[-=]+\$", 3);
 
         return (changelogPieces.length >= 2)? changelogPieces[1].trim() : text
