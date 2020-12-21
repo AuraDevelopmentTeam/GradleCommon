@@ -72,13 +72,10 @@ jobs:
       - name: Run all Tests
         id: gradle_tests
         run: ./gradlew ${{ env.GRADLE_CMD_OPTS }} -x spotlessCheck build
-        continue-on-error: true
-      - name: Publish Test Reports
+      - name: Publish JUnit Test Reports
+        if: ${{ always() }}
         uses: mikepenz/action-junit-report@v1
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
           check_name: 'JUnit Test Report (OS: ${{ matrix.os }})'
-      - name: Fail Job if Gradle Tests failed
-        run: false
-        if: ${{ steps.gradle_tests.outcome == "failure" }}
