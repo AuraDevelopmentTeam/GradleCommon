@@ -257,9 +257,9 @@ ext {
     if (project.hasProperty("isOnOre")) {
         if ((isOnOre instanceof String) && (isOnOre != "auto"))
             isOnOre = Boolean.parseBoolean(isOnOre)
-        isOnOre = ((type == SPONGE) || (type == SPONGEFORGE)) ? isOnOre : false
     } else
         isOnOre = "auto"
+    isOnOre = ((type == SPONGE) || (type == SPONGEFORGE)) ? isOnOre : false
     if (project.hasProperty("enableMockTesting")) {
         if (enableMockTesting instanceof String)
             enableMockTesting = Boolean.parseBoolean(enableMockTesting)
