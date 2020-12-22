@@ -79,14 +79,14 @@ jobs:
         id: gradle_tests
         run: ./gradlew ${{ env.GRADLE_CMD_OPTS }} -x spotlessCheck build
       - name: Publish JUnit Test Reports
-        if: ${{ always() }}
+        if: success() || failure()
         uses: mikepenz/action-junit-report@v1
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           github_token: ${{ github.token }}
           check_name: 'JUnit Test Report (OS: ${{ matrix.os }})'
       - name: Publish SpotBugs Reports
-        if: ${{ always() }}
+        if: success() || failure()
         uses: jwgmeligmeyling/spotbugs-github-action@v1.2
         with:
           path: '**/build/reports/spotbugs/*.xml'
