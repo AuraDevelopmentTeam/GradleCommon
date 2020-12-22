@@ -186,7 +186,7 @@ task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
             "gradle/wrapper/gradle-wrapper.properties",
             ".github/FUNDING.yml",
             ".github/CONTRIBUTING.md",
-            ".github/workflows/checks.yml"
+            ".github/workflows/code_checks.yml"
 }
 
 task commitUpdate(type: Exec, dependsOn: stageUpdate) {
