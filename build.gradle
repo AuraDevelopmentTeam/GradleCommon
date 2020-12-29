@@ -160,14 +160,14 @@ task updateGradleWrapper1(type: Exec, dependsOn: updateTemplateFiles) {
     workingDir project.file("..")
 
     executable file(Os.isFamily(Os.FAMILY_WINDOWS) ? "gradlew.bat" : "gradlew")
-    args "-Dorg.gradle.daemon=false", "--console=plain", "wrapper", "--gradle-version=${-> gradleVersion}", "--gradle-distribution-sha256-sum"
+    args "-Dorg.gradle.daemon=false", "--console=plain", "wrapper", "--gradle-version=${-> gradleVersion}"
 }
 
 task updateGradleWrapper2(type: Exec, dependsOn: updateGradleWrapper1) {
     workingDir project.file("..")
 
     executable file(Os.isFamily(Os.FAMILY_WINDOWS) ? "gradlew.bat" : "gradlew")
-    args "-Dorg.gradle.daemon=false", "--console=plain", "wrapper", "--gradle-distribution-sha256-sum"
+    args "-Dorg.gradle.daemon=false", "--console=plain", "wrapper"
 }
 
 task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
