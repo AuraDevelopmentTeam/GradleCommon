@@ -14,6 +14,7 @@ env:
     -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
   GRADLE_CMD_OPTS: >-
     --continue
+    --no-build-cache
     --no-daemon
     --parallel
 
