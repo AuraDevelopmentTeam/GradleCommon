@@ -187,6 +187,7 @@ task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
             ".github/FUNDING.yml",
             ".github/CONTRIBUTING.md",
             ".github/workflows/code_checks.yml",
+            ".github/workflows/code_checks_reports.yml",
             ".github/workflows/lang_checks.yml"
 }
 

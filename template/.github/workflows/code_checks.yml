@@ -101,17 +101,9 @@ jobs:
       - name: Run all Tests
         id: gradle_tests
         run: ./gradlew ${{ env.GRADLE_CMD_OPTS }} -x spotlessCheck build
-      - name: Publish JUnit Test Reports
-        if: success() || failure()
-        uses: mikepenz/action-junit-report@v1
+      - uses: actions/download-artifact@v2
         with:
-          report_paths: '**/build/test-results/test/TEST-*.xml'
-          github_token: ${{ github.token }}
-          check_name: 'JUnit Test Report (OS: ${{ matrix.os }})'
-      - name: Publish SpotBugs Reports
-        if: success() || failure()
-        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
-        with:
-          path: '**/build/reports/spotbugs/*.xml'
-          token: ${{ github.token }}
-          name: 'SpotBugs Report (OS: ${{ matrix.os }})'
+          name: ${{ github.ref }}_code_checks
+          path: |
+            **/build/test-results/test/TEST-*.xml
+            **/build/reports/spotbugs/*.xml
