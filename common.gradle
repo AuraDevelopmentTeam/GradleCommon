@@ -1087,9 +1087,11 @@ if (hasApi) {
             apiJar { classpath = sourceSets.api.compileClasspath }
         }
 
-        reobfApiJar {
-            doLast {
-                signJar(apiJar.archivePath)
+        if (signJar) {
+            reobfApiJar {
+                doLast {
+                    signJar(apiJar.archivePath)
+                }
             }
         }
 
@@ -1143,9 +1145,11 @@ if (enableShadow) {
             shadowJar {}
         }
 
-        reobfShadowJar {
-            doLast {
-                signJar(shadowJar.archivePath)
+        if (signJar) {
+            reobfShadowJar {
+                doLast {
+                    signJar(shadowJar.archivePath)
+                }
             }
         }
 
@@ -1158,9 +1162,11 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
         jar {}
     }
 
-    reobfJar {
-        doLast {
-            signJar(jar.archivePath)
+    if (signJar) {
+        reobfJar {
+            doLast {
+                signJar(jar.archivePath)
+            }
         }
     }
 
@@ -1178,8 +1184,10 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
 
         classifier = "deobf"
 
-        doLast {
-            signJar(deobfJar.archivePath)
+        if (signJar) {
+            doLast {
+                signJar(deobfJar.archivePath)
+            }
         }
     }
 }
