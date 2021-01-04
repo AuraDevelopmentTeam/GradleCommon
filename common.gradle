@@ -238,6 +238,11 @@ ext {
             hasApi = Boolean.parseBoolean(hasApi)
     } else
         hasApi = false
+    if (project.hasProperty("showMinecraftVersion")) {
+        if (showMinecraftVersion instanceof String)
+            showMinecraftVersion = Boolean.parseBoolean(showMinecraftVersion)
+    } else
+        showMinecraftVersion = (type == FORGE)
     if (project.hasProperty("apiDependsOnPlatform")) {
         if (apiDependsOnPlatform instanceof String)
             apiDependsOnPlatform = Boolean.parseBoolean(apiDependsOnPlatform)
@@ -344,7 +349,7 @@ if (description == null) description = "Empty description"
 if (project != rootProject) ext.baseGroup = project.parent.group
 group = "${baseGroup}.${pluginId}".toString()
 
-if (type == FORGE)
+if (showMinecraftVersion)
     archivesBaseName += "-${minecraft_version}"
 
 ext {
