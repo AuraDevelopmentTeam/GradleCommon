@@ -141,7 +141,7 @@ def getDiscordGroupPing(groupName) {
 }
 def getMavenUrl() {
     return "${-> project.tasks.uploadArchives.repositories.mavenDeployer.repository.url}" +
-            "${project.group.replace('.', '/')}/${project.name}/${project.version}/${project.name}-${project.version}.jar"
+            "${project.group.replace('.', '/')}/${project.archivesBaseName}/${project.version}/${project.archivesBaseName}-${project.version}.jar"
 }
 def isLocalMaven() {
     return project.tasks.uploadArchives.repositories.mavenDeployer.repository.url.startsWith("file://")
