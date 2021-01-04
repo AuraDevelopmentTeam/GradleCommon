@@ -1044,7 +1044,7 @@ tasks.withType(Jar) {
 
     if (signJar) {
         doLast {
-            signJar(jar)
+            signJar(it.archivePath)
         }
     }
 }
@@ -1089,7 +1089,7 @@ if (hasApi) {
 
         reobfApiJar {
             doLast {
-                signJar(apiJar)
+                signJar(apiJar.archivePath)
             }
         }
 
@@ -1145,7 +1145,7 @@ if (enableShadow) {
 
         reobfShadowJar {
             doLast {
-                signJar(shadowJar)
+                signJar(shadowJar.archivePath)
             }
         }
 
@@ -1160,7 +1160,7 @@ if ((type == FORGE) || (type == SPONGEFORGE)) {
 
     reobfJar {
         doLast {
-            signJar(jar)
+            signJar(jar.archivePath)
         }
     }
 
