@@ -264,7 +264,7 @@ ext {
             isOnOre = Boolean.parseBoolean(isOnOre)
     } else
         isOnOre = "auto"
-    isOnOre = ((type == SPONGE) || (type == SPONGEFORGE)) ? isOnOre : false
+    isOnOre = ((type == SPONGE) || (type == FORGE) || (type == SPONGEFORGE)) ? isOnOre : false
     if (project.hasProperty("enableMockTesting")) {
         if (enableMockTesting instanceof String)
             enableMockTesting = Boolean.parseBoolean(enableMockTesting)
@@ -1339,7 +1339,7 @@ uploadArchives {
     }
 }
 
-if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
+if (((type == SPONGE) || (type == FORGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
     task oreDeploy(type: de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask) {
         apiKey.set(oreDeployApiKey)
         projectId.set(pluginId)
