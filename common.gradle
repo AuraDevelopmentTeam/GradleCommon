@@ -485,7 +485,11 @@ buildscript {
         if ((type == "spongeforge") && (project.hasProperty("useMixins") && Boolean.parseBoolean(useMixins.toString())))
             classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
 
-        if ((project.hasProperty("isOnOre") && ((isOnOre == "auto") || Boolean.parseBoolean(isOnOre.toString()))) ||
+        if (
+                (
+                        (!project.hasProperty("isOnOre") && ((type == "sponge") || (type == "forge") || (type == "spongeforge"))) ||
+                        ((isOnOre == "auto") || Boolean.parseBoolean(isOnOre.toString()))
+                ) ||
                 (project.hasProperty("devUpdateWebHook") || (System.env.devUpdateWebHook != null)) ||
                 (project.hasProperty("releaseWebHook") || (System.env.releaseWebHook != null))) {
             classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.2.1"
@@ -1339,7 +1343,7 @@ uploadArchives {
     }
 }
 
-if (((type == SPONGE) || (type == FORGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
+if (project.hasProperty("oreDeployApiKey") && isOnOre) {
     task oreDeploy(type: de.dosmike.sponge.pluginpublisher.gradle.PublishToOreTask) {
         apiKey.set(oreDeployApiKey)
         projectId.set(pluginId)
@@ -1392,7 +1396,7 @@ if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForg
 }
 
 task releaseSnapshot(dependsOn: uploadArchives) {
-    if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
+    if (project.hasProperty("oreDeployApiKey") && isOnOre) {
         dependsOn oreDeploy
     }
 
@@ -1402,7 +1406,7 @@ task releaseSnapshot(dependsOn: uploadArchives) {
 }
 
 task release(dependsOn: uploadArchives) {
-    if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre)) {
+    if (project.hasProperty("oreDeployApiKey") && isOnOre) {
         dependsOn oreDeploy
     }
 
@@ -1463,7 +1467,7 @@ if (project.findProperty("releaseWebHook")) {
         messageBody.set(_messageBody)
 
         release.finalizedBy postReleaseDiscordMessage
-        if (((type == SPONGE) || (type == SPONGEFORGE)) && (project.hasProperty("oreDeployApiKey") && isOnOre))
+        if (project.hasProperty("oreDeployApiKey") && isOnOre)
             oreDeploy.finalizedBy postReleaseDiscordMessage
     }
 }
