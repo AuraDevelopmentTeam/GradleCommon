@@ -1135,10 +1135,14 @@ if (enableShadow) {
         configurations = [project.configurations.shadow]
 
         doFirst {
+            final String libGroup = "${project.baseGroup}.lib."
+
             project.configurations.shadowRelocate.incoming.resolutionResult.allComponents {
                 if (it.id instanceof ModuleComponentIdentifier) {
                     def group = it.id.group.replace("-", "")
-                    relocate(group, "${project.group}.shadow.${group}")
+                    relocate(group, group.startsWith(libGroup)?
+                            "${project.group}.lib.${group.substring(libGroup.length())}" :
+                            "${project.group}.shadow.${group}")
                 }
             }
         }
