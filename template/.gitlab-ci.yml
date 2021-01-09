@@ -32,6 +32,9 @@ stages:
 
 build:
   stage: build
+  tags:
+    - linux
+    - shell
   cache:
     policy: push
     key: "$CACHE_KEY"
@@ -48,6 +51,9 @@ build:
 
 test:
   stage: test
+  tags:
+    - linux
+    - shell
   cache:
     policy: pull-push
     key: "$CACHE_KEY"
@@ -70,6 +76,9 @@ test:
 
 checkFormatting:
   stage: test
+  tags:
+    - linux
+    - shell
   needs: []
   script:
   - ./gradlew --continue --console=plain spotlessCheck
@@ -78,6 +87,9 @@ checkFormatting:
 
 checkTranslations:
   stage: test
+  tags:
+    - linux
+    - shell
   needs: []
   script:
   - ./gradlew --continue --console=plain checkTranslations
@@ -90,6 +102,9 @@ checkTranslations:
 
 coverage:
   stage: report
+  tags:
+    - linux
+    - shell
   needs:
     - job: test
       artifacts: true
@@ -105,6 +120,9 @@ coverage:
 
 spotbugs:
   stage: report
+  tags:
+    - linux
+    - shell
   needs:
     - job: build
       artifacts: false
@@ -119,6 +137,9 @@ spotbugs:
 
 deploySnapshot:
   stage: deploy
+  tags:
+    - linux
+    - shell
   needs:
     - job: build
       artifacts: true
@@ -131,6 +152,9 @@ deploySnapshot:
 
 deploy:
   stage: deploy
+  tags:
+    - linux
+    - shell
   needs:
     - job: build
       artifacts: true
@@ -143,6 +167,9 @@ deploy:
   
 sendCoverage:
   stage: deploy
+  tags:
+    - linux
+    - shell
   needs:
     - job: coverage
       artifacts: true
@@ -153,6 +180,9 @@ sendCoverage:
 
 pages:
   stage: deploy
+  tags:
+    - linux
+    - shell
   needs:
     - job: build
       artifacts: true
