@@ -1,0 +1,64 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  CACHE_KEY: "$CI_COMMIT_REF_NAME $CI_COMMIT_SHA"
+  ORIG_ARTIFACTS1: "$CI_PROJECT_DIR/**/build/libs/*.jar*"
+  ORIG_ARTIFACTS2: "$CI_PROJECT_DIR/**/build/distributions/*.zip*"
+  ARTIFACTS1: "$CI_PROJECT_DIR/*.jar*"
+  ARTIFACTS2: "$CI_PROJECT_DIR/*.zip*"
+  TEST_DATA: "$CI_PROJECT_DIR/**/build/test-results/*/TEST-*.xml"
+  GRADLE_OPTS: >
+    -Dorg.gradle.project.branchName="$CI_COMMIT_REF_NAME"
+
+cache:
+  policy: pull
+  key: "$CACHE_KEY"
+  untracked: true
+
+before_script:
+  - shopt -s globstar
+  - shopt -s nullglob
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  tags:
+    - linux
+    - shell
+  cache:
+    policy: push
+    key: "$CACHE_KEY"
+    untracked: true
+  script:
+    - ./gradlew --console=plain assemble compileTest
+    - cp $ORIG_ARTIFACTS1 $ORIG_ARTIFACTS2 .
+  retry: 2
+  when: on_success
+  artifacts:
+    paths:
+      - $ARTIFACTS1
+      - $ARTIFACTS2
+
+test:
+  stage: test
+  tags:
+    - linux
+    - shell
+  cache:
+    policy: pull-push
+    key: "$CACHE_KEY"
+    untracked: true
+  needs:
+    - job: build
+      artifacts: false
+  script:
+    - ./gradlew --continue --console=plain build
+  retry: 2
+  when: on_success
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - $TEST_DATA
