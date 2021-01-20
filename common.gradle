@@ -208,7 +208,7 @@ ext {
         testSecrets = "{}"
 
     if (!project.hasProperty("pluginName")) pluginName = name
-    if (!project.hasProperty("baseGroup")) baseGroup = "dev.aura"
+    if (!project.hasProperty("baseGroup")) baseGroup = "team.aura_dev"
 
     buildNum = getBuild()
     buildType = getBuildType()
