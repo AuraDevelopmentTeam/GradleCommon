@@ -1449,30 +1449,32 @@ if (project.findProperty("devUpdateWebHook")) {
     }
 }
 
-if (project.findProperty("releaseWebHook")) {
-    task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
-        def downloadLinks = []
+rootProject {
+    if (project.findProperty("releaseWebHook")) {
+        task postReleaseDiscordMessage(type: de.dosmike.sponge.pluginpublisher.gradle.NotifyDiscordTask) {
+            def downloadLinks = []
 
-        if (project.hasProperty("oreDeployApiKey") && isOnOre) {
-            downloadLinks += "https://ore.spongepowered.org/${project.oreNamespace}/${project.oreSlug}/versions/${project.version}"
+            if (project.hasProperty("oreDeployApiKey") && isOnOre) {
+                downloadLinks += "https://ore.spongepowered.org/${project.oreNamespace}/${project.oreSlug}/versions/${project.version}"
+            }
+            if (!isLocalMaven()) {
+                downloadLinks += getMavenUrl()
+            }
+
+            webHookUrl.set(releaseWebHook)
+
+            messageHeader.set("${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**")
+            def _messageBody = "\n__Changelog:__\n\n${getChangelog()}"
+
+            if (!downloadLinks.empty)
+                _messageBody += "\n\n__Download:__\n* ${-> downloadLinks.join("\n* ")}"
+
+            messageBody.set(_messageBody)
+
+            release.finalizedBy postReleaseDiscordMessage
+            if (project.hasProperty("oreDeployApiKey") && isOnOre)
+                oreDeploy.finalizedBy postReleaseDiscordMessage
         }
-        if (!isLocalMaven()) {
-            downloadLinks += getMavenUrl()
-        }
-
-        webHookUrl.set(releaseWebHook)
-
-        messageHeader.set("${getDiscordGroupPing(project.name)} - **New Version: ${project.version}**")
-        def _messageBody = "\n__Changelog:__\n\n${getChangelog()}"
-
-        if (!downloadLinks.empty)
-            _messageBody += "\n\n__Download:__\n* ${-> downloadLinks.join("\n* ")}"
-
-        messageBody.set(_messageBody)
-
-        release.finalizedBy postReleaseDiscordMessage
-        if (project.hasProperty("oreDeployApiKey") && isOnOre)
-            oreDeploy.finalizedBy postReleaseDiscordMessage
     }
 }
 
