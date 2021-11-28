@@ -1488,7 +1488,7 @@ if ((project == rootProject) && project.findProperty("releaseWebHook")) {
 // =====================================================
 
 jacoco {
-    toolVersion = "0.8.1"
+    toolVersion = "0.8.7"
 }
 
 jacocoTestReport {
