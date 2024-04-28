@@ -8,6 +8,23 @@ description "Common Gradle Build Script"
 def getLatestTag() {
     return "git rev-list --tags --max-count=1".execute(null, projectDir).text.trim()
 }
+def getNewTagVersion() {
+    def gitDescription = "git describe --tags".execute(null, projectDir).text.trim()
+    def tempVersion = Arrays.stream(gitDescription.replaceAll("^v|-.*", "").split("\\."), 0, 3).mapToInt{num -> Integer.parseInt(num)}.toArray()
+
+    if (project.hasProperty("major")) {
+        tempVersion[0]++;
+        tempVersion[1] = 0;
+        tempVersion[2] = 0;
+    } else if (project.hasProperty("minor")) {
+        tempVersion[1]++;
+        tempVersion[2] = 0;
+    } else {
+        tempVersion[2]++;
+    }
+
+    return Arrays.stream(tempVersion).mapToObj{num -> Integer.toString(num)}.collect(Collectors.joining("."))
+}
 
 task gitTag {
         group "help"
@@ -16,11 +33,11 @@ Specify "-Pminor" to update the minor version.
 Specify "-Pmajor" to update the major version."""
 
         doLast {
-            def tagVersion = Arrays.stream(getLatestTag().split("\\."), 0, 3).collect(Collectors.joining("."))
+            def tagVersion = "v${getNewTagVersion()}"
 
             exec {
                 executable "git"
-                args "tag", "-a", "v${tagVersion}", "-m", getChangelog().replace("\"", "\\\"")
+                args "tag", "-a", tagVersion, "-m", tagVersion
             }
         }
     }
