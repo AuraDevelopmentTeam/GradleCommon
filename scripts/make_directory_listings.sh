@@ -23,22 +23,22 @@
 function create_gnu_index ()
 {
     # call it right or die
-    [[ $# != 2 ]] && echo "bad args. do: $FUNCNAME '/DOCUMENT_ROOT/' '/'" && exit 2
+    [[ $# -ne 2 ]] && echo "bad args. do: $FUNCNAME '/DOCUMENT_ROOT/' '/'" && exit 2
 
     # D is the doc_root containing the site
-    local L= D="$1" SUBDIR="$2" F=
+    local L="" D="$1" SUBDIR="$2" F=
 
     # The index.html file to create
     F="${D}index.html"
 
     # if dir doesnt exist, create it
-    [[ -d "$D" ]] || mkdir -p "$D";
+    [[ -d "$D" ]] || mkdir -p "$D"
 
     # cd into dir or die
-    pushd "$D" > /dev/null || exit 2;
+    pushd "$D" > /dev/null || exit 2
 
     # touch index.html and check if writable or die
-    touch "$F" && test -w "$F" || exit 2;
+    touch "$F" && test -w "$F" || exit 2
 
     # start of total output for saving as index.html
     (
@@ -60,17 +60,17 @@ function create_gnu_index ()
             IFS=$'\n';
 
             # pretty sweet, will mimick the normal apache output
-            for L in $(find -L . -mount -depth -maxdepth 1 -type f ! -name 'index.html' -printf "      <a href=\"%f\">%-44f@_@%Td-%Tb-%TY %Tk:%TM  @%f@\n" | sort | sed 's,\([\ ]\+\)@_@,</a>\1,g');
+            for L in $(find -L . -mount -depth -maxdepth 1 -type f ! -name 'index.html' -printf "      <a href=\"%f\">%-44f@_@%Td-%Tb-%TY %Tk:%TM  @%f@\n" | sort | sed 's,\([\ ]\+\)@_@,</a>\1,g')
             do
                 # file
-                F=$(sed -e 's,^.*@\([^@]\+\)@.*$,\1,g'<<<"$L");
+                F=$(sed -e 's,^.*@\([^@]\+\)@.*$,\1,g'<<<"$L")
 
                 # file with file size
-                F=$(du -bh $F | cut -f1);
+                F=$(du -bh $F | cut -f1)
 
                 # output with correct format
-                sed -e 's,\ @.*$, '"$F"',g'<<<"$L";
-            done;
+                sed -e 's,\ @.*$, '"$F"',g'<<<"$L"
+            done
         )
 
         # print the footer html
@@ -79,13 +79,13 @@ function create_gnu_index ()
     # finally save the output of the subshell to index.html
     )  > "$F";
 
-    popd > /dev/null
+    popd > /dev/null || exit
 }
 
 # call it right or die
-[[ $# > 1 ]] && echo "bad args. do: $0 '<path>'" && exit 2
+[[ $# -gt 1 ]] && echo "bad args. do: $0 '<path>'" && exit 2
 
-[[ $# == 0 ]] && (cd "$1" || exit 2)
+[[ $# -eq 1 ]] && (cd "$1" || exit 2)
 
 path="$(pwd)/"
 
