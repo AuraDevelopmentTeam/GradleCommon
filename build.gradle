@@ -138,6 +138,7 @@ task updateTemplateFiles(dependsOn: checkoutLatestTag) {
             }
 
             from(project.file(".")) {
+                include ".editorconfig"
                 include ".gitignore"
                 include ".gitattributes"
                 include ".github/FUNDING.yml"
@@ -177,6 +178,7 @@ task stageUpdate(type: Exec, dependsOn: updateGradleWrapper2) {
     executable "git"
     args "add",
             "GradleCommon",
+            ".editorconfig",
             ".gitlab-ci.yml",
             ".travis.yml",
             ".gitignore",
