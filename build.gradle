@@ -49,6 +49,7 @@ if (project.hasProperty("newProjectDir")) {
         }
 
         from(projectDir) {
+            include ".editorconfig"
             include ".gitattributes"
             include ".gitignore"
             include ".github/FUNDING.yml"
