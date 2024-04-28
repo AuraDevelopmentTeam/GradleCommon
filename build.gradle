@@ -1,11 +1,29 @@
 import org.apache.tools.ant.DirectoryScanner
 import org.apache.tools.ant.taskdefs.condition.Os
 
+import java.util.stream.Collectors
+
 description "Common Gradle Build Script"
 
 def getLatestTag() {
     return "git rev-list --tags --max-count=1".execute(null, projectDir).text.trim()
 }
+
+task gitTag {
+        group "help"
+        description """Tags the current version in git.
+Specify "-Pminor" to update the minor version.
+Specify "-Pmajor" to update the major version."""
+
+        doLast {
+            def tagVersion = Arrays.stream(getLatestTag().split("\\."), 0, 3).collect(Collectors.joining("."))
+
+            exec {
+                executable "git"
+                args "tag", "-a", "v${tagVersion}", "-m", getChangelog().replace("\"", "\\\"")
+            }
+        }
+    }
 
 if (project.hasProperty("newProjectDir")) {
     File destiontionDir = new File(newProjectDir)
