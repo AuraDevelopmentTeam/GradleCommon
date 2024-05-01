@@ -279,6 +279,7 @@ ext {
 
     // default versions
 
+    if (!project.hasProperty("java_version")) lombok_version = "17"
     if (!project.hasProperty("lombok_version")) lombok_version = "1.18.32"
     if (!project.hasProperty("lombok_hash")) lombok_hash = "97574674e2a25f567a313736ace00df8787d443de316407d57fc877d9f19a65d"
     if (!project.hasProperty("spotBugs_version")) spotBugs_version = "4.8.4"
@@ -564,8 +565,8 @@ if ((project.hasProperty("oreDeployApiKey") && isOnOre) ||
 //
 // ==============================================================================
 
-// Force java 8
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = JavaVersion.VERSION_1_8
+// Select Java compatibility
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = JavaVersion.getVersionForMajor(Integer.parseInt(java_version))
 
 Project proj = project
 
