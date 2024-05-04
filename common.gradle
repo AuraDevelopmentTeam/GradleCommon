@@ -287,7 +287,7 @@ ext {
     if (!project.hasProperty("powerMock_version")) powerMock_version = "2.0.9"
 
     if (!project.hasProperty("bungeecoord_version")) bungeecoord_version = "1.20-R0.3-SNAPSHOT"
-    if (!project.hasProperty("velocity_version")) velocity_version = "3.3.0"
+    if (!project.hasProperty("velocity_version")) velocity_version = "3.1.1"
     if (!project.hasProperty("spigot_version")) spigot_version = "1.20.6-R0.1-SNAPSHOT"
     if (!project.hasProperty("sponge_version")) sponge_version = "10.0.0"
     if (!project.hasProperty("nukkit_version")) nukkit_version = "2.0.0-SNAPSHOT"
