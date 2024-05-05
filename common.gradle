@@ -439,7 +439,6 @@ ext {
 
 buildscript {
     repositories {
-        jcenter()
         mavenCentral()
         maven {
             name "Gradle-Plugins"
@@ -501,7 +500,6 @@ buildscript {
 allprojects {
     buildscript {
         repositories {
-            jcenter()
             mavenCentral()
             maven {
                 name "Gradle-Plugins"
@@ -668,7 +666,6 @@ repositories {
     }
 
     // Standard repos
-    jcenter()
     mavenCentral()
 
     // Custom repos
@@ -1092,8 +1089,8 @@ if (hasApi) {
         from sourceSets.api.output
         from mainDirResources
 
-        classifier = "api"
-        version = jar.version
+        archiveClassifier = "api"
+        archiveVersion = jar.archiveVersion
     }
 
     if (apiDependsOnPlatform && ((type == FORGE) || (type == SPONGEFORGE))) {
@@ -1125,8 +1122,8 @@ task sourceJar (type: Jar, dependsOn: processSources) {
         dependsOn processApiSources
     }
 
-    classifier = "sources"
-    version = jar.version
+    archiveClassifier = "sources"
+    archiveVersion = jar.archiveVersion
 }
 
 if (enableShadow) {
@@ -1140,8 +1137,8 @@ if (enableShadow) {
             dependsOn compileApiJava
         }
 
-        classifier = null
-        version = jar.version
+        archiveClassifier = null
+        archiveVersion = jar.version
         configurations = [project.configurations.shadow]
 
         doFirst {
@@ -1241,8 +1238,8 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
     from javadoc.destinationDir
 
-    classifier = "javadoc"
-    version = jar.version
+    archiveClassifier = "javadoc"
+    archiveVersion = jar.version
 }
 
 cleanTest {
@@ -1382,22 +1379,22 @@ if (((type == FORGE) || (type == SPONGEFORGE)) && project.hasProperty("curseForg
             if (project.hasProperty("curseforge_additional_versions") && !curseforge_additional_versions.isEmpty()) curseforge_additional_versions.split(',').each{ addGameVersion it }
 
             mainArtifact(jar) {
-                displayName = jar.archiveName.replace(".jar", "")
+                displayName = jar.archiveFileName.replace(".jar", "")
             }
 
             if (hasApi) {
                 addArtifact(apiJar) {
-                    displayName = apiJar.archiveName.replace(".jar", "")
+                    displayName = apiJar.archiveFileName.replace(".jar", "")
                     changelog = "*This is a file for mod developers. If you don't know what to do with it, don't use it!*"
                 }
             }
 
             addArtifact(deobfJar) {
-                displayName = deobfJar.archiveName.replace(".jar", "")
+                displayName = deobfJar.archiveFileName.replace(".jar", "")
                 changelog = "*This is a file for mod developers. If you don't know what to do with it, don't use it!*"
             }
             addArtifact(sourceJar) {
-                displayName = sourceJar.archiveName.replace(".jar", "")
+                displayName = sourceJar.archiveFileName.replace(".jar", "")
                 changelog = "*This is a file for mod developers. If you don't know what to do with it, don't use it!*"
             }
 
