@@ -1138,7 +1138,7 @@ if (enableShadow) {
         }
 
         archiveClassifier = null
-        archiveVersion = jar.version
+        archiveVersion = jar.archiveVersion
         configurations = [project.configurations.shadow]
 
         doFirst {
@@ -1239,7 +1239,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 
     archiveClassifier = "javadoc"
-    archiveVersion = jar.version
+    archiveVersion = jar.archiveVersion
 }
 
 cleanTest {
@@ -1269,8 +1269,8 @@ test {
 task generateTestReport(type: Zip) {
     from file("${buildDir}/reports/tests/test")
     from file("${projectDir}/run/logs/unit-test.log")
-    archiveName "${project.name}-TestReport.zip"
-    destinationDir rootProject.projectDir
+    archiveFileName "${project.name}-TestReport.zip"
+    destinationDirectory rootProject.projectDir
 
     test.finalizedBy generateTestReport
 }
@@ -1284,8 +1284,8 @@ task spotbugs(dependsOn: tasks.withType(SpotBugsTask)) {
 
 task generateSpotbugsReport(type: Zip) {
     from file("${buildDir}/reports/spotbugs")
-    archiveName "${project.name}-SpotbugsReport.zip"
-    destinationDir rootProject.projectDir
+    archiveFileName "${project.name}-SpotbugsReport.zip"
+    destinationDirectory rootProject.projectDir
 }
 
 tasks.withType(SpotBugsTask) {
