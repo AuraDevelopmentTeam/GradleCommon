@@ -14,6 +14,7 @@ import groovy.json.JsonSlurper
 import groovy.json.StringEscapeUtils
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.myire.munge.TransformTask
 
 import java.util.stream.Collectors
@@ -67,8 +68,8 @@ def getBuildType() {
 def getVersion() {
     def branch = (project.hasProperty("branchName") ?
             branchName.replaceFirst("^refs/(?:heads|tags|pull)/", "") :
-            ("git describe --all".execute().text.trim().replaceFirst(".*?/", ""))).replaceAll("/|\\\\", "_")
-    def tempVersion = Arrays.stream(gitDescription.replaceAll("^v|-.*", "").split("\\."), 0, 3).map{num -> Integer.parseInt(num)}.toArray()
+            ("git describe --all".execute().text.trim().replaceFirst(".*?/", ""))).replaceAll("[/\\\\]", "_")
+    def tempVersion = Arrays.stream((String[])gitDescription.replaceAll("^v|-.*", "").split("\\."), 0, 3).mapToInt{num -> Integer.parseInt(num)}.toArray()
 
     if (isDev) {
         if (project.hasProperty("major")) {
@@ -83,7 +84,7 @@ def getVersion() {
         }
     }
 
-    def baseVersion = Arrays.stream(tempVersion).map{num -> Integer.toString(num)}.collect(Collectors.joining(".")) + ".${project.buildNum}"
+    def baseVersion = Arrays.stream(tempVersion).mapToObj{num -> Integer.toString(num)}.collect(Collectors.joining(".")) + ".${project.buildNum}"
 
     if ((branch != "master") && !branch.matches("^v\\d+\\.\\d+.\\d+\$"))
         baseVersion += "-${branch}"
@@ -163,7 +164,6 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 
 apply plugin: "java-library"
 apply plugin: "jacoco"
-apply plugin: "maven"
 apply plugin: "maven-publish"
 apply plugin: "signing"
 apply plugin: "eclipse"
@@ -612,12 +612,12 @@ sourceSets {
 }
 
 sourceSets.all {
-  configurations.getByName(runtimeClasspathConfigurationName) {
-    attributes.attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
-  }
-  configurations.getByName(compileClasspathConfigurationName) {
-    attributes.attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
-  }
+    configurations.getByName(runtimeClasspathConfigurationName) {
+        attributes.attribute(Attribute.of("org.gradle.jvm.environment", TargetJvmEnvironment), project.objects.named(TargetJvmEnvironment, TargetJvmEnvironment.STANDARD_JVM))
+    }
+    configurations.getByName(compileClasspathConfigurationName) {
+        attributes.attribute(Attribute.of("org.gradle.jvm.environment", TargetJvmEnvironment), project.objects.named(TargetJvmEnvironment, TargetJvmEnvironment.STANDARD_JVM))
+    }
 }
 
 configurations {
@@ -1269,8 +1269,8 @@ test {
 task generateTestReport(type: Zip) {
     from file("${buildDir}/reports/tests/test")
     from file("${projectDir}/run/logs/unit-test.log")
-    archiveFileName "${project.name}-TestReport.zip"
-    destinationDirectory rootProject.projectDir
+    archiveName "${project.name}-TestReport.zip"
+    destinationDir rootProject.projectDir
 
     test.finalizedBy generateTestReport
 }
@@ -1284,8 +1284,8 @@ task spotbugs(dependsOn: tasks.withType(SpotBugsTask)) {
 
 task generateSpotbugsReport(type: Zip) {
     from file("${buildDir}/reports/spotbugs")
-    archiveFileName "${project.name}-SpotbugsReport.zip"
-    destinationDirectory rootProject.projectDir
+    archiveName "${project.name}-SpotbugsReport.zip"
+    destinationDir rootProject.projectDir
 }
 
 tasks.withType(SpotBugsTask) {
