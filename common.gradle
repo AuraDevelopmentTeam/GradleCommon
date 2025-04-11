@@ -492,7 +492,8 @@ buildscript {
                 ) ||
                 (project.hasProperty("devUpdateWebHook") || (System.env.devUpdateWebHook != null)) ||
                 (project.hasProperty("releaseWebHook") || (System.env.releaseWebHook != null))) {
-            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.2.1"
+            classpath "gradle.plugin.com.github.dosmike:PluginPublisher:1.2.3"
+            classpath "net.dv8tion:JDA:5.3.2"
         }
     }
 }
